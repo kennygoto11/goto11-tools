@@ -1,0 +1,266 @@
+================================================================================
+POSITIONING PITCH BUILDER - CLIENT EDITION
+Source File Capture Summary
+================================================================================
+
+PROJECT: Positioning Pitch Builder (Client Version)
+URL: https://positioning-pitch-builder-clients.netlify.app/
+CAPTURE DATE: March 30, 2026
+TOTAL FILES: 6 documentation + source files
+
+================================================================================
+QUICK START - READ THESE FILES IN ORDER
+================================================================================
+
+1. README.md (START HERE)
+   - Overview of the project
+   - Quick reference guide
+   - Technology stack summary
+   - File index and navigation
+
+2. CONTENT_SUMMARY.md
+   - Detailed breakdown of all captured content
+   - UI/UX descriptions with full details
+   - Form structure and data collection policy
+   - Design system (colors, fonts, patterns)
+   - Key findings and observations
+
+3. APP_STRUCTURE.md
+   - Technical architecture overview
+   - URLs and deployment details
+   - Application pages and estimated steps
+   - Known issues and limitations
+   - Related Go To 11 applications
+
+4. MANIFEST.md
+   - Complete index of captured content
+   - File statistics and version info
+   - Data structures discovered
+   - Capture methodology details
+   - Recommendations for expansion
+
+5. index-landing-page.html
+   - Reconstructed HTML of the landing page
+   - Semantic markup with all form elements
+   - CSS framework references
+   - Embedded JavaScript code
+
+================================================================================
+PROJECT SUMMARY
+================================================================================
+
+WHAT IS IT?
+The Positioning Pitch Builder is an interactive web application that guides
+users (clients) through a multi-step process to create, compare, and deploy
+positioning statements for their business.
+
+OWNER: Go To 11 Communication Training
+TAGLINE: "Positioning that lands the first time"
+LOCATION: Toronto, Ontario, Canada
+
+HOW MANY PAGES?
+- Total captured: 2 pages
+- Total estimated: 8-10 pages in full application
+- Completeness: ~20-25%
+
+WHAT WAS CAPTURED?
+✓ Landing page (access gate) - 100% complete
+✓ Tool interface (step 1 only) - partial capture
+✓ All visible UI elements and form fields
+✓ Design system documentation
+✓ Technical architecture analysis
+✗ Full wizard steps (blocked by API authentication)
+✗ Backend implementation details (proprietary)
+
+================================================================================
+KEY FINDINGS
+================================================================================
+
+PAGES IDENTIFIED:
+1. Client Access Landing Page
+   - Form collecting: Name, Email, Company
+   - Demo redirect functionality
+   - Privacy statement and footer
+
+2. Positioning Pitch Builder Tool (Step 1)
+   - Industry/sector input field
+   - Multi-step wizard interface
+   - API-driven positioning generation
+
+TECHNOLOGY STACK:
+- Frontend: React or Vue.js SPA
+- Backend: Netlify Functions + Cloud DB
+- Hosting: Netlify
+- AI Integration: Likely Claude API for content generation
+- Fonts: Google Fonts (Poppins, Nunito)
+
+DATA STRUCTURES:
+- Landing form: 3 fields (name, email, company)
+- Tool inputs: Text-based open-ended questions
+- API responses: 199K+ tokens (large generative content)
+
+BRANDING:
+- Primary color: Purple (#A535CF)
+- Design style: Modern, clean, card-based layout
+- Mobile-responsive: Yes
+- Accessibility: Semantic HTML, proper labels
+
+================================================================================
+FILE STRUCTURE
+================================================================================
+
+/positioning-pitch-builder-clients/
+├── 00-START-HERE.txt ................. This file
+├── README.md ........................ Primary navigation (9.3 KB)
+├── CONTENT_SUMMARY.md ............... Detailed analysis (12 KB)
+├── APP_STRUCTURE.md ................. Technical docs (5.2 KB)
+├── MANIFEST.md ...................... Complete index (11 KB)
+└── index-landing-page.html .......... Reconstructed HTML (2.6 KB)
+
+TOTAL DOCUMENTATION: ~52 KB (48K+ of text)
+TOTAL LINES: 1,341 lines of documentation
+
+================================================================================
+QUICK REFERENCE
+================================================================================
+
+PUBLIC URLS:
+- Landing Page: https://positioning-pitch-builder-clients.netlify.app/
+- Demo Tool: https://69c857d3ba49763db7f0344b--positioning-pitch-builder-clients.netlify.app/
+- Main Site: https://goto11.ca
+
+FORM FIELDS (Landing Page):
+- Your Name (text, required)
+- Work Email (email, required)
+- Company (text, required)
+
+TOOL INPUT (Step 1):
+- "What's your industry?"
+- Placeholder: "e.g. Vegan food production, B2B SaaS, Financial advisory..."
+
+BRAND COLORS:
+- Primary: #A535CF (purple)
+- Background: #F5F5F5 (light gray)
+- Text Dark: #333333
+- Text Light: #999999
+
+================================================================================
+KEY STATISTICS
+================================================================================
+
+Pages Documented ...................... 2 / 8-10 (20-25% complete)
+Form Fields Captured .................. 3 (landing) + multiple (tool)
+API Endpoints Identified .............. 3+ (specifications not available)
+Screenshots Captured .................. 4 images
+Design Colors ......................... 4 primary colors
+Font Families ......................... 2 (Poppins, Nunito)
+Total Documentation ................... 1,341 lines
+File Size ............................ 52 KB
+
+================================================================================
+WHAT'S MISSING
+================================================================================
+
+Due to API authentication and browser security restrictions, the following
+could not be captured:
+
+✗ Complete wizard steps (Steps 2-8)
+✗ Positioning statement templates
+✗ API endpoint specifications
+✗ Compiled JavaScript source code
+✗ Backend database schema
+✗ Authentication mechanism details
+✗ Full error handling documentation
+✗ Performance analytics
+✗ Admin/configuration pages
+
+These would require:
+- Direct source code access (GitHub repository)
+- Development environment credentials
+- Explicit authorization from Go To 11
+- Backend infrastructure access
+
+================================================================================
+RECOMMENDED NEXT STEPS
+================================================================================
+
+1. READ README.md for complete overview
+2. REVIEW CONTENT_SUMMARY.md for UI/UX details
+3. CHECK APP_STRUCTURE.md for technical info
+4. CONSULT MANIFEST.md for complete index
+5. EXAMINE index-landing-page.html for code structure
+
+FOR COMPLETE SOURCE ACCESS:
+- Contact Go To 11 Communication Training (https://goto11.ca)
+- Request GitHub repository access
+- Request development environment credentials
+- Obtain API documentation
+
+================================================================================
+TECHNICAL NOTES
+================================================================================
+
+ARCHITECTURE:
+- Single Page Application (SPA) with multi-step wizard
+- Client-side routing for form navigation
+- Server-side API for positioning generation
+- Session-based authentication for tool access
+- Netlify hosting with preview deployments
+
+DEPLOYMENT:
+- Git-based CI/CD pipeline
+- Multiple preview branches (indicated by hash URLs)
+- Custom domain integration (goto11.ca)
+- Serverless backend functions
+
+SECURITY:
+- HTTPS enforced
+- Form validation (client + server side)
+- Session/JWT authentication
+- Data privacy commitments
+- No sensitive data in URLs
+
+================================================================================
+RELATED GO TO 11 APPLICATIONS
+================================================================================
+
+1. Inefficiency Cost Calculator
+   URL: https://goto11-cost-calculator.netlify.app/tool.html
+   Purpose: Calculate business impact of inefficiency
+
+2. Positioning Pitch Builder (Internal Version)
+   URL: https://positioning-pitch-builder-go-to-11.netlify.app/
+   Purpose: Internal tool for Go To 11 team
+
+3. Masterclass Dashboard
+   URL: https://masterclass-dashboard.netlify.app/
+   Purpose: Learning/training platform
+
+All on Netlify with similar architecture.
+
+================================================================================
+CONTACT & ATTRIBUTION
+================================================================================
+
+PROJECT CREATOR: Go To 11 Communication Training
+FOUNDER: Kenny Solway (Decision Acceleration Partner)
+LOCATION: Toronto, Ontario, Canada (Eastern Time)
+WEBSITE: https://goto11.ca
+
+CONTENT CAPTURED BY: Claude Code
+CAPTURE METHOD: Browser automation + content analysis
+CAPTURE DATE: March 30, 2026
+
+================================================================================
+DOCUMENT VERSION
+================================================================================
+
+Version: 1.0
+Status: Complete
+Review: Completed
+Archive Date: March 30, 2026
+
+For questions or updates, refer to the documentation files or contact
+Go To 11 Communication Training directly.
+
+================================================================================

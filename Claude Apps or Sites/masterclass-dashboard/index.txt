@@ -1,0 +1,36 @@
+PAGE: Masterclass Dashboard (index page)
+URL: https://masterclass-dashboard.netlify.app/
+TITLE: Masterclass Dashboard | Go To 11
+
+=== FULL PAGE TEXT CONTENT ===
+
+GOTO 11 Masterclass Dashboard Access the communication masterclass dashboard and resources. Enter your details below. Your Name Work Email Company Access the Dashboard → Your information is kept confidential. We'll only use it to follow up with you about this tool. Go To 11 Communication Training — goto11.ca
+
+=== EMBEDDED JAVASCRIPT ===
+
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('demo') === 'goto11') {
+    window.location.href = 'https://69b9b8bf01f4df93ef3947ef--masterclass-dashboard.netlify.app';
+  }
+})();
+
+=== PAGE STRUCTURE ===
+
+The page contains a single form with three input fields:
+1. Hidden field "masterclass-access"
+2. Hidden field "Masterclass Dashboard"
+3. Text input: "Your Name" (placeholder: "First and last name")
+4. Email input: "Work Email" (placeholder: "you@company.com")
+5. Text input: "Company" (placeholder: "Your organisation")
+6. Submit button: "Access the Dashboard →"
+
+The form appears to be a gated access page that requires user information before accessing the full masterclass dashboard.
+
+=== FOOTER LINK ===
+Link to: https://goto11.ca (Go To 11 Communication Training)
+
+=== DETECTED FEATURES ===
+- URL parameter detection script that checks for "demo=goto11" parameter
+- If demo parameter exists, redirects to: https://69b9b8bf01f4df93ef3947ef--masterclass-dashboard.netlify.app
+- Form submission likely sends user data (name, email, company) to backend service

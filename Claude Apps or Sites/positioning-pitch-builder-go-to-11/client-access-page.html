@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Positioning Tool | Go To 11</title>
+    <meta name="description" content="Access the interactive positioning and pitch builder designed for your engagement">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="/logo.svg" alt="GOTO 11" class="logo">
+        </header>
+
+        <main>
+            <h1>Client Positioning Tool</h1>
+            <p class="subtitle">Access the interactive positioning and pitch builder designed for your engagement. Enter your details below.</p>
+
+            <form class="access-form">
+                <input type="hidden" name="form-id" value="pitch-clients-access">
+                <input type="hidden" name="form-name" value="Positioning Pitch Builder (Clients)">
+
+                <div class="form-group">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" name="name" placeholder="First and last name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Work Email</label>
+                    <input type="email" id="email" name="email" placeholder="you@company.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="company">Company</label>
+                    <input type="text" id="company" name="company" placeholder="Your organisation" required>
+                </div>
+
+                <button type="submit" class="btn-submit">Access the Tool →</button>
+            </form>
+
+            <p class="privacy-notice">
+                Your information is kept confidential. We'll only use it to follow up with you about this tool.
+            </p>
+
+            <footer>
+                <p>Go To 11 Communication Training — <a href="https://goto11.ca">goto11.ca</a></p>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // Demo access redirect
+        (function() {
+            var params = new URLSearchParams(window.location.search);
+            if (params.get('demo') === 'goto11') {
+                window.location.href = 'https://69c857d3ba49763db7f0344b--positioning-pitch-builder-clients.netlify.app';
+            }
+        })();
+    </script>
+</body>
+</html>
