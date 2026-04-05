@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Decision Delay Calculator | Go To 11</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+:root{--purple-dark:#9439bf;--purple-light:#bfb1c4;--sand:#f4d4b7;--grey-dark:#66615c;--off-white:#ebeaeb;--white:#ffffff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Nunito',sans-serif;background:var(--off-white);color:var(--grey-dark);line-height:1.6}
+#gate-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 24px}
+.gate-card{background:var(--white);border-radius:20px;padding:48px 44px;max-width:480px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,0.08);text-align:center}
+.gate-logo{width:52px;height:52px;background:var(--purple-dark);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700;font-family:'Poppins',sans-serif;margin:0 auto 20px auto;line-height:1.3}
+.gate-label{font-family:'Poppins',sans-serif;font-size:11px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--purple-dark);margin-bottom:12px}
+.gate-title{font-family:'Poppins',sans-serif;font-size:1.6rem;font-weight:700;color:#2d2a2e;margin-bottom:8px;line-height:1.25}
+.gate-subtitle{font-size:0.92rem;color:#999;margin-bottom:28px;line-height:1.55}
+.conf-notice{display:flex;align-items:flex-start;gap:10px;background:#f7f4f9;border:1px solid #e8dff0;border-radius:10px;padding:14px 16px;margin-bottom:24px;text-align:left}
+.conf-notice p{font-size:0.82rem;color:#888;line-height:1.5}
+.conf-notice strong{color:#2d2a2e;font-weight:700}
+.gate-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.gate-field{margin-bottom:12px}
+.gate-field label{display:block;font-size:0.8rem;font-weight:700;color:#2d2a2e;margin-bottom:6px;text-align:left}
+.gate-field input{width:100%;padding:12px 16px;border:2px solid var(--off-white);border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.95rem;color:#2d2a2e;background:var(--off-white);outline:none;transition:border-color 0.2s}
+.gate-field input:focus{border-color:var(--purple-dark);background:var(--white)}
+.gate-field input::placeholder{color:#ccc}
+.gate-btn{width:100%;padding:16px;background:var(--purple-dark);color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;transition:background 0.2s;margin-top:4px}
+.gate-btn:hover{background:#7b2fa3}
+.gate-error{font-size:0.82rem;color:#c0392b;margin-top:8px;display:none}
+#calculator-screen{display:none}
+.demo-banner{background:var(--purple-dark);color:white;text-align:center;padding:10px 24px;font-size:0.82rem;font-weight:700;letter-spacing:1px}
+.container{max-width:1200px;margin:0 auto;padding:40px 24px}
+.header{display:flex;align-items:center;gap:12px;margin-bottom:32px}
+.header-logo{width:40px;height:40px;background:var(--purple-dark);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:700;font-family:'Poppins',sans-serif;line-height:1.3}
+.header-label{font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--grey-dark)}
+h1{font-family:'Poppins',sans-serif;font-size:2.2rem;font-weight:700;color:#2d2a2e;margin-bottom:8px;line-height:1.2}
+.subtitle{font-size:1.05rem;color:#888;margin-bottom:40px;max-width:700px}
+.layout{display:grid;grid-template-columns:1fr 400px;gap:40px;align-items:start}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.results-panel{position:static!important}}
+.input-section{background:var(--white);border-radius:16px;padding:32px;margin-bottom:24px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.section-title{font-family:'Poppins',sans-serif;font-size:1.3rem;font-weight:700;color:#2d2a2e;margin-bottom:8px}
+.section-desc{font-size:0.92rem;color:#999;margin-bottom:24px;line-height:1.5}
+.slider-group{margin-bottom:24px}
+.slider-label-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
+.slider-label{font-weight:700;font-size:0.95rem;color:#2d2a2e}
+.slider-value{font-weight:700;font-size:1rem;color:var(--purple-dark)}
+.slider-hint{font-size:0.8rem;color:#bbb;margin-bottom:8px}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;outline:none;cursor:pointer;background:linear-gradient(to right,var(--purple-dark) 0%,var(--purple-light) 100%)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--white);border:3px solid var(--purple-dark);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.15)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--white);border:3px solid var(--purple-dark);cursor:pointer}
+.dollar-wrap{display:flex;align-items:center;gap:8px;background:var(--off-white);border-radius:10px;padding:10px 16px;border:2px solid transparent;transition:border-color 0.2s}
+.dollar-wrap:focus-within{border-color:var(--purple-dark)}
+.dollar-sign{font-weight:700;color:var(--purple-dark);font-size:1.1rem}
+.dollar-input{border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:1.1rem;font-weight:600;color:#2d2a2e;outline:none;width:100%}
+.helper-box{background:var(--off-white);border-left:3px solid var(--purple-light);border-radius:0 10px 10px 0;padding:16px 20px;margin-bottom:24px;font-size:0.88rem}
+.helper-box strong{display:block;margin-bottom:8px;color:#2d2a2e}
+.helper-box p{margin-bottom:4px;color:#888}
+.helper-example{color:var(--purple-dark);font-weight:600}
+.helper-fallback{font-style:italic;color:#aaa;margin-top:8px}
+.conf-toggle{display:flex;background:var(--off-white);border-radius:10px;padding:4px;margin-bottom:24px}
+.conf-btn{flex:1;padding:10px 16px;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;background:transparent;color:#999;transition:all 0.2s}
+.conf-btn.active{background:var(--white);color:var(--purple-dark);box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.conf-label{font-weight:700;font-size:0.95rem;color:#2d2a2e;margin-bottom:4px}
+.conf-hint{font-size:0.8rem;color:#bbb;margin-bottom:10px}
+.results-panel{position:sticky;top:40px}
+.results-locked{background:var(--white);border-radius:16px;padding:40px 32px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:16px}
+.lock-big{font-size:40px;margin-bottom:16px}
+.results-locked h3{font-family:'Poppins',sans-serif;font-size:1.1rem;font-weight:700;color:#2d2a2e;margin-bottom:8px}
+.results-locked p{font-size:0.88rem;color:#999;line-height:1.55}
+.reveal-btn{width:100%;padding:18px 24px;background:linear-gradient(135deg,var(--purple-dark) 0%,#7b2fa3 100%);color:white;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-weight:700;font-size:1.05rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity 0.2s;margin-bottom:16px}
+.reveal-btn:hover{opacity:0.9}
+.reveal-btn:disabled{opacity:0.6;cursor:not-allowed}
+.results-sent{background:#f0f9f0;border:1px solid #a8d8a8;border-radius:12px;padding:20px 24px;text-align:center;display:none;margin-bottom:16px}
+.results-sent .check{font-size:28px;margin-bottom:8px}
+.results-sent p{font-size:0.88rem;color:#2d6a2d;line-height:1.5}
+.results-sent strong{font-weight:700}
+.annual-card{background:linear-gradient(135deg,var(--purple-dark) 0%,#7b2fa3 100%);border-radius:16px;padding:28px 32px;color:white;text-align:center;margin-bottom:16px}
+.annual-label{font-size:0.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:0.85;margin-bottom:4px}
+.annual-amount{font-family:'Poppins',sans-serif;font-size:2.8rem;font-weight:700;line-height:1.1;margin-bottom:6px}
+.annual-basis{font-size:0.8rem;opacity:0.7}
+.conf-badge{display:inline-block;background:rgba(255,255,255,0.2);border-radius:20px;padding:4px 12px;font-size:0.72rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:8px}
+.period-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.period-card{background:var(--white);border-radius:12px;padding:20px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.period-label{font-size:0.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#bbb;margin-bottom:4px}
+.period-amount{font-family:'Poppins',sans-serif;font-size:1.5rem;font-weight:700;color:#2d2a2e}
+.breakdown-card{background:var(--white);border-radius:12px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:16px}
+.breakdown-title{font-size:0.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#bbb;margin-bottom:16px}
+.breakdown-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0}
+.breakdown-row+.breakdown-row{border-top:1px solid var(--off-white)}
+.breakdown-item-label{font-weight:600;font-size:0.9rem;color:#2d2a2e}
+.breakdown-item-formula{font-size:0.75rem;color:#bbb;font-style:italic}
+.breakdown-item-value{font-weight:700;font-size:0.95rem;color:#2d2a2e}
+.breakdown-total{border-top:2px solid var(--grey-dark)!important;margin-top:8px;padding-top:12px!important}
+.breakdown-total .breakdown-item-value{color:var(--purple-dark);font-size:1.1rem}
+.method-toggle{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--purple-dark);font-family:'Nunito',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;padding:8px 0}
+.method-content{display:none;padding:16px 0 0 0;font-size:0.85rem;color:#888;line-height:1.6}
+.method-content.open{display:block}
+.method-content p{margin-bottom:10px}
+.method-content .source{font-size:0.78rem;color:#aaa;font-style:italic}
+.context-card{background:linear-gradient(135deg,var(--sand) 0%,#f0c89e 100%);border-radius:12px;padding:24px;margin-bottom:16px;text-align:center}
+.context-card p{font-size:0.92rem;color:var(--grey-dark);font-weight:600;line-height:1.5}
+.context-highlight{font-family:'Poppins',sans-serif;font-size:1.3rem;font-weight:700;color:#2d2a2e;display:block;margin-top:8px}
+.footer{text-align:center;margin-top:48px;padding-top:24px;border-top:1px solid #ddd;font-size:0.82rem;color:#bbb}
+.footer a{color:var(--purple-dark);text-decoration:none}
+</style>
+</head>
+<body>
+
+<div id="gate-screen">
+<div class="gate-card">
+<div class="gate-logo">GO<br>TO 11</div>
+<p class="gate-label">The Decision Delay Calculator</p>
+<h2 class="gate-title">See what it is costing you every time the answer is not yes</h2>
+<p class="gate-subtitle">Enter your details to access the calculator. Your results will be sent directly to your inbox.</p>
+<div class="conf-notice">
+<p><strong>Your information is confidential.</strong> The inputs you enter are not stored or shared. This calculator is for your use only.</p>
+</div>
+<div class="gate-field-row">
+<div class="gate-field">
+<label for="gf">First name</label>
+<input type="text" id="gf" placeholder="Sarah" autocomplete="given-name">
+</div>
+<div class="gate-field">
+<label for="gl">Last name</label>
+<input type="text" id="gl" placeholder="Chen" autocomplete="family-name">
+</div>
+</div>
+<div class="gate-field">
+<label for="ge">Work email</label>
+<input type="email" id="ge" placeholder="you@company.com" autocomplete="email">
+</div>
+<div style="display:none"><input type="text" id="gh" tabindex="-1" autocomplete="off"></div>
+<button class="gate-btn" onclick="go()">Access the Calculator</button>
+<p class="gate-error" id="gerr">Please fill in all fields with a valid email address.</p>
+</div>
+</div>
+
+<div id="calculator-screen">
+<div class="demo-banner" id="dbanner" style="display:none">DEMO MODE - Results update live. This view is for your eyes only.</div>
+<div class="container">
+<div class="header">
+<div class="header-logo">GO<br>TO 11</div>
+<span class="header-label">The Decision Delay Calculator</span>
+</div>
+<h1>What is it costing you every time the answer is not yes the first time?</h1>
+<p class="subtitle" id="csub">Adjust the inputs to match your organisation. When you are ready, click the button to see and receive your results.</p>
+<div class="layout">
+<div>
+
+<div class="input-section">
+<div class="conf-label">Estimation mode</div>
+<div class="conf-hint">Conservative uses a 50 percent waste factor. Moderate uses full cost.</div>
+<div class="conf-toggle">
+<button class="conf-btn" data-mode="conservative" onclick="setMode('conservative')">Conservative</button>
+<button class="conf-btn active" data-mode="moderate" onclick="setMode('moderate')">Moderate</button>
+</div>
+</div>
+
+<div class="input-section">
+<div class="section-title">The Wasted Meeting</div>
+<p class="section-desc">The initial meeting where the communication failed. Think a budget review where the data was not prepped, or a strategy pitch that needed to be completely reframed.</p>
+<div class="slider-group">
+<div class="slider-label-row"><span class="slider-label">Average attendee salary</span><span class="slider-value" id="sv1">$185,000</span></div>
+<div class="slider-hint">Fully loaded annual compensation</div>
+<input type="range" id="salary" min="80000" max="400000" step="5000" value="185000" oninput="calc()">
+</div>
+<div class="slider-group">
+<div class="slider-label-row"><span class="slider-label">Number of attendees</span><span class="slider-value" id="sv2">5</span></div>
+<div class="slider-hint">Everyone in the room including you</div>
+<input type="range" id="attendees" min="2" max="20" step="1" value="5" oninput="calc()">
+</div>
+<div class="slider-group">
+<div class="slider-label-row"><span class="slider-label">Meeting duration</span><span class="slider-value" id="sv3">60 min</span></div>
+<input type="range" id="duration" min="15" max="180" step="15" value="60" oninput="calc()">
+</div>
+</div>
+
+<div class="input-section">
+<div class="section-title">The Rework</div>
+<p class="section-desc">Follow-up meetings, committee reviews, and the time spent restructuring the original recommendation so it can actually be evaluated.</p>
+<div class="slider-group">
+<div class="slider-label-row"><span class="slider-label">People involved in rework</span><span class="slider-value" id="sv4">3</span></div>
+<div class="slider-hint">Those who need to regroup, rewrite, or re-present</div>
+<input type="range" id="rp" min="1" max="10" step="1" value="3" oninput="calc()">
+</div>
+<div class="slider-group">
+<div class="slider-label-row"><span class="slider-label">Total rework time</span><span class="slider-value" id="sv5">120 min</span></div>
+<div class="slider-hint">Combined time across all follow-ups</div>
+<input type="range" id="rt" min="30" max="480" step="15" value="120" oninput="calc()">
+</div>
+</div>
+
+<div class="input-section">
+<div class="section-title">The Delay</div>
+<p class="section-desc">The opportunity cost of a delayed decision. Every day the initiative waits is a day its value is not being realised.</p>
+<div class="helper-box">
+<strong>What should I enter for Value of the initiative?</strong>
+<p><span class="helper-example">Sales deal</span> - Average deal size or annual contract value</p>
+<p><span class="helper-example">Product launch</span> - Expected first-year revenue or margin</p>
+<p><span class="helper-example">Cost-saving project</span> - Projected annual savings</p>
+<p><span class="helper-example">Internal initiative</span> - Budget allocated or estimated annual productivity gain</p>
+<p class="helper-fallback">If unsure, use the project budget. A delayed $500K initiative costs roughly $1,370 per day.</p>
+</div>
+<div class="slider-group">
+<div class="slider-label-row"><span class="slider-label">Value of the initiative</span></div>
+<div class="slider-hint">The annual dollar value at stake</div>
+<div class="dollar-wrap"><span class="dollar-sign">$</span><input type="text" class="dollar-input" id="iv" value="500,000" oninput="calc()"></div>
+</div>
+<div class="slider-group">
+<div class="slider-label-row"><span class="slider-label">Decision delay</span><span class="slider-value" id="sv6">5 days</span></div>
+<div class="slider-hint">Business days lost waiting for a re-do</div>
+<input type="range" id="delay" min="1" max="30" step="1" value="5" oninput="calc()">
+</div>
+</div>
+
+<div class="input-section">
+<div class="section-title">The Frequency</div>
+<p class="section-desc">This does not happen once. How often do your direct reports come to you with unclear asks, weak recommendations, or presentations that miss the mark?</p>
+<div class="slider-group">
+<div class="slider-label-row"><span class="slider-label">Failed communications per week</span><span class="slider-value" id="sv7">3x / week</span></div>
+<div class="slider-hint">Across all your direct reports combined</div>
+<input type="range" id="freq" min="1" max="15" step="1" value="3" oninput="calc()">
+</div>
+<div class="slider-group">
+<div class="slider-label-row"><span class="slider-label">Direct reports</span><span class="slider-value" id="sv8">6</span></div>
+<div class="slider-hint">VPs, directors, and senior leaders reporting to you</div>
+<input type="range" id="reports" min="1" max="20" step="1" value="6" oninput="calc()">
+</div>
+</div>
+
+</div>
+
+<div class="results-panel">
+<div id="lead-locked">
+<div class="results-locked">
+<div class="lock-big">&#128202;</div>
+<h3>Your results are ready when you are</h3>
+<p>Adjust the inputs on the left to match your organisation, then click below.</p>
+</div>
+<button class="reveal-btn" id="rbtn" onclick="sendResults()">Show me what it is costing us</button>
+<div class="results-sent" id="rsent">
+<div class="check">&#9989;</div>
+<p>Your results have been sent to <strong id="cemail"></strong>. Check your inbox.</p>
+</div>
+</div>
+
+<div id="results-revealed" style="display:none">
+<div class="annual-card">
+<div class="annual-label">Estimated Annual Cost</div>
+<div class="annual-amount" id="r1">$0</div>
+<div class="annual-basis" id="r2"></div>
+<div class="conf-badge" id="r3">Moderate estimate</div>
+</div>
+<div class="period-row">
+<div class="period-card"><div class="period-label">Quarterly</div><div class="period-amount" id="r4">$0</div></div>
+<div class="period-card"><div class="period-label">Monthly</div><div class="period-amount" id="r5">$0</div></div>
+</div>
+<div class="breakdown-card">
+<div class="breakdown-title">Per Incident Breakdown</div>
+<div class="breakdown-row"><div><div class="breakdown-item-label">Wasted Meeting Time</div><div class="breakdown-item-formula">salary / 2080h / 60m x heads x mins</div></div><div class="breakdown-item-value" id="r6">$0</div></div>
+<div class="breakdown-row"><div><div class="breakdown-item-label">Rework and Follow-up</div><div class="breakdown-item-formula">Same rate x rework heads x rework mins</div></div><div class="breakdown-item-value" id="r7">$0</div></div>
+<div class="breakdown-row"><div><div class="breakdown-item-label">Delay and Opportunity Cost</div><div class="breakdown-item-formula">Initiative value / 365 x delay days</div></div><div class="breakdown-item-value" id="r8">$0</div></div>
+<div class="breakdown-row breakdown-total"><div class="breakdown-item-label">Single Event Total</div><div class="breakdown-item-value" id="r9">$0</div></div>
+<button class="method-toggle" onclick="document.getElementById('mc').classList.toggle('open')">Show methodology and assumptions</button>
+<div class="method-content" id="mc">
+<p><strong>Wasted Meeting Time:</strong> Fully loaded annual compensation divided by 2080 working hours then by 60 minutes multiplied by attendees and duration. Same methodology as Bain and Company, McKinsey, and Harvard Business Review.</p>
+<p><strong>Rework and Follow-up:</strong> Same hourly rate applied to rework headcount and combined rework time.</p>
+<p><strong>Delay and Opportunity Cost:</strong> Initiative value divided by 365 days multiplied by delay days.</p>
+<p><strong>Annual Projection:</strong> Per-incident cost times weekly frequency times direct reports times 52 weeks. Conservative mode applies a 50 percent waste factor.</p>
+<p class="source">Sources: Bain and Company Your Scarcest Resource HBR 2014. Atlassian Time Wasted in Meetings. Microsoft Work Trend Index 2023.</p>
+</div>
+</div>
+<div class="context-card">
+<p>At this rate the cost of ideas that do not get approved the first time is equivalent to<span class="context-highlight" id="r10">---</span></p>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="footer">
+<p>The Decision Delay Calculator - Go To 11 Communication Training - <a href="https://goto11.ca" target="_blank">goto11.ca</a> - <a href="mailto:kennysolway@goto11.ca">kennysolway@goto11.ca</a></p>
+</div>
+</div>
+
+<script>
+var mode='moderate',fn='',ln='',em='',sent=false,demo=false,lc={};
+(function(){
+var p=new URLSearchParams(window.location.search);
+if(p.get('demo')==='goto11'){
+demo=true;
+document.getElementById('gate-screen').style.display='none';
+document.getElementById('calculator-screen').style.display='block';
+document.getElementById('dbanner').style.display='block';
+document.getElementById('lead-locked').style.display='none';
+document.getElementById('results-revealed').style.display='block';
+document.getElementById('csub').textContent='Adjust the inputs to see how the numbers change in real time.';
+calc();
+}
+})();
+
+function go(){
+var f=document.getElementById('gf').value.trim();
+var l=document.getElementById('gl').value.trim();
+var e=document.getElementById('ge').value.trim();
+var h=document.getElementById('gh').value;
+if(h){return;}
+var ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+if(!f||!l||!ok){document.getElementById('gerr').style.display='block';return;}
+document.getElementById('gerr').style.display='none';
+fn=f;ln=l;em=e;
+document.getElementById('gate-screen').style.display='none';
+document.getElementById('calculator-screen').style.display='block';
+calc();
+}
+
+document.addEventListener('keydown',function(e){if(e.key==='Enter'&&document.getElementById('gate-screen').style.display!=='none'){go();}});
+
+function setMode(m){
+mode=m;
+document.querySelectorAll('.conf-btn').forEach(function(b){b.classList.toggle('active',b.dataset.mode===m);});
+calc();
+}
+
+function pn(s){return parseFloat(String(s).replace(/[^0-9.]/g,''))||0;}
+function fmt(n){return '$'+Math.round(n).toLocaleString('en-US');}
+
+function calc(){
+var sal=parseFloat(document.getElementById('salary').value);
+var att=parseInt(document.getElementById('attendees').value);
+var dur=parseInt(document.getElementById('duration').value);
+var rwp=parseInt(document.getElementById('rp').value);
+var rwt=parseInt(document.getElementById('rt').value);
+var ini=pn(document.getElementById('iv').value);
+var del=parseInt(document.getElementById('delay').value);
+var frq=parseInt(document.getElementById('freq').value);
+var rep=parseInt(document.getElementById('reports').value);
+var wf=mode==='conservative'?0.5:1.0;
+var rpm=sal/2080/60;
+var mc=rpm*att*dur*wf;
+var rc=rpm*rwp*rwt*wf;
+var dc=(ini/365)*del;
+var st=mc+rc+dc;
+var we=frq*rep;
+var ae=we*52;
+var at=st*ae;
+var fte=Math.round(at/sal);
+var ftel=fte+' full-time employee'+(fte!==1?'s':'');
+document.getElementById('sv1').textContent=fmt(sal);
+document.getElementById('sv2').textContent=att;
+document.getElementById('sv3').textContent=dur+' min';
+document.getElementById('sv4').textContent=rwp;
+document.getElementById('sv5').textContent=rwt+' min';
+document.getElementById('sv6').textContent=del+' days';
+document.getElementById('sv7').textContent=frq+'x / week';
+document.getElementById('sv8').textContent=rep;
+lc={annualTotal:fmt(at),quarterlyTotal:fmt(at/4),monthlyTotal:fmt(at/12),meetingCost:fmt(mc),reworkCost:fmt(rc),delayCost:fmt(dc),singleTotal:fmt(st),annualBasis:'Based on '+ae.toLocaleString('en-US')+' events per year ('+we+' per week x 52 weeks)',mode:mode,fteEquivalent:ftel};
+if(demo){upd();}
+}
+
+function upd(){
+document.getElementById('r1').textContent=lc.annualTotal;
+document.getElementById('r2').textContent=lc.annualBasis;
+document.getElementById('r4').textContent=lc.quarterlyTotal;
+document.getElementById('r5').textContent=lc.monthlyTotal;
+document.getElementById('r6').textContent=lc.meetingCost;
+document.getElementById('r7').textContent=lc.reworkCost;
+document.getElementById('r8').textContent=lc.delayCost;
+document.getElementById('r9').textContent=lc.singleTotal;
+document.getElementById('r10').textContent=lc.fteEquivalent;
+document.getElementById('r3').textContent=mode==='conservative'?'Conservative estimate':'Moderate estimate';
+}
+
+function sendResults(){
+var btn=document.getElementById('rbtn');
+btn.disabled=true;
+btn.textContent='Sending your results...';
+fetch('/send-results',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({firstName:fn,lastName:ln,email:em,annualTotal:lc.annualTotal,quarterlyTotal:lc.quarterlyTotal,monthlyTotal:lc.monthlyTotal,meetingCost:lc.meetingCost,reworkCost:lc.reworkCost,delayCost:lc.delayCost,singleTotal:lc.singleTotal,annualBasis:lc.annualBasis,mode:lc.mode,fteEquivalent:lc.fteEquivalent})
+}).then(function(res){
+if(res.ok){
+document.getElementById('cemail').textContent=em;
+document.getElementById('rsent').style.display='block';
+btn.style.display='none';
+}else{btn.disabled=false;btn.textContent='Show me what it is costing us';alert('Something went wrong. Please try again.');}
+}).catch(function(){btn.disabled=false;btn.textContent='Show me what it is costing us';alert('Connection error. Please try again.');});
+}
+
+document.getElementById('iv').addEventListener('blur',function(){var v=pn(this.value);if(v>0){this.value=Math.round(v).toLocaleString('en-US');}});
+calc();
+</script>
+</body>
+</html>
