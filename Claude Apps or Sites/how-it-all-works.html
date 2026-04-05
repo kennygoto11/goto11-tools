@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How It All Works — Go To 11 Tool System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&display=swap');
+
+  :root {
+    --purple: #9439bf;
+    --purple-light: #bfb1c4;
+    --sand: #f4d4b7;
+    --grey: #66615c;
+    --off-white: #ebeaeb;
+    --white: #fff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--off-white);
+    color: var(--grey);
+    padding: 40px 24px;
+    line-height: 1.6;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem;
+    color: #2d2a2e;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #999;
+    margin-bottom: 48px;
+    font-size: 1rem;
+  }
+
+  /* ── Section Headers ── */
+  .section-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--purple);
+    margin: 56px 0 24px 0;
+    padding-bottom: 8px;
+    border-bottom: 3px solid var(--sand);
+  }
+
+  /* ── The Big Picture Flow ── */
+  .flow-diagram {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0;
+    margin: 32px 0;
+    flex-wrap: wrap;
+  }
+
+  .flow-step {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-align: center;
+    flex: 1;
+    min-width: 200px;
+    max-width: 260px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    position: relative;
+  }
+
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--purple);
+    padding: 0 8px;
+    min-width: 48px;
+  }
+
+  .flow-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px auto;
+    font-size: 28px;
+  }
+
+  .icon-claude { background: #d4a574; }
+  .icon-github { background: #24292e; color: white; }
+  .icon-netlify { background: #00ad9f; color: white; }
+  .icon-user { background: var(--purple); color: white; }
+
+  .flow-step h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    color: #2d2a2e;
+    margin-bottom: 4px;
+  }
+
+  .flow-step .role {
+    font-size: 0.8rem;
+    color: var(--purple);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  .flow-step p {
+    font-size: 0.9rem;
+    color: #888;
+    line-height: 1.5;
+  }
+
+  /* ── Analogy Cards ── */
+  .analogy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin: 24px 0;
+  }
+
+  .analogy-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px 24px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    border-left: 5px solid;
+  }
+
+  .analogy-card.claude-card { border-color: #d4a574; }
+  .analogy-card.github-card { border-color: #24292e; }
+  .analogy-card.netlify-card { border-color: #00ad9f; }
+
+  .analogy-card h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.05rem;
+    color: #2d2a2e;
+    margin-bottom: 4px;
+  }
+
+  .analogy-card .analogy {
+    font-size: 0.85rem;
+    color: var(--purple);
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .analogy-card p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .analogy-card ul {
+    font-size: 0.9rem;
+    margin: 8px 0 0 20px;
+    line-height: 1.8;
+  }
+
+  /* ── Email Gate Flow ── */
+  .gate-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin: 32px 0;
+    flex-wrap: wrap;
+  }
+
+  .gate-step {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    min-width: 160px;
+    max-width: 200px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+  }
+
+  .gate-step .step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--purple);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.85rem;
+    margin: 0 auto 8px auto;
+  }
+
+  .gate-step h4 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    color: #2d2a2e;
+    margin-bottom: 6px;
+  }
+
+  .gate-step p {
+    font-size: 0.8rem;
+    color: #999;
+    line-height: 1.4;
+  }
+
+  .gate-arrow {
+    font-size: 1.5rem;
+    color: var(--purple);
+    padding: 0 6px;
+  }
+
+  /* ── Status Table ── */
+  .status-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 0.9rem;
+  }
+
+  .status-table th {
+    background: var(--purple);
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    padding: 12px 16px;
+    text-align: left;
+  }
+
+  .status-table th:first-child { border-radius: 12px 0 0 0; }
+  .status-table th:last-child { border-radius: 0 12px 0 0; }
+
+  .status-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--off-white);
+    background: var(--white);
+  }
+
+  .status-done { color: #00ad9f; font-weight: 700; }
+  .status-pending { color: #e6a817; font-weight: 700; }
+
+  /* ── Callout Box ── */
+  .callout {
+    background: linear-gradient(135deg, #f8f0fc, #fdf5ed);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin: 24px 0;
+    border-left: 5px solid var(--purple);
+  }
+
+  .callout h4 {
+    font-family: 'Poppins', sans-serif;
+    color: var(--purple);
+    margin-bottom: 8px;
+  }
+
+  .callout p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  /* ── Unique Experience ── */
+  .unique-demo {
+    display: flex;
+    gap: 24px;
+    margin: 24px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .unique-person {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 24px;
+    width: 280px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+    text-align: center;
+  }
+
+  .unique-person .avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin: 0 auto 12px auto;
+    color: white;
+    font-weight: 700;
+  }
+
+  .avatar-a { background: #e07c4f; }
+  .avatar-b { background: #4f7ce0; }
+
+  .unique-person h4 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    color: #2d2a2e;
+    margin-bottom: 8px;
+  }
+
+  .data-preview {
+    background: var(--off-white);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 0.8rem;
+    text-align: left;
+    font-family: monospace;
+    line-height: 1.6;
+    color: #555;
+  }
+
+  .footer-note {
+    text-align: center;
+    margin-top: 56px;
+    font-size: 0.8rem;
+    color: #bbb;
+  }
+
+  @media (max-width: 700px) {
+    .flow-diagram, .gate-flow { flex-direction: column; align-items: center; }
+    .flow-arrow, .gate-arrow { transform: rotate(90deg); }
+    .flow-step, .gate-step { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>How Your Tool System Works</h1>
+  <p class="subtitle">The full picture — explained simply</p>
+
+  <!-- ════════════════════════════════════════ -->
+  <div class="section-title">The Big Picture</div>
+
+  <div class="flow-diagram">
+    <div class="flow-step">
+      <div class="flow-icon icon-claude">
+        <span style="font-size:16px; font-weight:700; color:#fff;">K+C</span>
+      </div>
+      <h3>Claude + Kenny</h3>
+      <div class="role">The Workshop</div>
+      <p>You and I make changes together. I edit the files, you approve them.</p>
+    </div>
+
+    <div class="flow-arrow">&#8594;</div>
+
+    <div class="flow-step">
+      <div class="flow-icon icon-github">
+        <span style="font-size:16px;">&#9776;</span>
+      </div>
+      <h3>GitHub</h3>
+      <div class="role">The Filing Cabinet</div>
+      <p>Stores every version of your files. Keeps a perfect history of every change.</p>
+    </div>
+
+    <div class="flow-arrow">&#8594;</div>
+
+    <div class="flow-step">
+      <div class="flow-icon icon-netlify">
+        <span style="font-size:16px; font-weight:700;">N</span>
+      </div>
+      <h3>Netlify</h3>
+      <div class="role">The Delivery Truck</div>
+      <p>Watches GitHub. The moment a file changes, it publishes the updated version to the live website.</p>
+    </div>
+
+    <div class="flow-arrow">&#8594;</div>
+
+    <div class="flow-step">
+      <div class="flow-icon icon-user">
+        <span style="font-size:16px;">&#9787;</span>
+      </div>
+      <h3>Your Client</h3>
+      <div class="role">The Visitor</div>
+      <p>Submits their email to get in, then uses the tool in their own browser. Their data stays private.</p>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <div class="section-title">What Each Piece Does (Grade 5 Version)</div>
+
+  <div class="analogy-grid">
+    <div class="analogy-card claude-card">
+      <h3>Claude (Cowork)</h3>
+      <div class="analogy">Think of it as: Your assistant in the workshop</div>
+      <p><strong>What it does:</strong> This is where you and I talk. When you say "change the headline" or "update the pricing," I make the edit right here.</p>
+      <p style="margin-top:8px;"><strong>Why it's here:</strong> So you never have to touch code. You just tell me what you want, and I do the technical work.</p>
+      <ul>
+        <li>Edits files based on your instructions</li>
+        <li>Saves changes to GitHub (the filing cabinet)</li>
+        <li>Builds new tools and proposals</li>
+      </ul>
+    </div>
+
+    <div class="analogy-card github-card">
+      <h3>GitHub</h3>
+      <div class="analogy">Think of it as: A filing cabinet with a time machine</div>
+      <p><strong>What it does:</strong> Stores every version of every file. If something breaks, we can always go back to the version that worked.</p>
+      <p style="margin-top:8px;"><strong>Why it's here:</strong> Two reasons — safety (nothing is ever lost) and automation (it tells Netlify "hey, something changed!").</p>
+      <ul>
+        <li>Keeps a backup of everything</li>
+        <li>Tracks every change ever made</li>
+        <li>Sends a signal to Netlify when files update</li>
+      </ul>
+    </div>
+
+    <div class="analogy-card netlify-card">
+      <h3>Netlify</h3>
+      <div class="analogy">Think of it as: The delivery truck + the storefront</div>
+      <p><strong>What it does:</strong> Hosts your tools on the internet so people can visit them. When GitHub says "new version!", Netlify grabs it and puts it live — automatically.</p>
+      <p style="margin-top:8px;"><strong>Why it's here:</strong> Without Netlify, your tools would just be files on a computer. Netlify makes them into live websites anyone can visit.</p>
+      <ul>
+        <li>Turns files into live websites</li>
+        <li>Auto-updates when GitHub changes</li>
+        <li>Collects emails via the gate form</li>
+        <li>Sends you notifications of new visitors</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout">
+    <h4>The Magic: You Just Talk to Me</h4>
+    <p>When everything is wired up, your workflow is: <strong>"Hey Claude, change X on the calculator"</strong> → I edit the file → it goes to GitHub → Netlify publishes it live. You never touch code, you never drag and drop, you never log into anything. The whole pipeline runs automatically from our conversation.</p>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <div class="section-title">How the Email Gate Works</div>
+
+  <div class="gate-flow">
+    <div class="gate-step">
+      <div class="step-num">1</div>
+      <h4>Client visits link</h4>
+      <p>goto11-cost-calculator.netlify.app</p>
+    </div>
+    <div class="gate-arrow">&#8594;</div>
+    <div class="gate-step">
+      <div class="step-num">2</div>
+      <h4>Gate page appears</h4>
+      <p>Name, email, and company — all required</p>
+    </div>
+    <div class="gate-arrow">&#8594;</div>
+    <div class="gate-step">
+      <div class="step-num">3</div>
+      <h4>You get notified</h4>
+      <p>Netlify stores the submission and emails you</p>
+    </div>
+    <div class="gate-arrow">&#8594;</div>
+    <div class="gate-step">
+      <div class="step-num">4</div>
+      <h4>Client sees the tool</h4>
+      <p>Fresh, blank, private — their data only</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <h4>Your Demo Bypass</h4>
+    <p>When <em>you</em> want to demo a tool to a client without filling in the form, just add <strong>?demo=goto11</strong> to the end of any URL. Example: <code>goto11-cost-calculator.netlify.app?demo=goto11</code> — skips straight to the tool.</p>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <div class="section-title">Each Person Gets Their Own Experience</div>
+
+  <div class="unique-demo">
+    <div class="unique-person">
+      <div class="avatar avatar-a">A</div>
+      <h4>Sarah from Acme Corp</h4>
+      <p style="font-size:0.85rem; color:#999; margin-bottom:12px;">Opens the calculator, enters her company's data</p>
+      <div class="data-preview">
+        Employees: 500<br>
+        Avg salary: $85,000<br>
+        Meeting hours: 18/wk<br>
+        <br>
+        <strong style="color:#e07c4f;">Annual waste: $2.1M</strong>
+      </div>
+    </div>
+
+    <div class="unique-person">
+      <div class="avatar avatar-b">B</div>
+      <h4>Mike from Beta Inc</h4>
+      <p style="font-size:0.85rem; color:#999; margin-bottom:12px;">Opens the same link, sees a completely blank tool</p>
+      <div class="data-preview">
+        Employees: 120<br>
+        Avg salary: $72,000<br>
+        Meeting hours: 14/wk<br>
+        <br>
+        <strong style="color:#4f7ce0;">Annual waste: $430K</strong>
+      </div>
+    </div>
+  </div>
+
+  <p style="text-align:center; font-size:0.9rem; color:#888; margin-top:8px;">
+    They each get a blank slate. No data is shared between visitors. Nothing is saved on a server — it all runs in their own browser.
+  </p>
+
+  <!-- ════════════════════════════════════════ -->
+  <div class="section-title">Current Status of Your 4 Sites</div>
+
+  <table class="status-table">
+    <tr>
+      <th>Tool</th>
+      <th>Live URL</th>
+      <th>Email Gate</th>
+      <th>GitHub → Netlify</th>
+      <th>Email Notification</th>
+    </tr>
+    <tr>
+      <td><strong>Inefficiency Cost Calculator</strong></td>
+      <td>goto11-cost-calculator.netlify.app</td>
+      <td><span class="status-done">&#10003; Live</span></td>
+      <td><span class="status-done">&#10003; Auto-deploy</span></td>
+      <td><span class="status-done">&#10003; Active</span></td>
+    </tr>
+    <tr>
+      <td><strong>Pitch Builder (Clients)</strong></td>
+      <td>positioning-pitch-builder-clients.netlify.app</td>
+      <td><span class="status-done">&#10003; Live</span></td>
+      <td><span class="status-done">&#10003; Auto-deploy</span></td>
+      <td><span class="status-done">&#10003; Active</span></td>
+    </tr>
+    <tr>
+      <td><strong>Pitch Builder (Go To 11)</strong></td>
+      <td>positioning-pitch-builder-go-to-11.netlify.app</td>
+      <td><span class="status-done">&#10003; Live</span></td>
+      <td><span class="status-done">&#10003; Auto-deploy</span></td>
+      <td><span class="status-done">&#10003; Active</span></td>
+    </tr>
+    <tr>
+      <td><strong>Masterclass Dashboard</strong></td>
+      <td>masterclass-dashboard.netlify.app</td>
+      <td><span class="status-done">&#10003; Live</span></td>
+      <td><span class="status-done">&#10003; Auto-deploy</span></td>
+      <td><span class="status-done">&#10003; Active</span></td>
+    </tr>
+  </table>
+
+  <div class="callout">
+    <h4>Everything is Live</h4>
+    <p>The full pipeline is wired end-to-end for all 4 tools. Every site has its own GitHub repo linked to Netlify with continuous deployment, a branded email gate collecting name, email, and company, and email notifications sending to kenny@kennysolway.com on every new submission. To make changes, just tell me what you want updated — it goes live automatically.</p>
+  </div>
+
+  <p class="footer-note">Go To 11 Communication Training — System Architecture Overview</p>
+
+</div>
+</body>
+</html>

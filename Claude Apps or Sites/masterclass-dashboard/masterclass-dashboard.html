@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Go To 11 — Master Class Launch Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700&family=PT+Sans:wght@400;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #9439bf;
+    --purple-light: #bfb1c4;
+    --sand: #f4d4b7;
+    --grey: #66615c;
+    --offwhite: #ebeaeb;
+    --white: #ffffff;
+    --font-display: 'Nunito', sans-serif;
+    --font-body: 'PT Sans', sans-serif;
+    --font-ui: 'Poppins', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--offwhite);
+    color: var(--grey);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--purple);
+    padding: 2rem 2.5rem 1.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    right: 80px; bottom: -80px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    pointer-events: none;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1.25rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .brand-tag {
+    font-family: var(--font-display);
+    font-size: 11px;
+    color: var(--sand);
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+  }
+
+  .header-title {
+    font-family: var(--font-display);
+    font-size: 24px;
+    color: #fff;
+    line-height: 1.2;
+    max-width: 420px;
+  }
+
+  .header-sub {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: rgba(255,255,255,0.65);
+    margin-top: 0.35rem;
+  }
+
+  .countdown {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 14px;
+    padding: 1rem 1.5rem;
+    text-align: center;
+    flex-shrink: 0;
+    min-width: 110px;
+  }
+  .countdown-num {
+    font-family: var(--font-display);
+    font-size: 40px;
+    color: var(--sand);
+    line-height: 1;
+    display: block;
+  }
+  .countdown-label {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    color: rgba(255,255,255,0.65);
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    margin-top: 4px;
+    display: block;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 1.75rem;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+  .meta-pill {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: rgba(255,255,255,0.72);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .meta-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--sand);
+    flex-shrink: 0;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    background: var(--white);
+    border-bottom: 1px solid rgba(148,57,191,0.12);
+    display: flex;
+    overflow-x: auto;
+    padding: 0 1.5rem;
+    scrollbar-width: none;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 8px rgba(148,57,191,0.06);
+  }
+  .nav::-webkit-scrollbar { display: none; }
+
+  .nav-btn {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--purple-light);
+    background: none;
+    border: none;
+    border-bottom: 2.5px solid transparent;
+    padding: 1rem 1.1rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .nav-btn:hover { color: var(--purple); }
+  .nav-btn.active {
+    color: var(--purple);
+    border-bottom-color: var(--purple);
+    font-weight: 600;
+  }
+
+  /* ── BODY ── */
+  .body {
+    padding: 1.75rem 2.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    color: var(--purple);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid rgba(148,57,191,0.12);
+  }
+
+  /* ── SCOREBOARD ── */
+  .score-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .score-card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 1.1rem 1.2rem 1rem;
+    border: 1px solid rgba(148,57,191,0.1);
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+  }
+  .score-card:hover {
+    border-color: rgba(148,57,191,0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(148,57,191,0.1);
+  }
+
+  .score-label {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    color: var(--purple-light);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 0.6rem;
+  }
+
+  .score-row {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-bottom: 0.6rem;
+  }
+
+  .score-current {
+    font-family: var(--font-display);
+    font-size: 30px;
+    color: var(--purple);
+    line-height: 1;
+  }
+  .score-of {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: var(--purple-light);
+  }
+
+  .bar-bg {
+    height: 4px;
+    background: var(--offwhite);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+    background: var(--purple);
+  }
+  .bar-fill.done { background: #5a9e5a; }
+
+  .score-badge {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 9px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+  .badge-notstarted { background: var(--offwhite); color: var(--purple-light); }
+  .badge-progress { background: rgba(244,212,183,0.55); color: #9a5a1a; }
+  .badge-done { background: rgba(70,160,70,0.13); color: #2a8a2a; }
+
+  .hint { font-family: var(--font-ui); font-size: 11px; color: var(--purple-light); margin-top: 0.5rem; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(102,97,92,0.45);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--white);
+    border-radius: 18px;
+    padding: 2rem;
+    width: 340px;
+    box-shadow: 0 12px 40px rgba(148,57,191,0.18);
+    animation: modalIn 0.2s ease;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal h3 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--purple);
+    margin-bottom: 1.25rem;
+  }
+  .modal label {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: var(--grey);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  .modal input[type=number] {
+    width: 100%;
+    font-family: var(--font-display);
+    font-size: 28px;
+    color: var(--purple);
+    border: 2px solid rgba(148,57,191,0.25);
+    border-radius: 10px;
+    padding: 0.6rem 1rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .modal input[type=number]:focus { border-color: var(--purple); }
+
+  .modal-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 1.25rem;
+  }
+  .btn-save {
+    flex: 1;
+    background: var(--purple);
+    color: #fff;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 0.7rem;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn-save:hover { opacity: 0.88; }
+  .btn-cancel {
+    flex: 1;
+    background: var(--offwhite);
+    color: var(--grey);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    border: none;
+    border-radius: 10px;
+    padding: 0.7rem;
+    cursor: pointer;
+  }
+
+  /* ── CONTENT CALENDAR ── */
+  .table-wrap {
+    background: var(--white);
+    border-radius: 14px;
+    border: 1px solid rgba(148,57,191,0.1);
+    overflow: hidden;
+    margin-bottom: 1.75rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-ui);
+    font-size: 13px;
+  }
+  thead th {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--purple-light);
+    padding: 0.65rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(148,57,191,0.1);
+    background: rgba(235,234,235,0.4);
+    font-weight: 600;
+  }
+  tbody td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid rgba(148,57,191,0.05);
+    color: var(--grey);
+    vertical-align: middle;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(244,212,183,0.12); }
+  tr.done td { opacity: 0.38; }
+  tr.done td:first-child { opacity: 1; }
+
+  .check-btn {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--purple-light);
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+  }
+  .check-btn.checked {
+    background: var(--purple);
+    border-color: var(--purple);
+  }
+  .check-btn.checked::after {
+    content: '';
+    width: 5px; height: 9px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translate(-1px, -1px);
+    display: block;
+  }
+
+  .chip {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .chip-li { background: rgba(30,100,210,0.1); color: #1460c0; }
+  .chip-em { background: rgba(180,100,20,0.1); color: #9a5510; }
+  .chip-fu { background: rgba(148,57,191,0.1); color: var(--purple); }
+
+  .date-chip {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 9px;
+    border-radius: 20px;
+    background: rgba(148,57,191,0.08);
+    color: var(--purple);
+    white-space: nowrap;
+  }
+
+  /* ── PIPELINE ── */
+  .pipeline-board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .pipeline-col {
+    background: var(--white);
+    border-radius: 14px;
+    border: 1px solid rgba(148,57,191,0.1);
+    overflow: hidden;
+  }
+
+  .col-header {
+    padding: 0.65rem 0.85rem;
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .ch-aware   { background: var(--offwhite); color: var(--grey); }
+  .ch-warm    { background: rgba(244,212,183,0.45); color: #9a5a1a; }
+  .ch-hot     { background: rgba(220,90,20,0.12); color: #c04a10; }
+  .ch-offer   { background: rgba(148,57,191,0.12); color: var(--purple); }
+  .ch-closed  { background: rgba(60,150,60,0.12); color: #2a8a2a; }
+  .ch-notnow  { background: rgba(100,100,100,0.08); color: #999; }
+
+  .col-count {
+    font-family: var(--font-display);
+    font-size: 32px;
+    color: var(--purple);
+    padding: 0.6rem 0.85rem 0.25rem;
+    line-height: 1;
+  }
+
+  .lead-card {
+    margin: 0 0.85rem 0.5rem;
+    background: var(--offwhite);
+    border-radius: 8px;
+    padding: 0.5rem 0.7rem;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: var(--grey);
+    font-weight: 500;
+  }
+
+  .col-empty {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    color: var(--purple-light);
+    padding: 0 0.85rem 0.65rem;
+  }
+
+  .add-lead {
+    display: block;
+    width: calc(100% - 1.7rem);
+    margin: 0 0.85rem 0.85rem;
+    background: none;
+    border: 1px dashed rgba(148,57,191,0.25);
+    border-radius: 8px;
+    padding: 0.4rem;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    color: var(--purple-light);
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .add-lead:hover { border-color: var(--purple); color: var(--purple); }
+
+  /* ── PHASES ── */
+  .phase-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .phase-row {
+    background: var(--white);
+    border-radius: 14px;
+    border: 1px solid rgba(148,57,191,0.1);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    transition: border-color 0.15s;
+  }
+  .phase-row:hover { border-color: rgba(148,57,191,0.25); }
+
+  .phase-num {
+    font-family: var(--font-display);
+    font-size: 26px;
+    color: var(--purple-light);
+    width: 36px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .phase-info { flex: 1; }
+  .phase-name {
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--grey);
+    margin-bottom: 3px;
+  }
+  .phase-meta {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    color: var(--purple-light);
+  }
+
+  .phase-status {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .ps-active   { background: rgba(148,57,191,0.12); color: var(--purple); }
+  .ps-upcoming { background: var(--offwhite); color: var(--purple-light); }
+  .ps-done     { background: rgba(60,150,60,0.12); color: #2a8a2a; }
+
+  /* ── REGISTRANTS ── */
+  .reg-box {
+    background: var(--white);
+    border-radius: 14px;
+    border: 1px solid rgba(148,57,191,0.1);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .reg-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 0.75rem;
+  }
+  .reg-label {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: var(--purple-light);
+    white-space: nowrap;
+  }
+  .reg-num {
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--purple);
+    border: none;
+    background: none;
+    width: 70px;
+    outline: none;
+    -moz-appearance: textfield;
+  }
+  .reg-num::-webkit-inner-spin-button,
+  .reg-num::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  .reg-bar-bg {
+    flex: 1;
+    height: 7px;
+    background: var(--offwhite);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .reg-bar-fill {
+    height: 100%;
+    background: var(--purple);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+  .reg-pct {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: var(--purple-light);
+    min-width: 50px;
+    text-align: right;
+  }
+
+  .milestone-list { display: flex; flex-direction: column; gap: 8px; }
+  .milestone-row {
+    background: var(--white);
+    border-radius: 10px;
+    border: 1px solid rgba(148,57,191,0.08);
+    padding: 0.7rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .m-num {
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: var(--purple-light);
+    width: 40px;
+    text-align: center;
+    flex-shrink: 0;
+    transition: color 0.3s;
+  }
+  .m-num.hit { color: var(--purple); }
+  .m-text {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: var(--grey);
+    flex: 1;
+  }
+  .m-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+  .m-dot.pending { background: var(--offwhite); border: 1.5px solid var(--purple-light); }
+  .m-dot.hit { background: #5a9e5a; border: none; }
+
+  /* ── QUICK LINKS ── */
+  .links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  .link-card {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid rgba(148,57,191,0.1);
+    padding: 1rem 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+  }
+  .link-card:hover {
+    border-color: var(--purple);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(148,57,191,0.1);
+  }
+
+  .link-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: rgba(148,57,191,0.09);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .link-title {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--grey);
+    margin-bottom: 2px;
+  }
+  .link-sub {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    color: var(--purple-light);
+  }
+
+  /* ── DECISIONS ── */
+  .decisions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 10px;
+  }
+
+  .decision-card {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid rgba(148,57,191,0.1);
+    padding: 0.9rem 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .dec-indicator {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dec-done    { background: #5a9e5a; }
+  .dec-active  { background: #e8a020; }
+  .dec-pending { background: var(--offwhite); border: 1.5px solid var(--purple-light); }
+
+  .dec-name {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--grey);
+    flex: 1;
+  }
+  .dec-value {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    color: var(--purple-light);
+    white-space: nowrap;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(148,57,191,0.2); border-radius: 3px; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .score-card { animation: fadeUp 0.4s ease both; }
+  .score-card:nth-child(1) { animation-delay: 0.05s; }
+  .score-card:nth-child(2) { animation-delay: 0.1s; }
+  .score-card:nth-child(3) { animation-delay: 0.15s; }
+  .score-card:nth-child(4) { animation-delay: 0.2s; }
+  .score-card:nth-child(5) { animation-delay: 0.25s; }
+  .score-card:nth-child(6) { animation-delay: 0.3s; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div>
+      <div class="brand-tag">Go To 11 — Master Class Launch</div>
+      <div class="header-title">How to Sound Confident Under Pressure</div>
+      <div class="header-sub">Executive Communication Master Class</div>
+    </div>
+    <div class="countdown">
+      <span class="countdown-num" id="days-left">—</span>
+      <span class="countdown-label">days to go</span>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div class="meta-pill"><div class="meta-dot"></div>April 7, 2026</div>
+    <div class="meta-pill"><div class="meta-dot"></div>12:00 PM ET</div>
+    <div class="meta-pill"><div class="meta-dot"></div>Live on Zoom</div>
+    <div class="meta-pill"><div class="meta-dot"></div>Free</div>
+  </div>
+</header>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showSection('scoreboard', this)">Scoreboard</button>
+  <button class="nav-btn" onclick="showSection('content', this)">Content Calendar</button>
+  <button class="nav-btn" onclick="showSection('pipeline', this)">Pipeline</button>
+  <button class="nav-btn" onclick="showSection('phases', this)">Phases</button>
+  <button class="nav-btn" onclick="showSection('registrants', this)">Registrants</button>
+  <button class="nav-btn" onclick="showSection('links', this)">Quick Links</button>
+  <button class="nav-btn" onclick="showSection('decisions', this)">Decisions</button>
+</nav>
+
+<main class="body">
+
+  <!-- SCOREBOARD -->
+  <section id="scoreboard" class="section active">
+    <div class="section-title">Live Scoreboard</div>
+    <div class="score-grid" id="score-grid"></div>
+    <p class="hint">Click any card to update the number. Your changes are saved automatically.</p>
+  </section>
+
+  <!-- CONTENT CALENDAR -->
+  <section id="content" class="section">
+    <div class="section-title">LinkedIn Posts</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:38px"></th><th>#</th><th>Angle</th><th>Date</th></tr></thead>
+        <tbody id="li-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Email Campaign</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:38px"></th><th>Email</th><th>Subject</th><th>Date</th></tr></thead>
+        <tbody id="em-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PIPELINE -->
+  <section id="pipeline" class="section">
+    <div class="section-title">Sales Pipeline</div>
+    <div class="pipeline-board" id="pipeline-board"></div>
+    <p class="hint">Click + Add to add leads. Update stage as they move forward.</p>
+  </section>
+
+  <!-- PHASES -->
+  <section id="phases" class="section">
+    <div class="section-title">Phase Tracker</div>
+    <div class="phase-list" id="phase-list"></div>
+  </section>
+
+  <!-- REGISTRANTS -->
+  <section id="registrants" class="section">
+    <div class="section-title">Registration Progress</div>
+    <div class="reg-box">
+      <div class="reg-row">
+        <span class="reg-label">Registered</span>
+        <input class="reg-num" type="number" id="reg-input" value="0" min="0" oninput="updateReg()">
+        <div class="reg-bar-bg"><div class="reg-bar-fill" id="reg-bar" style="width:0%"></div></div>
+        <span class="reg-pct" id="reg-pct">0 / 50</span>
+      </div>
+      <p style="font-family: var(--font-ui); font-size: 12px; color: var(--purple-light);">Target: 50 registrants by April 6. Update from your Calendly CSV export.</p>
+    </div>
+
+    <div class="section-title">Milestones</div>
+    <div class="milestone-list" id="milestone-list"></div>
+
+    <div style="margin-top: 1.25rem; background: var(--white); border-radius: 14px; border: 1px solid rgba(148,57,191,0.1); padding: 1.25rem 1.5rem;">
+      <div style="font-family: var(--font-ui); font-size: 13px; font-weight: 600; color: var(--purple); margin-bottom: 0.5rem;">How to import from Calendly</div>
+      <div style="font-family: var(--font-ui); font-size: 13px; color: var(--grey); line-height: 1.7;">
+        1. Go to Calendly → Scheduled Events → export CSV<br>
+        2. Update the number above with your total registrant count<br>
+        3. Copy individual challenge responses into your Notion Registrant Tracker for personal follow-up
+      </div>
+    </div>
+  </section>
+
+  <!-- QUICK LINKS -->
+  <section id="links" class="section">
+    <div class="section-title">Notion Pages</div>
+    <div class="links-grid" id="notion-links"></div>
+
+    <div class="section-title" style="margin-top:1.5rem">Registration & Calendar</div>
+    <div class="links-grid" id="other-links"></div>
+  </section>
+
+  <!-- DECISIONS -->
+  <section id="decisions" class="section">
+    <div class="section-title">Key Decisions</div>
+    <div class="decisions-grid" id="decisions-grid"></div>
+  </section>
+
+</main>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h3 id="modal-title">Update metric</h3>
+    <label id="modal-label">Current count</label>
+    <input type="number" id="modal-input" min="0" style="margin-top:0.25rem">
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+
+const SCORES_KEY = 'gt11_scores';
+const CHECKED_KEY = 'gt11_checked';
+const LEADS_KEY = 'gt11_leads';
+const REG_KEY = 'gt11_reg';
+
+const defaultScores = [
+  { key: 'regs',     label: 'Registrations',  target: 50 },
+  { key: 'posts',    label: 'LinkedIn Posts',  target: 9  },
+  { key: 'emails',   label: 'Emails Sent',     target: 8  },
+  { key: 'magnets',  label: 'Lead Magnets',    target: 20 },
+  { key: 'outreach', label: 'Warm Outreach',   target: 10 },
+  { key: 'clients',  label: 'Clients Closed',  target: 3  },
+];
+
+const liPosts = [
+  { id: 'li1',  num: '1',  angle: "The Problem — your idea didn't fail. Your delivery did.",         date: 'Mar 18' },
+  { id: 'li2',  num: '2',  angle: "The Freeze — you knew your material cold. Then someone pushed back.", date: 'Mar 20' },
+  { id: 'li3',  num: '3',  angle: "Credibility Story — personal moment + the lesson it taught",       date: 'Mar 23' },
+  { id: 'li4',  num: '4',  angle: "Framework Breakdown — 3 things every approved proposal has",       date: 'Mar 25' },
+  { id: 'li5',  num: '5',  angle: "Event Announcement — first direct mention of April 7",             date: 'Mar 27' },
+  { id: 'li6',  num: '6',  angle: "Mini Case Study — before/after, no fluff",                         date: 'Mar 30' },
+  { id: 'li7',  num: '7',  angle: "Outcomes List — exactly what you'll walk away with",               date: 'Apr 1'  },
+  { id: 'li8',  num: '8',  angle: "Last Call — spots are filling",                                    date: 'Apr 3'  },
+  { id: 'li9',  num: '9',  angle: "Tomorrow — dead simple final push",                                date: 'Apr 5'  },
+];
+
+const emails = [
+  { id: 'em1',  num: '1',   subject: "Something's coming",                         date: 'Mar 19', type: 'em' },
+  { id: 'em2',  num: '2',   subject: "The real reason proposals get rejected",      date: 'Mar 22', type: 'em' },
+  { id: 'em3',  num: '3',   subject: "I'm opening the doors",                       date: 'Mar 25', type: 'em' },
+  { id: 'em4',  num: '4',   subject: "Here's what we'll cover",                     date: 'Mar 28', type: 'em' },
+  { id: 'em5',  num: '5',   subject: "[Name] said this after working with me...",   date: 'Mar 31', type: 'em' },
+  { id: 'em6',  num: '6',   subject: "A few spots left",                            date: 'Apr 3',  type: 'em' },
+  { id: 'em7',  num: '7',   subject: "Last chance — tomorrow at noon",              date: 'Apr 5',  type: 'em' },
+  { id: 'em8',  num: '8',   subject: "We're live today — here's the link",          date: 'Apr 7',  type: 'em' },
+  { id: 'fu1',  num: 'FU1', subject: "Here's everything from today + one more thing", date: 'Apr 7', type: 'fu' },
+  { id: 'fu2',  num: 'FU2', subject: "24 hours left — bonus expires tomorrow",      date: 'Apr 8',  type: 'fu' },
+  { id: 'fu3',  num: 'FU3', subject: "Last chance — bonus expires tonight",         date: 'Apr 8',  type: 'fu' },
+  { id: 'fu4',  num: 'FU4', subject: "Didn't get a chance to join us?",             date: 'Apr 10', type: 'fu' },
+];
+
+const pipelineStages = [
+  { key: 'aware',   label: 'Aware',      cls: 'ch-aware'  },
+  { key: 'warm',    label: 'Warm',       cls: 'ch-warm'   },
+  { key: 'hot',     label: 'Hot',        cls: 'ch-hot'    },
+  { key: 'offer',   label: 'Offer Sent', cls: 'ch-offer'  },
+  { key: 'closed',  label: 'Closed',     cls: 'ch-closed' },
+  { key: 'notnow',  label: 'Not Now',    cls: 'ch-notnow' },
+];
+
+const phases = [
+  { num:1, name:'Fill the Room',    goal:'50 registrations',          dates:'Mar 17 – Apr 6', status:'active'   },
+  { num:2, name:'Build the Room',   goal:'Curriculum + slide deck',   dates:'Apr 1–6',        status:'upcoming' },
+  { num:3, name:'Deliver & Close',  goal:'Run session, close clients',dates:'Apr 7',          status:'upcoming' },
+  { num:4, name:'Follow Up',        goal:'4 emails + warm outreach',  dates:'Apr 7–10',       status:'upcoming' },
+  { num:5, name:'Package',          goal:'Notion product + self-paced',dates:'Apr–May',       status:'upcoming' },
+  { num:6, name:'Scale',            goal:'Corporate, certification, licensing', dates:'Jun+', status:'upcoming' },
+];
+
+const notionLinks = [
+  { icon:'🎯', title:'Command Centre',          sub:'Strategy & decisions',       url:'https://www.notion.so/326674c264368129b4c6ef2eaa808cf1' },
+  { icon:'🚀', title:'Phase 1 Launch Assets',   sub:'Hooks, title, lead magnet',  url:'https://www.notion.so/326674c2643681949684e6bac30d78a1' },
+  { icon:'📍', title:'Calendly Setup Guide',    sub:'Registration setup',         url:'https://www.notion.so/326674c264368124b162dcb18983201b' },
+  { icon:'✉️', title:'Session Design Intent',   sub:'Taster, not training',       url:'https://www.notion.so/326674c2643681a68bc5e323b19cdf2f' },
+  { icon:'📊', title:'Notion Launch Hub',       sub:'Full visual hub',            url:'https://www.notion.so/326674c2643681339503e4a17a4490f4' },
+  { icon:'💰', title:'Sales Pipeline (Notion)', sub:'Board view',                 url:'https://www.notion.so/6d07d796d5ce4890ba11809cf026b82f' },
+];
+
+const otherLinks = [
+  { icon:'📅', title:'Google Calendar Event',   sub:'Apr 7, 12:00 PM ET',         url:'https://www.google.com/calendar/event?eid=ZDNuaXZvbjc5bHVyc2hnbmZzMHViNjhybmsga2VubnlAa2Vubnlzb2x3YXkuY29t' },
+  { icon:'🔗', title:'Registration Link',        sub:'Add your link here',         url:null },
+];
+
+const decisions = [
+  { name:'Price',                value:'FREE',                     status:'done'    },
+  { name:'Date & time',          value:'Apr 7, 12:00 PM ET',       status:'done'    },
+  { name:'Title (working)',      value:'Confident Under Pressure',  status:'active'  },
+  { name:'Registration platform',value:'TBD',                      status:'pending' },
+  { name:'Registration link',    value:'TBD',                      status:'pending' },
+  { name:'Offer type',           value:'TBD',                      status:'pending' },
+  { name:'Program name',         value:'TBD',                      status:'pending' },
+  { name:'Paid program price',   value:'TBD',                      status:'pending' },
+  { name:'Lead magnet designed', value:'TBD',                      status:'pending' },
+  { name:'Bonus decided',        value:'TBD',                      status:'pending' },
+  { name:'Payment link created', value:'TBD',                      status:'pending' },
+];
+
+const milestones = [
+  { count:10, text:"Momentum is real. Keep going." },
+  { count:25, text:"Double down on what's working." },
+  { count:50, text:"Full room. Shift focus to delivery." },
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem(SCORES_KEY) || '{}');
+    const c = JSON.parse(localStorage.getItem(CHECKED_KEY) || '{}');
+    const l = JSON.parse(localStorage.getItem(LEADS_KEY) || '{}');
+    const r = parseInt(localStorage.getItem(REG_KEY) || '0');
+    return { s, c, l, r };
+  } catch(e) { return { s:{}, c:{}, l:{}, r:0 }; }
+}
+
+function saveState() {
+  const vals = {};
+  defaultScores.forEach(sc => { vals[sc.key] = sc.current || 0; });
+  localStorage.setItem(SCORES_KEY, JSON.stringify(vals));
+  localStorage.setItem(CHECKED_KEY, JSON.stringify(checked));
+  localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+  localStorage.setItem(REG_KEY, String(regCount));
+}
+
+const { s: savedScores, c: savedChecked, l: savedLeads, r: savedReg } = loadState();
+
+defaultScores.forEach(sc => { sc.current = savedScores[sc.key] || 0; });
+const checked = savedChecked;
+const leads = savedLeads;
+let regCount = savedReg;
+
+// ── COUNTDOWN ─────────────────────────────────────────────────────────────
+
+function updateCountdown() {
+  const target = new Date('2026-04-07T12:00:00-04:00');
+  const now = new Date();
+  const diff = Math.ceil((target - now) / 86400000);
+  document.getElementById('days-left').textContent = Math.max(0, diff);
+}
+updateCountdown();
+setInterval(updateCountdown, 60000);
+
+// ── NAV ───────────────────────────────────────────────────────────────────
+
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// ── SCOREBOARD ────────────────────────────────────────────────────────────
+
+function renderScoreboard() {
+  document.getElementById('score-grid').innerHTML = defaultScores.map((sc, i) => {
+    const pct = sc.target > 0 ? Math.min(100, Math.round(sc.current / sc.target * 100)) : 0;
+    const done = sc.current >= sc.target;
+    const started = sc.current > 0;
+    const badgeCls = done ? 'badge-done' : started ? 'badge-progress' : 'badge-notstarted';
+    const badgeTxt = done ? 'Complete' : started ? 'In progress' : 'Not started';
+    return `<div class="score-card" onclick="openModal('${sc.key}')">
+      <div class="score-label">${sc.label}</div>
+      <div class="score-row">
+        <span class="score-current">${sc.current}</span>
+        <span class="score-of">/ ${sc.target}</span>
+      </div>
+      <div class="bar-bg"><div class="bar-fill ${done?'done':''}" style="width:${pct}%"></div></div>
+      <span class="score-badge ${badgeCls}">${badgeTxt}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────
+
+let editKey = null;
+
+function openModal(key) {
+  editKey = key;
+  const sc = defaultScores.find(s => s.key === key);
+  document.getElementById('modal-title').textContent = sc.label;
+  document.getElementById('modal-label').textContent = `Current count (target: ${sc.target})`;
+  document.getElementById('modal-input').value = sc.current;
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('modal-input').select(), 50);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  editKey = null;
+}
+
+function saveModal() {
+  const val = Math.max(0, parseInt(document.getElementById('modal-input').value) || 0);
+  const sc = defaultScores.find(s => s.key === editKey);
+  sc.current = val;
+  if (editKey === 'regs') { regCount = val; renderRegistrants(); }
+  renderScoreboard();
+  saveState();
+  closeModal();
+}
+
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.getElementById('modal-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveModal();
+});
+
+// ── CONTENT ───────────────────────────────────────────────────────────────
+
+function renderContent() {
+  document.getElementById('li-tbody').innerHTML = liPosts.map(p => {
+    const done = !!checked[p.id];
+    return `<tr class="${done?'done':''}">
+      <td><button class="check-btn ${done?'checked':''}" onclick="toggleCheck('${p.id}','li')"></button></td>
+      <td><span class="chip chip-li">Post ${p.num}</span></td>
+      <td>${p.angle}</td>
+      <td><span class="date-chip">${p.date}</span></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('em-tbody').innerHTML = emails.map(e => {
+    const done = !!checked[e.id];
+    const chipCls = e.type === 'fu' ? 'chip-fu' : 'chip-em';
+    return `<tr class="${done?'done':''}">
+      <td><button class="check-btn ${done?'checked':''}" onclick="toggleCheck('${e.id}','em')"></button></td>
+      <td><span class="chip ${chipCls}">${e.num}</span></td>
+      <td>${e.subject}</td>
+      <td><span class="date-chip">${e.date}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function toggleCheck(id, type) {
+  checked[id] = !checked[id];
+  const liDone = liPosts.filter(p => checked[p.id]).length;
+  const emDone = emails.filter(e => checked[e.id] && e.type === 'em').length;
+  defaultScores.find(s => s.key === 'posts').current = liDone;
+  defaultScores.find(s => s.key === 'emails').current = emDone;
+  renderContent();
+  renderScoreboard();
+  saveState();
+}
+
+// ── PIPELINE ─────────────────────────────────────────────────────────────
+
+function renderPipeline() {
+  document.getElementById('pipeline-board').innerHTML = pipelineStages.map(st => {
+    const stLeads = leads[st.key] || [];
+    const cards = stLeads.map(l => `<div class="lead-card">${l}</div>`).join('');
+    const empty = stLeads.length === 0 ? `<div class="col-empty">No leads yet</div>` : '';
+    return `<div class="pipeline-col">
+      <div class="col-header ${st.cls}">${st.label}</div>
+      <div class="col-count">${stLeads.length}</div>
+      ${empty}${cards}
+      <button class="add-lead" onclick="addLead('${st.key}')">+ Add lead</button>
+    </div>`;
+  }).join('');
+}
+
+function addLead(stageKey) {
+  const name = prompt(`Add lead to "${pipelineStages.find(s=>s.key===stageKey).label}":`);
+  if (name && name.trim()) {
+    if (!leads[stageKey]) leads[stageKey] = [];
+    leads[stageKey].push(name.trim());
+    renderPipeline();
+    saveState();
+  }
+}
+
+// ── PHASES ────────────────────────────────────────────────────────────────
+
+function renderPhases() {
+  document.getElementById('phase-list').innerHTML = phases.map(p => {
+    const cls = p.status === 'active' ? 'ps-active' : p.status === 'done' ? 'ps-done' : 'ps-upcoming';
+    const lbl = p.status === 'active' ? 'Active now' : p.status === 'done' ? 'Done' : 'Upcoming';
+    return `<div class="phase-row">
+      <div class="phase-num">${p.num}</div>
+      <div class="phase-info">
+        <div class="phase-name">${p.name}</div>
+        <div class="phase-meta">${p.goal} &mdash; ${p.dates}</div>
+      </div>
+      <span class="phase-status ${cls}">${lbl}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── REGISTRANTS ───────────────────────────────────────────────────────────
+
+function renderRegistrants() {
+  const pct = Math.min(100, Math.round(regCount / 50 * 100));
+  document.getElementById('reg-bar').style.width = pct + '%';
+  document.getElementById('reg-pct').textContent = regCount + ' / 50';
+  document.getElementById('reg-input').value = regCount;
+
+  document.getElementById('milestone-list').innerHTML = milestones.map(m => {
+    const hit = regCount >= m.count;
+    return `<div class="milestone-row">
+      <div class="m-num ${hit?'hit':''}">${m.count}</div>
+      <div class="m-text">${m.text}</div>
+      <div class="m-dot ${hit?'hit':'pending'}"></div>
+    </div>`;
+  }).join('');
+}
+
+function updateReg() {
+  regCount = Math.max(0, parseInt(document.getElementById('reg-input').value) || 0);
+  defaultScores.find(s => s.key === 'regs').current = regCount;
+  renderRegistrants();
+  renderScoreboard();
+  saveState();
+}
+
+// ── LINKS ─────────────────────────────────────────────────────────────────
+
+function renderLinks() {
+  document.getElementById('notion-links').innerHTML = notionLinks.map(l =>
+    `<a class="link-card" href="${l.url}" target="_blank" rel="noopener">
+      <div class="link-icon">${l.icon}</div>
+      <div><div class="link-title">${l.title}</div><div class="link-sub">${l.sub}</div></div>
+    </a>`
+  ).join('');
+
+  document.getElementById('other-links').innerHTML = otherLinks.map(l => {
+    if (l.url) {
+      return `<a class="link-card" href="${l.url}" target="_blank" rel="noopener">
+        <div class="link-icon">${l.icon}</div>
+        <div><div class="link-title">${l.title}</div><div class="link-sub">${l.sub}</div></div>
+      </a>`;
+    } else {
+      return `<div class="link-card" onclick="alert('Paste your registration link into the masterclass-dashboard.html file — find otherLinks and update the url field.')">
+        <div class="link-icon">${l.icon}</div>
+        <div><div class="link-title">${l.title}</div><div class="link-sub">${l.sub}</div></div>
+      </div>`;
+    }
+  }).join('');
+}
+
+// ── DECISIONS ─────────────────────────────────────────────────────────────
+
+function renderDecisions() {
+  document.getElementById('decisions-grid').innerHTML = decisions.map(d => {
+    const dotCls = d.status === 'done' ? 'dec-done' : d.status === 'active' ? 'dec-active' : 'dec-pending';
+    return `<div class="decision-card">
+      <div class="dec-indicator ${dotCls}"></div>
+      <div class="dec-name">${d.name}</div>
+      <div class="dec-value">${d.value}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+
+renderScoreboard();
+renderContent();
+renderPipeline();
+renderPhases();
+renderRegistrants();
+renderLinks();
+renderDecisions();
+</script>
+</body>
+</html>

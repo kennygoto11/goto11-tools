@@ -1,0 +1,321 @@
+================================================================================
+POSITIONING PITCH BUILDER - WEB CONTENT CAPTURE SUMMARY
+================================================================================
+
+CAPTURE DATE: March 30, 2026
+SOURCE DOMAIN: https://positioning-pitch-builder-go-to-11.netlify.app/
+CAPTURE METHOD: Chrome Browser Inspection + DOM Analysis
+
+================================================================================
+SITE OVERVIEW
+================================================================================
+
+PAGES DISCOVERED: 3 main pages + 1 interactive application
+
+Page 1: Landing/Access Form (Internal)
+  URL: https://positioning-pitch-builder-go-to-11.netlify.app/
+  Purpose: Gated access to internal tool
+  Status: Captures gate form structure
+
+Page 2: Landing/Access Form (Client)
+  URL: https://positioning-pitch-builder-clients.netlify.app/
+  Purpose: Gated access to client-facing tool
+  Status: Captures gate form structure
+
+Page 3: Main Application Dashboard
+  URL: https://69c802f9b878206b9e8f8e79--positioning-pitch-builder-go-to-11.netlify.app/
+  Purpose: Interactive positioning statement builder
+  Status: Captures layout and navigation structure
+
+  Application Features:
+  - 3-tab navigation (Builder, My List, Trash)
+  - 3-column layout (Audience, Builder, Pitches)
+  - 6 audience category selection
+  - Interactive form inputs for positioning development
+
+================================================================================
+WHAT THE APP DOES
+================================================================================
+
+FUNCTION:
+The Positioning Pitch Builder guides users through a structured workflow to
+create, compare, and deploy positioning statements tailored to different
+audience contexts.
+
+WORKFLOW:
+1. User authenticates via access form (name, email, company)
+2. Selects target audience (6 categories: Tech, Finance, CPG, Services, Startup, Corporate)
+3. Inputs positioning elements (Who, What, Problem, Solution)
+4. Generates positioning statement variants
+5. Compares and refines positioning
+6. Saves/deploys to stakeholders
+
+PRIMARY USE CASES:
+- Sales pitch preparation
+- Executive presentations
+- Investor pitches
+- Client engagement preparation
+- Internal initiative approval
+
+TARGET USERS:
+- Go To 11 clients
+- Go To 11 team members
+- Leaders preparing to pitch
+
+================================================================================
+DATA & FORMULAS EMBEDDED
+================================================================================
+
+AUDIENCE CATEGORIES (6 Total):
+1. Tech / SaaS
+   Context: "Selling platforms, integrations, or digital products"
+   Keywords: B2B, software, integrations, APIs
+
+2. Investment / Finance
+   Context: "Raising capital, pitching funds, or selling financial products"
+   Keywords: Fundraising, VCs, capital, financial instruments
+
+3. CPG / Consumer Goods
+   Context: "Launching products, entering markets, or pitching retail"
+   Keywords: Consumer, retail, product launch, market entry
+
+4. Professional Services
+   Context: "Consulting, agencies, or advisory firms pitching clients"
+   Keywords: Consulting, agencies, advisory, B2B services
+
+5. Startup / Founder
+   Context: "Pitching investors, boards, or strategic partners"
+   Keywords: Founder, investor, board, strategic
+
+6. Internal Corporate
+   Context: "Pitching up — strategies, budgets, or initiatives to leadership"
+   Keywords: Internal, executives, budgets, initiatives
+
+FORM FIELDS (Access Layer):
+- Your Name (text input)
+- Work Email (email input)
+- Company (text input)
+
+FORM METADATA:
+- Hidden form-id (identifies internal vs. client)
+- Hidden form-name (display label)
+- Privacy notice (confidentiality assurance)
+
+POSITIONING LOGIC (Inferred):
+The app likely applies these frameworks based on audience:
+- Problem Statement: What challenge exists?
+- Solution Statement: How does your offering address it?
+- Positioning Statement: Why are you uniquely suited?
+- Pitch Variants: Different messaging for different contexts
+
+================================================================================
+FILE STRUCTURE
+================================================================================
+
+/positioning-pitch-builder-go-to-11/
+├── README.md (177 lines)
+│   - Project overview and complete file guide
+│   - URLs and access information
+│   - Technical architecture summary
+│   - Integration with Go To 11 frameworks
+│
+├── APP_STRUCTURE.md (163 lines)
+│   - Comprehensive technical documentation
+│   - Page/route structure details
+│   - Data models (inferred)
+│   - Feature list
+│   - Integration points
+│
+├── page-structure.md (40 lines)
+│   - Quick reference guide
+│   - Pages discovered
+│   - Key sections
+│   - Application type classification
+│
+├── landing-page.html (61 lines)
+│   - HTML reconstruction of internal access form
+│   - Form structure and metadata
+│   - Redirect logic
+│   - Privacy and branding elements
+│
+├── client-access-page.html (61 lines)
+│   - HTML reconstruction of client access form
+│   - Identical structure to landing page
+│   - Different form IDs and metadata
+│
+└── main-app-structure.html (122 lines)
+    - HTML skeleton of main application
+    - Navigation tabs
+    - Three-column layout structure
+    - Audience selection buttons
+    - Placeholder sections for builder and outputs
+
+TOTAL FILES: 6
+TOTAL LINES: 624
+TOTAL SIZE: 40 KB
+
+================================================================================
+TECHNICAL ARCHITECTURE
+================================================================================
+
+FRAMEWORK: React (Single Page Application)
+HOSTING: Netlify
+DEPLOYMENT: Automated from git repository
+PREVIEW DEPLOYMENTS: Available (staging versions)
+
+FRONTEND STACK:
+- React (component-based UI)
+- Custom CSS (emoji-based navigation)
+- Responsive design (mobile-first)
+- Form validation (HTML5)
+
+BACKEND/INTEGRATION:
+- Netlify Forms API (form submissions)
+- Possible backend for data persistence
+- Session management (localStorage or API)
+- User tracking and follow-up
+
+DATA PERSISTENCE:
+- User pitches (likely localStorage or backend)
+- Session data (current selections)
+- Saved/deleted items (trash functionality)
+
+SECURITY:
+- Form-gated access (prevents anonymous use)
+- Privacy policy (data confidentiality)
+- No external tracking visible
+- HTTPS (Netlify default)
+
+================================================================================
+AUDIENCE CONTEXT INFORMATION
+================================================================================
+
+The app implements context-aware positioning by recognizing that different
+audiences require different positioning approaches:
+
+TECH/SAAS CONTEXT:
+- Emphasizes innovation, integration, technical capabilities
+- Target: Product managers, CTOs, engineering leaders
+- Focus: ROI, efficiency, technical advancement
+
+FINANCE CONTEXT:
+- Emphasizes returns, risk mitigation, growth potential
+- Target: Investors, financial managers, partners
+- Focus: Capital efficiency, market opportunity, exit potential
+
+CPG CONTEXT:
+- Emphasizes consumer benefits, market fit, retail viability
+- Target: Retailers, distributors, consumers
+- Focus: Product-market fit, shelf appeal, demand
+
+SERVICES CONTEXT:
+- Emphasizes expertise, results, client outcomes
+- Target: Procurement managers, CMOs, CFOs
+- Focus: Capability, past results, ROI
+
+STARTUP CONTEXT:
+- Emphasizes market opportunity, team, defensibility
+- Target: VCs, angels, board members
+- Focus: TAM, team, competitive moat, traction
+
+CORPORATE CONTEXT:
+- Emphasizes strategic alignment, organizational benefit
+- Target: Executives, decision makers
+- Focus: Strategic fit, ROI, organizational transformation
+
+================================================================================
+KEY FINDINGS
+================================================================================
+
+1. DESIGN PHILOSOPHY
+   - Structured, step-by-step approach to positioning
+   - Context-aware (different positioning for different audiences)
+   - User-friendly (emoji navigation, clear labels)
+   - Professional but approachable tone
+
+2. BUSINESS MODEL
+   - B2B SaaS positioning tool
+   - Gated access (likely for lead generation)
+   - Client engagement tool (builds loyalty)
+   - Internal team tool (operational efficiency)
+
+3. GO TO 11 METHODOLOGY INTEGRATION
+   - Velocity Ladder: Clear progression through steps
+   - Three Pillars: People (audience), Process (workflow), Presentation (outputs)
+   - Decision Acceleration: Structured positioning for faster decisions
+   - Audience Recognition: Different positioning for different contexts
+
+4. DIFFERENTIATION
+   - Audience-context awareness (unique value prop)
+   - Structured guidance (not just templates)
+   - Comparison functionality (select best positioning)
+   - Export/deploy capability (actionable outputs)
+
+5. TECHNICAL EXECUTION
+   - Modern React stack (maintainable, scalable)
+   - Netlify hosting (reliable, preview deployments)
+   - Form-based access (privacy-conscious)
+   - Clean, semantic HTML structure
+
+================================================================================
+NOTES ON CAPTURE LIMITATIONS
+================================================================================
+
+WHAT WAS CAPTURED:
+✓ Static HTML structure of all pages
+✓ Form fields and metadata
+✓ Navigation structure
+✓ Audience categories and descriptions
+✓ Branding and footer information
+✓ URL structure and redirects
+
+WHAT WAS NOT CAPTURED (React app is obfuscated):
+✗ React component code (compiled/minified)
+✗ CSS stylesheets (injected at runtime)
+✗ JavaScript bundles (obfuscated)
+✗ API endpoints and backend logic
+✗ User session handling
+✗ Data persistence methods
+✗ Form submission handlers
+
+NEXT STEPS FOR FULL CAPTURE:
+- Access Netlify project repository (git source)
+- Build/compile from source (if available)
+- Review Next.js/React build artifacts
+- Inspect network traffic during use
+- Document API endpoints via network monitoring
+- Reverse engineer form submission flow
+
+================================================================================
+RELATED ASSETS
+================================================================================
+
+BRAND SITE: https://goto11.ca
+LINKED RESOURCES:
+- Inefficiency Cost Calculator: https://goto11-cost-calculator.netlify.app/
+- Masterclass Dashboard: https://masterclass-dashboard.netlify.app/
+- (Other potential go-to-11 Netlify projects)
+
+FRAMEWORKS REFERENCED:
+- Velocity Ladder (progression model)
+- Three Pillars (People, Process, Presentation)
+- Decision Acceleration Framework
+- Problem-Solution-Positioning Arc
+
+================================================================================
+FILE LOCATIONS
+================================================================================
+
+All captured files saved to:
+/sessions/youthful-inspiring-gauss/positioning-pitch-builder-go-to-11/
+
+Files accessible for:
+- Documentation review
+- Architecture analysis
+- Prototype development
+- Integration planning
+- Training and reference
+
+================================================================================
+END OF SUMMARY
+================================================================================

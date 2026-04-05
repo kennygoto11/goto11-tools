@@ -1,0 +1,213 @@
+PAGE: Masterclass Dashboard - Full Launch Hub
+URL: https://69b9b8bf01f4df93ef3947ef--masterclass-dashboard.netlify.app/
+TITLE: Go To 11 — Master Class Launch Hub
+
+=== HEADER INFO ===
+Event: "How to Sound Confident Under Pressure"
+Subtitle: "Executive Communication Master Class"
+Date: April 7, 2026
+Time: 12:00 PM ET
+Format: Live on Zoom
+Price: Free
+
+=== MAIN NAVIGATION TABS ===
+- Scoreboard
+- Content Calendar
+- Pipeline
+- Phases
+- Registrants
+- Quick Links
+- Decisions
+
+=== SECTION 1: LIVE SCOREBOARD ===
+Key Metrics (clickable to update):
+- Registrations: 0 / 50 (Not started)
+- LinkedIn Posts: 0 / 9 (Not started)
+- Emails Sent: 0 / 8 (Not started)
+- Lead Magnets: 0 / 20 (Not started)
+- Warm Outreach: 0 / 10 (Not started)
+- Clients Closed: 0 / 3 (Not started)
+
+Note: "Click any card to update the number. Your changes are saved automatically."
+
+=== SECTION 2: LINKEDIN POSTS CALENDAR ===
+9-Post Content Strategy:
+
+1. Post 1 — Mar 18
+   Angle: "The Problem — your idea didn't fail. Your delivery did."
+
+2. Post 2 — Mar 20
+   Angle: "The Freeze — you knew your material cold. Then someone pushed back."
+
+3. Post 3 — Mar 23
+   Angle: "Credibility Story — personal moment + the lesson it taught"
+
+4. Post 4 — Mar 25
+   Angle: "Framework Breakdown — 3 things every approved proposal has"
+
+5. Post 5 — Mar 27
+   Angle: "Event Announcement — first direct mention of April 7"
+
+6. Post 6 — Mar 30
+   Angle: "Mini Case Study — before/after, no fluff"
+
+7. Post 7 — Apr 1
+   Angle: "Outcomes List — exactly what you'll walk away with"
+
+8. Post 8 — Apr 3
+   Angle: "Last Call — spots are filling"
+
+9. Post 9 — Apr 5
+   Angle: "Tomorrow — dead simple final push"
+
+=== SECTION 3: EMAIL CAMPAIGN ===
+8 Main Campaign Emails + 4 Follow-ups:
+
+Main Campaign:
+1. Mar 19 — "Something's coming"
+2. Mar 22 — "The real reason proposals get rejected"
+3. Mar 25 — "I'm opening the doors"
+4. Mar 28 — "Here's what we'll cover"
+5. Mar 31 — "[Name] said this after working with me..."
+6. Apr 3 — "A few spots left"
+7. Apr 5 — "Last chance — tomorrow at noon"
+8. Apr 7 — "We're live today — here's the link"
+
+Follow-up Sequence:
+FU1 — Apr 7 — "Here's everything from today + one more thing"
+FU2 — Apr 8 — "24 hours left — bonus expires tomorrow"
+FU3 — Apr 8 — "Last chance — bonus expires tonight"
+FU4 — Apr 10 — "Didn't get a chance to join us?"
+
+=== SECTION 4: SALES PIPELINE ===
+Pipeline Stages (all starting at 0):
+- Aware: No leads yet (+ Add lead button)
+- Warm: No leads yet (+ Add lead button)
+- Hot: No leads yet (+ Add lead button)
+- Offer Sent: No leads yet (+ Add lead button)
+- Closed: No leads yet (+ Add lead button)
+- Not Now: No leads yet (+ Add lead button)
+
+Note: "Click + Add to add leads. Update stage as they move forward."
+
+=== SECTION 5: PHASE TRACKER ===
+6-Phase Launch Roadmap:
+
+Phase 1: Fill the Room
+- Goal: 50 registrations
+- Timeline: Mar 17 – Apr 6
+- Status: Active now
+
+Phase 2: Build the Room
+- Goal: Curriculum + slide deck
+- Timeline: Apr 1–6
+- Status: Upcoming
+
+Phase 3: Deliver & Close
+- Goal: Run session, close clients
+- Timeline: Apr 7
+- Status: Upcoming
+
+Phase 4: Follow Up
+- Goal: 4 emails + warm outreach
+- Timeline: Apr 7–10
+- Status: Upcoming
+
+Phase 5: Package
+- Goal: Notion product + self-paced
+- Timeline: Apr–May
+- Status: Upcoming
+
+Phase 6: Scale
+- Goal: Corporate, certification, licensing
+- Timeline: Jun+
+- Status: Upcoming
+
+=== SECTION 6: REGISTRATION PROGRESS ===
+Current: 0 / 50 registered
+Target: 50 registrants by April 6
+Input Field: Allows manual entry (connected to Calendly CSV export)
+
+Milestone Messages:
+- At 10: "Momentum is real. Keep going."
+- At 25: "Double down on what's working."
+- At 50: "Full room. Shift focus to delivery."
+
+Calendly Import Instructions:
+1. Go to Calendly → Scheduled Events → export CSV
+2. Update the number above with your total registrant count
+3. Copy individual challenge responses into your Notion Registrant Tracker for personal follow-up
+
+=== SECTION 7: NOTION PAGES (QUICK LINKS) ===
+Integrated Notion workspace links:
+
+1. Command Centre
+   Purpose: Strategy & decisions
+   Link: https://www.notion.so/326674c264368129b4c6ef2eaa808cf1
+
+2. Phase 1 Launch Assets
+   Purpose: Hooks, title, lead magnet
+   Link: https://www.notion.so/326674c2643681949684e6bac30d78a1
+
+3. Calendly Setup Guide
+   Purpose: Registration setup
+   Link: https://www.notion.so/326674c264368124b162dcb18983201b
+
+4. Session Design Intent
+   Purpose: Taster, not training
+   Link: https://www.notion.so/326674c2643681a68bc5e323b19cdf2f
+
+5. Notion Launch Hub
+   Purpose: Full visual hub
+   Link: https://www.notion.so/326674c2643681339503e4a17a4490f4
+
+6. Sales Pipeline (Notion)
+   Purpose: Board view
+   Link: https://www.notion.so/6d07d796d5ce4890ba11809cf026b82f
+
+Additional Links:
+- Google Calendar Event: Apr 7, 12:00 PM ET
+  Link: https://www.google.com/calendar/event?eid=ZDNuaXZvbjc5bHVyc2hnbmZzMHViNjhybmsga2VubnlAa2Vubnlzb2x3YXkuY29t
+
+- Registration Link: "Add your link here" (currently placeholder)
+
+=== SECTION 8: KEY DECISIONS ===
+Configuration Settings (TBD = To Be Determined):
+
+- Price: FREE
+- Date & time: Apr 7, 12:00 PM ET
+- Title (working): "Confident Under Pressure"
+- Registration platform: TBD
+- Registration link: TBD
+- Offer type: TBD
+- Program name: TBD
+- Paid program price: TBD
+- Lead magnet designed: TBD
+- Bonus decided: TBD
+- Payment link created: TBD
+
+=== INTERACTIVE FEATURES ===
+1. Metric Update Modal
+   - Heading: "Update metric"
+   - Input: Current count (number field)
+   - Buttons: Cancel, Save
+
+2. All scoreboard cards are clickable to update metrics
+3. All changes are saved automatically
+4. Sales pipeline supports adding leads dynamically
+
+=== DATA STRUCTURE ===
+The dashboard appears to be a React-based single-page application with:
+- State management for all metrics (registrations, posts, emails, etc.)
+- Auto-save functionality
+- Modal dialogs for metric updates
+- Integration with Notion API for embedded links
+- Google Calendar integration
+- Calendly CSV import support
+
+=== STYLING NOTES ===
+- Multi-section layout with tab-based navigation
+- Card-based UI for metrics
+- Table views for content calendar
+- Phase tracker with status indicators
+- Color-coded status: "Active now" vs "Upcoming"
