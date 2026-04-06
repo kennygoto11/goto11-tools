@@ -174,7 +174,8 @@ body {
       <div class="timer" id="t1">3:00</div>
     </div>
     <hr class="divider">
-    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:13px;">Open LinkedIn using the links above. Three scans, in this order:</p>
+    <div class="hint" style="margin-bottom:13px;border-left-color:var(--purple-light);"><strong>What to do:</strong> Open each LinkedIn link above (Notifications, Feed, People search) and look for people from your Working List who did something recently — posted, commented, got promoted, or changed jobs. These are called <strong>triggers</strong>. Write down up to 3 names. You'll use them in the next step.</div>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:13px;">Three scans, in this order:</p>
     <div class="inst-list">
       <div class="inst-row">
         <div class="num-badge">1</div>
@@ -204,7 +205,8 @@ body {
       <div class="timer" id="t2">2:00</div>
     </div>
     <hr class="divider">
-    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:11px;">Working List contacts only. Pick the highest available reason for each person:</p>
+    <div class="hint" style="margin-bottom:13px;border-left-color:var(--purple-light);"><strong>What to do:</strong> Enter 3 contacts from your Working List. For each one, type their name, select why you're reaching out (Trigger is best, then Filter, then Relationship), paste any context (a LinkedIn post, a note about them), then hit "Draft with Claude" to copy a ready-made prompt you can paste into Claude Chat to generate your outreach message.</div>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:11px;">Pick the highest available reason for each person:</p>
     <div class="priority-bar">
       <div class="pri-chip t">Trigger</div>
       <div class="pri-arrow">→</div>
@@ -268,6 +270,7 @@ body {
       <div class="timer" id="t3">10:00</div>
     </div>
     <hr class="divider">
+    <div class="hint" style="margin-bottom:13px;border-left-color:var(--purple-light);"><strong>What to do:</strong> For each contact below, write and send the message on LinkedIn (or paste the one Claude drafted for you). After you've actually sent it, click "Mark as sent." You need all 3 marked sent before you can finish the brief.</div>
     <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">Don't draft and save. Each message references one specific thing. Write it. Send it. Move to the next.</p>
     <div id="send-slots" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
     <div class="gate-status" id="gate-status">0 of 3 sent</div>
@@ -286,7 +289,7 @@ body {
         </svg>
       </div>
       <div class="complete-title">Brief complete</div>
-      <div class="complete-sub">Three messages sent. The rest of the day is yours — go earn it.</div>
+      <div class="complete-sub">Three messages sent. Log each one in Notion using the link below, then get on with your day.</div>
       <div class="sent-list" id="summary"></div>
       <a href="https://www.notion.so/goto11ca/165674c264368185874cfd0198b1d832?v=16c674c264368077af4f000c9971364c" target="_blank" class="notion-btn">Open Notion — start the day →</a>
       <div class="notion-note">Opens your Tasks → Due Today view</div>
@@ -457,7 +460,7 @@ function resetBrief(){
   ['cn0','cn1','cn2'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   ['ctx0','ctx1','ctx2'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   ['0','1','2'].forEach(function(i){
-    contacts[parseInt(i)]={name:'',reason:''};
+    contacts[parseInt(i)]={name:'',reason:'',context:''};
     var cr=document.getElementById('cr'+i);
     if(cr)cr.className='cr';
     var map=[['p'+i+'t','pt'],['p'+i+'f','pf'],['p'+i+'r','pr']];
