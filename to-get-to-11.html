@@ -126,6 +126,15 @@ body {
 .notion-note { font-size: 11px; color: var(--text-tertiary); text-align: center; margin-top: 6px; }
 .reset-btn { display: block; width: 100%; margin-top: 8px; padding: 11px; border-radius: 10px; border: 1px solid var(--border-med); background: transparent; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
 .reset-btn:hover { background: var(--bg-subtle); }
+.cr-context { width: 100%; margin-top: 8px; padding: 9px 12px; border: 1px solid var(--border-med); border-radius: 8px; background: var(--bg-subtle); font-family: 'Nunito', sans-serif; font-size: 13px; color: var(--text-primary); resize: vertical; min-height: 56px; line-height: 1.5; outline: none; transition: border-color 0.15s; }
+.cr-context::placeholder { color: var(--text-tertiary); }
+.cr-context:focus { border-color: var(--purple-light); }
+.draft-btn { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border-med); background: transparent; font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
+.draft-btn:hover { border-color: var(--purple); color: var(--purple); background: #faf5fd; }
+.draft-btn.copied { border-color: var(--purple); color: var(--purple); background: #faf5fd; }
+.gate-status { font-size: 13px; font-weight: 700; color: var(--text-tertiary); text-align: center; margin-bottom: 8px; transition: color 0.2s; }
+.gate-status.ready { color: var(--purple); }
+.btn-s.gated { opacity: 0.45; pointer-events: none; background: var(--bg-subtle); color: var(--text-tertiary); }
 </style>
 </head>
 <body>
@@ -214,6 +223,8 @@ body {
           <span class="pill pf" id="p0f" onclick="setR(0,'filter')">Filter</span>
           <span class="pill pr" id="p0r" onclick="setR(0,'relationship')">Relationship</span>
         </div>
+        <textarea class="cr-context" id="ctx0" placeholder="Paste context — LinkedIn post, trigger note, or anything relevant." oninput="contacts[0].context=this.value"></textarea>
+        <button class="draft-btn" id="db0" onclick="draftClaude(0)">Draft with Claude ↗</button>
       </div>
       <div class="cr" id="cr1">
         <div class="cr-top">
@@ -225,6 +236,8 @@ body {
           <span class="pill pf" id="p1f" onclick="setR(1,'filter')">Filter</span>
           <span class="pill pr" id="p1r" onclick="setR(1,'relationship')">Relationship</span>
         </div>
+        <textarea class="cr-context" id="ctx1" placeholder="Paste context — LinkedIn post, trigger note, or anything relevant." oninput="contacts[1].context=this.value"></textarea>
+        <button class="draft-btn" id="db1" onclick="draftClaude(1)">Draft with Claude ↗</button>
       </div>
       <div class="cr" id="cr2">
         <div class="cr-top">
@@ -236,6 +249,8 @@ body {
           <span class="pill pf" id="p2f" onclick="setR(2,'filter')">Filter</span>
           <span class="pill pr" id="p2r" onclick="setR(2,'relationship')">Relationship</span>
         </div>
+        <textarea class="cr-context" id="ctx2" placeholder="Paste context — LinkedIn post, trigger note, or anything relevant." oninput="contacts[2].context=this.value"></textarea>
+        <button class="draft-btn" id="db2" onclick="draftClaude(2)">Draft with Claude ↗</button>
       </div>
     </div>
     <div class="hint" style="margin-bottom:1rem;">No trigger or filter for someone? Skip them and pick the next person on your Working List.</div>
@@ -255,9 +270,10 @@ body {
     <hr class="divider">
     <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">Don't draft and save. Each message references one specific thing. Write it. Send it. Move to the next.</p>
     <div id="send-slots" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
+    <div class="gate-status" id="gate-status">0 of 3 sent</div>
     <div class="btn-row">
       <button class="btn-p" id="bs3" onclick="startTimer(3)">Start timer</button>
-      <button class="btn-s" onclick="goStep('complete')">Brief complete →</button>
+      <button class="btn-s gated" id="complete-btn" onclick="goStep('complete')">Brief complete →</button>
     </div>
   </div>
 
@@ -281,7 +297,7 @@ body {
 </div>
 
 <script>
-var contacts = [{name:'',reason:''},{name:'',reason:''},{name:'',reason:''}];
+var contacts = [{name:'',reason:'',context:''},{name:'',reason:'',context:''},{name:'',reason:'',context:''}];
 var tsecs = {1:180,2:120,3:600};
 var tints = {};
 var curStep = 1;
@@ -367,7 +383,30 @@ function markSent(i){
     btn.className='msb done';
     btn.textContent='Sent';
     btn.onclick=null;
+    updateGate();
   }
+}
+
+function updateGate(){
+  var sent = document.querySelectorAll('.send-slot.sent').length;
+  var gs = document.getElementById('gate-status');
+  var cb = document.getElementById('complete-btn');
+  if(gs) { gs.textContent = sent + ' of 3 sent'; gs.className = 'gate-status' + (sent >= 3 ? ' ready' : ''); }
+  if(cb) { cb.className = sent >= 3 ? 'btn-s' : 'btn-s gated'; }
+}
+
+function draftClaude(i){
+  var ct = contacts[i];
+  var name = ct.name || 'Contact ' + (i+1);
+  var reason = ct.reason || 'none selected';
+  var context = ct.context || 'none provided';
+  var prompt = 'I want to reach out to ' + name + '. Reason: ' + reason + '. Context: ' + context + '. Use the outreach-message skill and my proof bank to draft a LinkedIn DM.';
+  navigator.clipboard.writeText(prompt).then(function(){
+    var btn = document.getElementById('db'+i);
+    btn.textContent = 'Copied \u2713';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = 'Draft with Claude \u2197'; btn.classList.remove('copied'); }, 2000);
+  });
 }
 
 function buildSummary(){
@@ -406,7 +445,7 @@ function goStep(n){
 }
 
 function resetBrief(){
-  contacts=[{name:'',reason:''},{name:'',reason:''},{name:'',reason:''}];
+  contacts=[{name:'',reason:'',context:''},{name:'',reason:'',context:''},{name:'',reason:'',context:''}];
   Object.keys(tints).forEach(function(k){ clearInterval(tints[k]); delete tints[k]; });
   tsecs={1:180,2:120,3:600};
   [1,2,3].forEach(function(n){
@@ -416,6 +455,7 @@ function resetBrief(){
     if(b){b.textContent='Start timer';b.disabled=false;}
   });
   ['cn0','cn1','cn2'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  ['ctx0','ctx1','ctx2'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   ['0','1','2'].forEach(function(i){
     contacts[parseInt(i)]={name:'',reason:''};
     var cr=document.getElementById('cr'+i);
