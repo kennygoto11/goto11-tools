@@ -239,7 +239,7 @@ body {
       <div class="timer" id="t2">2:00</div>
     </div>
     <hr class="divider">
-    <div class="hint" style="margin-bottom:13px;border-left-color:var(--purple-light);"><strong>What to do:</strong> Enter 3 contacts. For each: type the name, pick a reason (Trigger > Filter > Relationship), paste context (a LinkedIn post, a note). Then hit <strong>Draft DM</strong> — Claude writes the message right here in 3-5 seconds. Edit it inline if you want, then copy it and paste into LinkedIn.</div>
+    <div class="hint" style="margin-bottom:13px;border-left-color:var(--purple-light);"><strong>What to do:</strong> Enter 3 contacts. For each: type the name, pick a reason (Trigger > Filter > Relationship), and <strong>paste the full LinkedIn post text</strong> (or a rich, specific note) into the context box. The richer the context, the more Claude can tie the draft to your work. Then hit <strong>Draft DM</strong>. Claude writes the message inline in 3 to 5 seconds. Edit it, copy it, paste into LinkedIn.</div>
     <p style="font-size:13px;color:var(--text-secondary);margin-bottom:11px;">Pick the highest available reason for each person:</p>
     <div class="flag-box" id="flag-box-2" style="display:none;">
       <div class="flag-label">Flagged from step 1 — click to add</div>
@@ -263,7 +263,7 @@ body {
           <span class="pill pf" id="p0f" onclick="setR(0,'filter')">Filter</span>
           <span class="pill pr" id="p0r" onclick="setR(0,'relationship')">Relationship</span>
         </div>
-        <textarea class="cr-context" id="ctx0" placeholder="Paste context — LinkedIn post, trigger note, or anything relevant." oninput="contacts[0].context=this.value"></textarea>
+        <textarea class="cr-context" id="ctx0" placeholder="Paste the FULL post text or a detailed note. The more concrete the context, the better Claude can connect it to your work." oninput="contacts[0].context=this.value"></textarea>
         <button class="draft-btn" id="db0" onclick="draftDM(0)">Draft DM</button>
         <textarea class="draft-out" id="do0" placeholder="Draft will appear here..."></textarea>
         <div class="draft-actions" id="da0">
@@ -282,7 +282,7 @@ body {
           <span class="pill pf" id="p1f" onclick="setR(1,'filter')">Filter</span>
           <span class="pill pr" id="p1r" onclick="setR(1,'relationship')">Relationship</span>
         </div>
-        <textarea class="cr-context" id="ctx1" placeholder="Paste context — LinkedIn post, trigger note, or anything relevant." oninput="contacts[1].context=this.value"></textarea>
+        <textarea class="cr-context" id="ctx1" placeholder="Paste the FULL post text or a detailed note. The more concrete the context, the better Claude can connect it to your work." oninput="contacts[1].context=this.value"></textarea>
         <button class="draft-btn" id="db1" onclick="draftDM(1)">Draft DM</button>
         <textarea class="draft-out" id="do1" placeholder="Draft will appear here..."></textarea>
         <div class="draft-actions" id="da1">
@@ -301,7 +301,7 @@ body {
           <span class="pill pf" id="p2f" onclick="setR(2,'filter')">Filter</span>
           <span class="pill pr" id="p2r" onclick="setR(2,'relationship')">Relationship</span>
         </div>
-        <textarea class="cr-context" id="ctx2" placeholder="Paste context — LinkedIn post, trigger note, or anything relevant." oninput="contacts[2].context=this.value"></textarea>
+        <textarea class="cr-context" id="ctx2" placeholder="Paste the FULL post text or a detailed note. The more concrete the context, the better Claude can connect it to your work." oninput="contacts[2].context=this.value"></textarea>
         <button class="draft-btn" id="db2" onclick="draftDM(2)">Draft DM</button>
         <textarea class="draft-out" id="do2" placeholder="Draft will appear here..."></textarea>
         <div class="draft-actions" id="da2">

@@ -112,11 +112,18 @@ export default async (req) => {
     });
   }
 
-  const userMessage = `Draft a LinkedIn DM to: ${name}
-Reason for outreach: ${reason || "(none specified — make a reasonable choice)"}
-Context: ${context || "(none provided — keep it general but still specific to the person)"}
+  const userMessage = `Draft a LinkedIn DM from Kenny Solway to:
 
-Write the DM now. Output only the message text.`;
+CONTACT: ${name}
+REASON: ${reason || "(none specified, make a reasonable choice)"}
+CONTEXT: ${context || "(none provided, keep it general but still specific to the person)"}
+
+Before writing, do this thinking silently:
+1. What specifically did this person say, do, or show in the context above? Quote it back to yourself.
+2. What does this concretely connect to in Kenny's world? (How leaders show up in high-stakes moments. How decisions actually get made. How communication frames whether ideas land or stall. Decision velocity. The room where the decision happens.)
+3. If there is a real connection, the message must surface it as a perspective, not a pitch. If there is NO real connection (the context is generic, social, or unrelated to leadership/decisions/communication), do NOT force one. Write a shorter, genuinely human message instead.
+
+Now write the DM. Output only the message text. No em dashes anywhere.`;
 
   try {
     const client = new Anthropic({ apiKey });
@@ -127,11 +134,20 @@ Write the DM now. Output only the message text.`;
       messages: [{ role: "user", content: userMessage }],
     });
 
-    const text = response.content
+    let text = response.content
       .filter((block) => block.type === "text")
       .map((block) => block.text)
       .join("\n")
       .trim();
+
+    // Belt-and-braces: strip every em dash (and en dash) the model produces.
+    // Replace " — " and " – " patterns with ". " to keep sentence rhythm clean,
+    // then any remaining em/en dashes become a comma + space.
+    text = text
+      .replace(/\s*[\u2014\u2013]\s*/g, ". ")
+      .replace(/[\u2014\u2013]/g, ",")
+      .replace(/\.\s*\./g, ".")
+      .replace(/\s{2,}/g, " ");
 
     return new Response(JSON.stringify({ draft: text }), {
       status: 200,
