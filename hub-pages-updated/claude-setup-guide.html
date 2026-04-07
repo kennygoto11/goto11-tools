@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Guide to Claude — A Comic Strip</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%239439bf'/><text x='50' y='72' font-family='Nunito,Arial,sans-serif' font-size='62' font-weight='700' text-anchor='middle' fill='white'>C</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --panel-bg: #fff9f0;
+    --panel-border: #2a2a2a;
+    --bubble-bg: #ffffff;
+    --accent-purple: #9439bf;
+    --accent-light-purple: #bfb1c4;
+    --accent-sand: #f4d4b7;
+    --accent-grey: #66615c;
+    --accent-offwhite: #ebeaeb;
+    --speech-border: #333;
+    --caption-bg: #fef3c7;
+    --highlight: #f59e0b;
+    --success: #10b981;
+    --claude-orange: #da7756;
+    --page-bg: #f0e6d6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--page-bg);
+    background-image:
+      radial-gradient(circle at 20% 50%, rgba(148,57,191,0.04) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(244,212,183,0.08) 0%, transparent 50%);
+    font-family: 'Comic Neue', cursive, sans-serif;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .comic-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px 0 40px;
+  }
+
+  /* ─── TITLE BANNER ─── */
+  .title-banner {
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+  }
+
+  .title-banner h1 {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    color: var(--panel-border);
+    letter-spacing: 3px;
+    text-shadow: 3px 3px 0 var(--accent-sand), -1px -1px 0 #fff;
+    line-height: 1.1;
+  }
+
+  .title-banner .subtitle {
+    font-family: 'Caveat', cursive;
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    color: var(--accent-grey);
+    margin-top: 4px;
+  }
+
+  /* ─── COMIC GRID ─── */
+  .comic-grid {
+    display: grid;
+    gap: 16px;
+  }
+
+  .row { display: grid; gap: 16px; }
+  .row-2 { grid-template-columns: 1fr 1fr; }
+  .row-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .row-1 { grid-template-columns: 1fr; }
+  .row-2-1 { grid-template-columns: 2fr 1fr; }
+  .row-1-2 { grid-template-columns: 1fr 2fr; }
+
+  /* ─── PANELS ─── */
+  .panel {
+    background: var(--panel-bg);
+    border: 3px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.15s;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.12);
+  }
+
+  .panel:hover { transform: translateY(-2px); }
+
+  .panel-number {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    font-family: 'Bangers', cursive;
+    font-size: 1.1rem;
+    color: white;
+    background: var(--accent-purple);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+  }
+
+  /* ─── SCENE ILLUSTRATIONS ─── */
+  .scene {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin: 8px 0;
+    min-height: 100px;
+  }
+
+  .icon-scene {
+    font-size: 3.5rem;
+    text-align: center;
+    line-height: 1.2;
+    filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.1));
+  }
+
+  /* ─── SPEECH BUBBLES ─── */
+  .speech {
+    background: var(--bubble-bg);
+    border: 2.5px solid var(--speech-border);
+    border-radius: 18px;
+    padding: 12px 16px;
+    position: relative;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    color: #333;
+    z-index: 2;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.06);
+  }
+
+  .speech::after {
+    content: '';
+    position: absolute;
+    bottom: -14px;
+    left: 28px;
+    width: 0; height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 14px solid var(--speech-border);
+  }
+
+  .speech::before {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 30px;
+    width: 0; height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 12px solid var(--bubble-bg);
+    z-index: 1;
+  }
+
+  .speech.no-tail::after,
+  .speech.no-tail::before { display: none; }
+
+  .speech.thought {
+    border-radius: 24px;
+    border-style: dashed;
+    border-color: var(--accent-purple);
+    background: #faf5ff;
+  }
+  .speech.thought::after { border-top-color: var(--accent-purple); }
+  .speech.thought::before { border-top-color: #faf5ff; }
+
+  /* ─── CAPTION BOXES ─── */
+  .caption {
+    background: var(--caption-bg);
+    border: 2px solid #d69e2e;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-family: 'Caveat', cursive;
+    font-size: 1.05rem;
+    color: #744210;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  /* ─── PANEL TITLE ─── */
+  .panel-title {
+    font-family: 'Bangers', cursive;
+    font-size: 1.25rem;
+    color: var(--accent-purple);
+    letter-spacing: 1px;
+    text-align: center;
+    margin-bottom: 6px;
+    text-shadow: 1px 1px 0 rgba(148,57,191,0.1);
+  }
+
+  /* ─── ACTION ITEMS (the how-to bits) ─── */
+  .action-list {
+    list-style: none;
+    padding: 0;
+    margin: 6px 0;
+    font-size: 0.88rem;
+  }
+
+  .action-list li {
+    padding: 4px 0 4px 22px;
+    position: relative;
+    line-height: 1.4;
+  }
+
+  .action-list li::before {
+    content: '→';
+    position: absolute;
+    left: 4px;
+    color: var(--accent-purple);
+    font-weight: 700;
+  }
+
+  .path {
+    background: #ede9fe;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: monospace;
+    font-size: 0.82rem;
+    color: var(--accent-purple);
+    white-space: nowrap;
+  }
+
+  .highlight-box {
+    background: linear-gradient(135deg, #fdf2f8, #ede9fe);
+    border: 2px dashed var(--accent-light-purple);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin: 6px 0;
+    font-size: 0.88rem;
+  }
+
+  .pro-tip {
+    background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+    border-left: 4px solid var(--success);
+    padding: 8px 12px;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.85rem;
+    margin-top: 8px;
+  }
+
+  .pro-tip strong { color: var(--success); }
+
+  /* ─── SFX ─── */
+  .sfx {
+    font-family: 'Bangers', cursive;
+    font-size: 1.6rem;
+    color: var(--claude-orange);
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+    transform: rotate(-5deg);
+    display: inline-block;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 700px) {
+    .row-2, .row-3, .row-2-1, .row-1-2 {
+      grid-template-columns: 1fr;
+    }
+    .panel { min-height: 160px; }
+    body { padding: 10px; }
+  }
+
+  /* ─── FOOTER ─── */
+  .comic-footer {
+    text-align: center;
+    margin-top: 24px;
+    font-family: 'Caveat', cursive;
+    font-size: 1.15rem;
+    color: var(--accent-grey);
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes popIn {
+    0% { opacity: 0; transform: scale(0.9) translateY(12px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .panel { animation: popIn 0.4s ease-out both; }
+  .row:nth-child(2) .panel { animation-delay: 0.08s; }
+  .row:nth-child(3) .panel { animation-delay: 0.16s; }
+  .row:nth-child(4) .panel { animation-delay: 0.24s; }
+  .row:nth-child(5) .panel { animation-delay: 0.32s; }
+  .row:nth-child(6) .panel { animation-delay: 0.40s; }
+  .row:nth-child(7) .panel { animation-delay: 0.48s; }
+  .row:nth-child(8) .panel { animation-delay: 0.56s; }
+  .row:nth-child(9) .panel { animation-delay: 0.64s; }
+</style>
+</head>
+<body>
+<a href="/" style="display:inline-flex;align-items:center;gap:6px;font-family:-apple-system,system-ui,sans-serif;font-size:13px;color:#9439bf;text-decoration:none;font-weight:700;padding:12px 16px">&larr; Back to Hub</a>
+
+<div class="comic-page">
+
+  <!-- TITLE -->
+  <div class="title-banner">
+    <h1>🤖 Your First Day with Claude</h1>
+    <div class="subtitle">A Setup Guide in 12 Panels — by someone who's been there</div>
+  </div>
+
+  <div class="comic-grid">
+
+    <!-- ROW 1: Panels 1 & 2 -->
+    <div class="row row-2">
+
+      <!-- PANEL 1 — THE OPENER -->
+      <div class="panel">
+        <div class="panel-number">1</div>
+        <div class="panel-title">Meet Claude</div>
+        <div class="scene">
+          <div class="icon-scene">👩‍💻 &nbsp;🤝&nbsp; 🧠</div>
+        </div>
+        <div class="speech">
+          Think of Claude as a <strong>thinking partner</strong>, not a search engine. The more context you give, the better it gets — and it keeps learning about <em>you</em> over time.
+        </div>
+        <div class="pro-tip">
+          <strong>Key mindset:</strong> You're building a working relationship, not typing queries.
+        </div>
+      </div>
+
+      <!-- PANEL 2 — PROFILE & PREFERENCES -->
+      <div class="panel">
+        <div class="panel-number">2</div>
+        <div class="panel-title">Set Up Your Profile</div>
+        <div class="scene">
+          <div class="icon-scene">⚙️ ✨</div>
+        </div>
+        <div class="speech">
+          First stop: <strong>Settings</strong>. Tell Claude who you are and how you like to work.
+        </div>
+        <ul class="action-list">
+          <li>Go to <span class="path">Settings → Profile</span></li>
+          <li>Add your <strong>name</strong> and what you do</li>
+          <li>Set <strong>User Preferences</strong> — tone, format, anything you always want</li>
+          <li>Choose a <strong>Style</strong> if you want Claude to write a certain way</li>
+        </ul>
+        <div class="pro-tip">
+          <strong>Why it matters:</strong> These apply to every new conversation automatically!
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 2: Panels 3 & 4 -->
+    <div class="row row-2">
+
+      <!-- PANEL 3 — MEMORY -->
+      <div class="panel">
+        <div class="panel-number">3</div>
+        <div class="panel-title">Turn On Memory</div>
+        <div class="scene">
+          <div class="icon-scene">🧠 💾</div>
+        </div>
+        <div class="speech">
+          Claude can <strong>remember things</strong> between conversations — your projects, preferences, and context — so you don't repeat yourself every time.
+        </div>
+        <ul class="action-list">
+          <li>Go to <span class="path">Settings → Memory</span></li>
+          <li>Toggle it <strong>ON</strong></li>
+          <li>You can say <em>"Remember that I…"</em> to teach it things</li>
+          <li>You can say <em>"Forget that…"</em> to remove anything</li>
+        </ul>
+      </div>
+
+      <!-- PANEL 4 — FEATURES -->
+      <div class="panel">
+        <div class="panel-number">4</div>
+        <div class="panel-title">Enable Your Features</div>
+        <div class="scene">
+          <div class="icon-scene">🔍 📊 📁</div>
+        </div>
+        <div class="speech thought">
+          Claude can do way more than chat. Turn on the good stuff!
+        </div>
+        <ul class="action-list">
+          <li><strong>Web Search</strong> — real-time info from the internet</li>
+          <li><strong>Artifacts</strong> — code, apps, and interactive widgets</li>
+          <li><strong>File Creation</strong> — Word docs, spreadsheets, PDFs</li>
+          <li><strong>Research Mode</strong> — deep dives on complex topics</li>
+        </ul>
+        <div class="caption">Check these in <span class="path">Settings → Features</span></div>
+      </div>
+    </div>
+
+    <!-- ROW 3: WIDE PANEL — PROJECTS -->
+    <div class="row row-1">
+      <div class="panel" style="background: linear-gradient(135deg, var(--panel-bg), #faf5ff);">
+        <div class="panel-number">5</div>
+        <div class="panel-title" style="font-size: 1.4rem;">🗂️ &nbsp;Create Projects — This Is the Big One</div>
+        <div class="speech" style="max-width: 700px; margin: 8px auto;">
+          <strong>Projects</strong> are like dedicated workspaces. Each one keeps its own instructions, files, and context separate.
+          Instead of one massive conversation about everything, you get <strong>focused environments</strong> for each area of your life or work.
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-top: 12px;">
+          <div class="highlight-box" style="text-align: center;">
+            <div style="font-size: 2rem;">✍️</div>
+            <strong>Writing</strong><br>
+            <span style="font-size: 0.82rem;">Blogs, articles, posts, emails</span>
+          </div>
+          <div class="highlight-box" style="text-align: center;">
+            <div style="font-size: 2rem;">💼</div>
+            <strong>Work</strong><br>
+            <span style="font-size: 0.82rem;">Job tasks, meeting prep, strategy</span>
+          </div>
+          <div class="highlight-box" style="text-align: center;">
+            <div style="font-size: 2rem;">🏠</div>
+            <strong>Home &amp; Family</strong><br>
+            <span style="font-size: 0.82rem;">Meals, kids, logistics</span>
+          </div>
+          <div class="highlight-box" style="text-align: center;">
+            <div style="font-size: 2rem;">🌱</div>
+            <strong>Personal</strong><br>
+            <span style="font-size: 0.82rem;">Health, learning, hobbies</span>
+          </div>
+        </div>
+        <div class="pro-tip" style="max-width: 700px; margin: 10px auto 0;">
+          <strong>The key move:</strong> Add <strong>Project Instructions</strong> to each one — who you are <em>in that context</em>, what you're working on, and how you want Claude to respond. Claude reads these every time you open a chat in that project. It's like onboarding a team member for each area of your life.
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 4: Panels 6, 7 & 8 -->
+    <div class="row row-3">
+
+      <!-- PANEL 6 — CONNECT YOUR TOOLS -->
+      <div class="panel">
+        <div class="panel-number">6</div>
+        <div class="panel-title">Connect Your Tools</div>
+        <div class="scene">
+          <div class="icon-scene">🔌 🔗</div>
+        </div>
+        <div class="speech">
+          Claude can plug into apps you already use — so it can <strong>read, search, and act</strong> inside them.
+        </div>
+        <ul class="action-list">
+          <li><strong>Google Calendar</strong> — check & create events</li>
+          <li><strong>Gmail</strong> — search & draft emails</li>
+          <li><strong>Notion</strong> — read & create pages</li>
+          <li><strong>Slack</strong> — search & send messages</li>
+        </ul>
+        <div class="caption">Find these in <span class="path">Settings → Integrations</span></div>
+      </div>
+
+      <!-- PANEL 7 — DESKTOP APP & FOLDERS -->
+      <div class="panel">
+        <div class="panel-number">7</div>
+        <div class="panel-title">Get the Desktop App</div>
+        <div class="scene">
+          <div class="icon-scene">🖥️ 📂</div>
+        </div>
+        <div class="speech">
+          The desktop app lets you <strong>connect Claude to folders on your computer</strong> — so it can read your actual files without uploading them every time.
+        </div>
+        <ul class="action-list" style="font-size: 0.84rem;">
+          <li>Download from <strong>claude.ai/download</strong></li>
+          <li>Go to <span class="path">Settings → Files</span></li>
+          <li>Add folders Claude can access (e.g. Documents, Desktop, a project folder)</li>
+          <li>Then just say <em>"Look at the draft in my Documents folder"</em></li>
+        </ul>
+        <div class="pro-tip">
+          <strong>Perfect for writers:</strong> Point it at your drafts folder and Claude can review, edit, and reference your files directly.
+        </div>
+      </div>
+
+      <!-- PANEL 8 — PROMPTING -->
+      <div class="panel">
+        <div class="panel-number">8</div>
+        <div class="panel-title">Talk to It Like a Person</div>
+        <div class="scene">
+          <div class="icon-scene">💬 🎯</div>
+        </div>
+        <div class="speech">
+          You don't need special commands. Just be <strong>specific</strong> about what you want.
+        </div>
+        <div class="highlight-box">
+          <div style="margin-bottom: 8px;">
+            <span style="color: #dc2626;">❌</span> <em>"Help me with dinner."</em>
+          </div>
+          <div>
+            <span style="color: var(--success);">✅</span> <em>"I've got chicken thighs, rice, and broccoli. Give me a quick 30-minute recipe for 2 people — nothing too spicy."</em>
+          </div>
+        </div>
+        <div class="pro-tip">
+          <strong>The formula:</strong> Context + what you need + any constraints = great output.
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 5: TOKEN EFFICIENCY -->
+    <div class="row row-1">
+      <div class="panel" style="background: linear-gradient(135deg, #fffbeb, #fef3c7); border-color: #d97706; border-width: 3px;">
+        <div class="panel-number" style="background: #d97706;">9</div>
+        <div class="panel-title" style="font-size: 1.4rem; color: #92400e;">⛽ &nbsp;Don't Burn Through Your Fuel</div>
+        <div class="speech no-tail" style="max-width: 700px; margin: 8px auto;">
+          Claude runs on <strong>tokens</strong> — think of them like fuel. Every message you send <em>and</em> every reply Claude gives costs tokens. Your plan has a daily/monthly limit, so being smart about usage means you'll never hit a wall mid-task.
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+          <div>
+            <div style="font-family: 'Bangers', cursive; font-size: 1.05rem; color: #92400e; margin-bottom: 6px;">🪫 Burns Tokens Fast</div>
+            <ul class="action-list" style="font-size: 0.85rem;">
+              <li>Pasting in an entire 30-page document when you only need page 5</li>
+              <li>Letting one conversation run for 50+ messages (context balloons)</li>
+              <li>Asking for a huge output when a short answer would do</li>
+              <li>Re-explaining your background in every single chat</li>
+              <li>Using the most powerful model for simple quick questions</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-family: 'Bangers', cursive; font-size: 1.05rem; color: var(--success); margin-bottom: 6px;">🔋 Stays Efficient</div>
+            <ul class="action-list" style="font-size: 0.85rem;">
+              <li>Paste only the <strong>relevant section</strong> — not the whole thing</li>
+              <li>Start <strong>fresh conversations</strong> when switching topics</li>
+              <li>Tell Claude the <strong>length</strong> you want: <em>"keep it to 3 bullets"</em></li>
+              <li>Use <strong>Projects & Memory</strong> so context is already loaded</li>
+              <li>Use <strong>Sonnet</strong> for quick tasks, <strong>Opus</strong> for complex ones</li>
+            </ul>
+          </div>
+        </div>
+        <div class="pro-tip" style="max-width: 700px; margin: 12px auto 0; background: linear-gradient(135deg, #fefce8, #fef9c3); border-left-color: #d97706;">
+          <strong style="color: #92400e;">Think of it this way:</strong> A 100-message conversation doesn't use 100× the tokens — it uses <em>way more</em>, because Claude re-reads the entire conversation history with every reply. Shorter, focused chats are your best friend.
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 6: CHAT NAMING & SKILLS -->
+    <div class="row row-2">
+
+      <!-- PANEL 10 — CHAT NAMING -->
+      <div class="panel">
+        <div class="panel-number">10</div>
+        <div class="panel-title">Name Your Chats</div>
+        <div class="scene">
+          <div class="icon-scene">🏷️ ✏️</div>
+        </div>
+        <div class="speech">
+          Claude auto-names chats, but they're often vague. <strong>Rename them yourself</strong> so you can actually find things later.
+        </div>
+        <div class="highlight-box" style="font-size: 0.84rem;">
+          <div style="margin-bottom: 4px;"><span style="color: #dc2626;">❌</span> <em>"Untitled"</em></div>
+          <div style="margin-bottom: 4px;"><span style="color: #dc2626;">❌</span> <em>"Help with email"</em></div>
+          <div style="margin-bottom: 6px; border-top: 1px dashed #ccc; padding-top: 6px;"><span style="color: var(--success);">✅</span> <em>"Q2 Board Deck — Draft 1"</em></div>
+          <div><span style="color: var(--success);">✅</span> <em>"Meal Prep — Week of Apr 7"</em></div>
+        </div>
+        <div class="pro-tip">
+          <strong>Tip:</strong> Click the chat title at the top to rename it. Future you will thank present you.
+        </div>
+      </div>
+
+      <!-- PANEL 11 — SKILLS -->
+      <div class="panel">
+        <div class="panel-number">11</div>
+        <div class="panel-title">Build Custom Skills</div>
+        <div class="scene">
+          <div class="icon-scene">🛠️ ⚡</div>
+        </div>
+        <div class="speech">
+          If you do the same type of writing often, you can teach Claude <strong>your exact method</strong> by saving a skill file inside a Project.
+        </div>
+        <ul class="action-list" style="font-size: 0.84rem;">
+          <li>A skill = <strong>instructions + rules + examples</strong> that Claude follows every time</li>
+          <li>Think: a <strong>recipe card</strong> for how you want a specific type of content made</li>
+        </ul>
+        <div class="highlight-box" style="font-size: 0.84rem;">
+          <div style="font-weight: 700; margin-bottom: 4px;">Writer's Starter Skills:</div>
+          <div style="margin-bottom: 3px;">📝 <strong>Blog Post Skill</strong> — your structure, tone, word count, CTA style</div>
+          <div style="margin-bottom: 3px;">📧 <strong>Email Drafting Skill</strong> — your voice, sign-off, level of formality</div>
+          <div style="margin-bottom: 3px;">📣 <strong>Social Post Skill</strong> — hook style, hashtag rules, platform format</div>
+          <div>📰 <strong>Article Skill</strong> — research depth, section flow, citation style</div>
+        </div>
+        <div class="pro-tip">
+          <strong>How:</strong> Upload a skill file (a text doc with your instructions) into your Project's knowledge base. Claude reads it automatically in every new chat.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ROW 7: FINAL PANEL — WIDE -->
+    <div class="row row-1">
+      <div class="panel" style="background: linear-gradient(135deg, #faf5ff, var(--panel-bg)); border-color: var(--accent-purple); border-width: 4px;">
+        <div class="panel-number" style="background: var(--claude-orange);">12</div>
+        <div class="panel-title" style="font-size: 1.4rem;">🚀 &nbsp;The Secret: Build on Every Conversation</div>
+        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 250px;">
+            <div class="speech no-tail" style="margin-bottom: 12px;">
+              Claude gets better <strong>the more you use it</strong>. Every conversation teaches it about your preferences, your world, and how you think. That's the real advantage — <em>cumulative context</em>.
+            </div>
+            <ul class="action-list" style="font-size: 0.9rem;">
+              <li>Don't start over every time — <strong>build</strong> on past chats</li>
+              <li>Tell Claude when it gets something right (or wrong)</li>
+              <li>Use <em>"Remember that..."</em> to lock in important things</li>
+              <li>Upload files, share links, paste in real content</li>
+              <li>Think of it as a <strong>co-worker</strong> who shows up ready every day</li>
+            </ul>
+          </div>
+          <div style="flex: 0 0 auto; text-align: center; padding: 16px;">
+            <div style="font-size: 4rem; line-height: 1;">🏆</div>
+            <div class="sfx" style="font-size: 1.8rem; margin-top: 4px;">LEVEL UP!</div>
+            <div style="font-family: 'Caveat', cursive; font-size: 1.1rem; color: var(--accent-grey); margin-top: 4px;">
+              You've got this.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end comic-grid -->
+
+  <div class="comic-footer">
+    Made with 💜 — Welcome to the Claude family!
+  </div>
+
+</div><!-- end comic-page -->
+
+</body>
+</html>

@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>How I Used Claude to Reverse-Engineer My LinkedIn Posts — Kenny Solway</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%239439bf'/><text x='50' y='72' font-family='Nunito,Arial,sans-serif' font-size='62' font-weight='700' text-anchor='middle' fill='white'>L</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100vw;height:100vh;overflow:hidden;font-family:'Poppins',system-ui,sans-serif;background:#000;}
+:root{
+  --p:#9439bf;--pd:#1a0a2e;--pm:#6b1f9a;--pl:#bfb1c4;
+  --sand:#f4d4b7;--grey:#66615c;--ow:#ebeaeb;--w:#fff;
+  --plg:rgba(148,57,191,0.11);
+  --sh:0 4px 20px rgba(0,0,0,0.09);--shd:0 4px 24px rgba(0,0,0,0.35);
+  --r:12px;--rs:8px;
+}
+.slide-deck{position:relative;width:100vw;height:100vh;}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
+  padding:4.5vh 6.5vw 5.5vh;opacity:0;pointer-events:none;transition:opacity .35s ease;overflow:hidden;}
+.slide.active{opacity:1;pointer-events:auto;}
+/* backgrounds */
+.bg-hero{background:radial-gradient(ellipse at 30% 50%,#2d0f52 0%,#1a0a2e 65%);color:#fff;}
+.bg-hero::before{content:'';position:absolute;top:-12%;right:-6%;width:52vh;height:52vh;
+  border-radius:50%;border:1.5px solid rgba(255,255,255,0.055);pointer-events:none;}
+.bg-hero::after{content:'';position:absolute;top:5%;right:6%;width:30vh;height:30vh;
+  border-radius:50%;border:1px solid rgba(148,57,191,0.18);pointer-events:none;}
+.bg-purple{background:linear-gradient(140deg,#9439bf 0%,#6b1f9a 100%);color:#fff;}
+.bg-dark{background:#1a0a2e;color:#fff;}
+.bg-white{background:#fff;color:var(--pd);}
+.bg-off-white{background:#ebeaeb;color:var(--pd);}
+.bg-sand{background:#f4d4b7;color:var(--pd);}
+/* type */
+.t-display{font-size:clamp(2rem,5.5vw,3.8rem);font-weight:800;line-height:1.12;letter-spacing:-.025em;}
+.t-h2{font-size:clamp(1.35rem,2.8vw,2.1rem);font-weight:700;line-height:1.2;}
+.t-h3{font-size:clamp(1rem,1.6vw,1.25rem);font-weight:600;line-height:1.3;}
+.t-body{font-size:clamp(.85rem,1.35vw,1rem);line-height:1.65;}
+.t-small{font-size:clamp(.75rem,1.1vw,.88rem);line-height:1.5;}
+.eyebrow{font-size:.68rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--p);margin-bottom:.4rem;}
+.bg-purple .eyebrow,.bg-hero .eyebrow,.bg-dark .eyebrow{color:rgba(255,255,255,.5);}
+.accent-bar{width:44px;height:4px;background:var(--p);border-radius:2px;margin-bottom:1.3rem;flex-shrink:0;}
+.bg-purple .accent-bar,.bg-hero .accent-bar,.bg-dark .accent-bar{background:rgba(255,255,255,.3);}
+/* layout */
+.cols-2{display:grid;grid-template-columns:1fr 1fr;gap:1.3rem;}
+.cols-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.3rem;}
+.cols-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+.cols-23{display:grid;grid-template-columns:2fr 3fr;gap:1.5rem;}
+.cols-32{display:grid;grid-template-columns:3fr 2fr;gap:2rem;align-items:center;}
+/* cards */
+.card{background:#fff;border-radius:var(--r);padding:1.15rem 1.3rem;box-shadow:var(--sh);}
+.card-pt{border-top:3px solid var(--p);}
+.card-pl{border-left:4px solid var(--p);}
+.card-dark{background:var(--pd);color:#fff;border-radius:var(--r);padding:1.15rem 1.3rem;border-top:3px solid var(--p);}
+.card-frost{background:rgba(255,255,255,.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);border-radius:var(--r);padding:1.4rem;}
+.card-tint{background:var(--plg);border-radius:var(--r);padding:1.1rem 1.3rem;}
+.card-sand{background:#f4d4b7;border-radius:var(--r);padding:1.1rem 1.3rem;}
+/* callouts */
+.callout{background:var(--sand);border-left:4px solid var(--grey);border-radius:0 var(--rs) var(--rs) 0;padding:.9rem 1.1rem;}
+.callout-p{background:var(--plg);border:1.5px solid rgba(148,57,191,.28);border-radius:var(--rs);padding:.75rem 1rem;}
+.prompt-block{background:#1a0a2e;border-radius:var(--r);padding:1rem 1.2rem;
+  color:rgba(255,255,255,.82);font-family:'Courier New',monospace;font-size:.78rem;
+  line-height:1.75;white-space:pre-line;border-left:3px solid var(--p);}
+/* stat big */
+.stat-num{font-size:clamp(2.8rem,6vw,4.5rem);font-weight:800;line-height:1;letter-spacing:-.03em;}
+.stat-label{font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;opacity:.65;margin-top:.25rem;}
+/* answer options */
+.answer-opt{background:rgba(148,57,191,.07);border:1.5px solid rgba(148,57,191,.18);border-radius:var(--rs);
+  padding:.65rem 1rem;display:flex;gap:.8rem;align-items:flex-start;margin-bottom:.55rem;}
+.answer-opt:last-child{margin-bottom:0;}
+.answer-letter{font-weight:700;color:var(--p);font-size:1rem;flex-shrink:0;width:1.2rem;}
+/* process flow */
+.flow{display:flex;align-items:stretch;gap:0;}
+.flow-step{flex:1;padding:1.5rem .9rem;text-align:center;color:#fff;display:flex;flex-direction:column;align-items:center;gap:.4rem;}
+.flow-step:first-child{border-radius:var(--r) 0 0 var(--r);}
+.flow-step:last-child{border-radius:0 var(--r) var(--r) 0;}
+.flow-step .icon{font-size:1.8rem;}
+.flow-step .name{font-size:.95rem;font-weight:700;}
+.flow-step .desc{font-size:.68rem;opacity:.82;line-height:1.4;}
+.flow-arrow{width:0;height:0;border-top:48px solid transparent;border-bottom:48px solid transparent;align-self:center;flex-shrink:0;}
+/* stat bar */
+.stat-row{display:flex;gap:1rem;}
+.stat-box{flex:1;background:var(--plg);border-radius:var(--rs);padding:.8rem;text-align:center;
+  border:1px solid rgba(148,57,191,.15);}
+.stat-box .n{font-size:1.5rem;font-weight:700;color:var(--p);}
+.stat-box .l{font-size:.72rem;opacity:.65;margin-top:.15rem;}
+/* before/after */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;}
+.compare-col{border-radius:var(--r);padding:1.1rem 1.2rem;}
+/* paths */
+.paths{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+.path{background:#fff;border-radius:var(--r);padding:1rem;box-shadow:var(--sh);border-top:3px solid var(--p);text-align:center;}
+.path h3{font-size:.95rem;color:var(--p);margin-bottom:.5rem;}
+.path p{font-size:.8rem;opacity:.75;line-height:1.45;}
+/* browser chrome mockup */
+.browser{background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);}
+.browser-bar{background:#f0f0f0;padding:.35rem .7rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid #d6d6d6;}
+.browser-dots{display:flex;gap:.22rem;}
+.browser-dot{width:7px;height:7px;border-radius:50%;}
+.url-bar{background:#fff;border-radius:3px;padding:.12rem .5rem;font-size:.58rem;color:#666;flex:1;border:1px solid #ddd;}
+/* animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{opacity:0;}
+.slide.active .fade-up{animation:fadeUp .5s ease forwards;}
+.slide.active .fade-up:nth-child(1){animation-delay:.04s;}
+.slide.active .fade-up:nth-child(2){animation-delay:.13s;}
+.slide.active .fade-up:nth-child(3){animation-delay:.22s;}
+.slide.active .fade-up:nth-child(4){animation-delay:.31s;}
+.slide.active .fade-up:nth-child(5){animation-delay:.4s;}
+.slide.active .fade-up:nth-child(6){animation-delay:.49s;}
+.slide:not(.active) .fade-up{opacity:0;animation:none!important;}
+/* persistent */
+.progress-bar{position:fixed;top:0;left:0;height:3px;z-index:101;
+  background:linear-gradient(90deg,#9439bf,#bfb1c4);transition:width .4s ease;pointer-events:none;}
+.brand-pill{position:fixed;top:1.6vh;right:2vw;z-index:100;background:rgba(148,57,191,.9);
+  padding:5px 14px;border-radius:20px;backdrop-filter:blur(6px);
+  box-shadow:0 2px 12px rgba(0,0,0,.25);pointer-events:none;}
+.brand-pill span{font-size:.67rem;font-weight:800;color:#fff;letter-spacing:1.6px;}
+.sowhat-bar{position:fixed;bottom:0;left:0;right:0;height:58px;z-index:85;
+  background:rgba(130,40,175,.98);backdrop-filter:blur(4px);
+  display:flex;align-items:center;padding:0 3vw;gap:1.2rem;
+  box-shadow:0 -2px 16px rgba(0,0,0,.3);}
+.sowhat-lbl{font-size:.75rem;font-weight:900;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(255,255,255,.95);white-space:nowrap;}
+.sowhat-sep{width:1.5px;height:20px;background:rgba(255,255,255,.4);}
+.sowhat-txt{font-size:1rem;color:#fff;font-style:italic;font-weight:400;flex:1;line-height:1.3;}
+.slide-counter{position:fixed;bottom:68px;right:2.5vw;z-index:86;
+  font-size:.64rem;font-weight:500;color:rgba(130,110,150,.55);letter-spacing:.05em;}
+.notes-panel{position:fixed;bottom:58px;left:0;right:0;background:rgba(10,3,20,.96);
+  color:rgba(255,255,255,.85);max-height:0;overflow:hidden;
+  transition:max-height .3s ease,padding .3s ease;z-index:80;
+  font-size:.81rem;line-height:1.65;padding:0 3vw;}
+.notes-panel.visible{max-height:22vh;padding:.9rem 3vw 1.1rem;
+  border-top:2px solid rgba(148,57,191,.5);}
+.notes-lbl{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(148,57,191,.7);margin-bottom:.45rem;}
+</style>
+</head>
+<body>
+<a href="/" style="display:inline-flex;align-items:center;gap:6px;font-family:-apple-system,system-ui,sans-serif;font-size:13px;color:#9439bf;text-decoration:none;font-weight:700;padding:12px 16px">&larr; Back to Hub</a>
+<div class="progress-bar" id="prog"></div>
+<div class="brand-pill"><span>GO TO 11</span></div>
+<div class="slide-deck">
+
+<div class="slide active bg-hero" data-sowhat="You have more data than you think. Today I'll show you how to use it." data-notes="Welcome everyone. Thanks for being here. Today I want to walk you through something I did last month that completely changed how I think about my LinkedIn presence — and honestly, all my content. I reverse-engineered my own posts using Claude. Not other people's viral posts — MY posts, MY data, MY audience. And I'm going to show you exactly how I did it, step by step, so you can do the same thing tonight. By the end, you'll have a replicable process that saves you hours every week and makes you more confident every time you hit publish. Let's get into it.">
+  <div class="fade-up" style="margin-bottom:1.5rem;">
+    <div class="eyebrow">Kenny Solway · Go To 11</div>
+  </div>
+  <div class="fade-up">
+    <h1 class="t-display" style="color:#fff;max-width:80%;">How I Used Claude to Reverse-Engineer My LinkedIn Posts — and 3× My Engagement</h1>
+  </div>
+  <div class="fade-up" style="margin-top:1.8rem;">
+    <p style="font-size:clamp(1rem,1.8vw,1.3rem);color:rgba(255,255,255,.55);font-weight:300;font-style:italic;">A step-by-step process you can replicate tonight — with your own data</p>
+  </div>
+  <div class="fade-up" style="margin-top:3rem;display:flex;gap:2rem;">
+    <div style="text-align:center;padding:.8rem 1.5rem;background:rgba(255,255,255,.07);border-radius:var(--r);border:1px solid rgba(255,255,255,.1);">
+      <div style="font-size:1.6rem;font-weight:800;color:#fff;">3×</div>
+      <div style="font-size:.7rem;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;margin-top:.15rem;">Engagement lift</div>
+    </div>
+    <div style="text-align:center;padding:.8rem 1.5rem;background:rgba(255,255,255,.07);border-radius:var(--r);border:1px solid rgba(255,255,255,.1);">
+      <div style="font-size:1.6rem;font-weight:800;color:#fff;">45→5</div>
+      <div style="font-size:.7rem;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;margin-top:.15rem;">Min per post</div>
+    </div>
+    <div style="text-align:center;padding:.8rem 1.5rem;background:rgba(255,255,255,.07);border-radius:var(--r);border:1px solid rgba(255,255,255,.1);">
+      <div style="font-size:1.6rem;font-weight:800;color:#fff;">100%</div>
+      <div style="font-size:.7rem;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;margin-top:.15rem;">Your voice</div>
+    </div>
+  </div>
+</div>
+<div class="slide bg-white" data-sowhat="What we're doing, why it matters, and what you'll walk away with." data-notes="Set the stage. What: how to use Claude to optimize your LinkedIn engagement. Why: we're all trying to get the greatest resonance and engagement on LinkedIn to generate leads and build brand. How: I'll walk you through an exercise I did recently — show and tell, so you understand the process AND the outputs. Feel free to go off mute and ask questions as we go. Outcome: you'll get a leave-behind, a repeatable process, and — time permitting — some ideas for other things you can build.">
+  <div class="fade-up">
+    <div class="eyebrow">Setting the Stage</div>
+    <h2 class="t-h2">Today's Session</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up cols-2" style="gap:1.2rem;">
+    <div class="card" style="border-left:4px solid var(--p);padding:1.2rem 1.4rem;">
+      <p style="font-size:.72rem;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem;">What</p>
+      <p class="t-body">How to use Claude to optimize your LinkedIn engagement.</p>
+    </div>
+    <div class="card" style="border-left:4px solid var(--sand);padding:1.2rem 1.4rem;">
+      <p style="font-size:.72rem;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem;">Why</p>
+      <p class="t-body">Greater resonance, higher engagement, more leads, stronger brand.</p>
+    </div>
+    <div class="card" style="border-left:4px solid var(--pm);padding:1.2rem 1.4rem;">
+      <p style="font-size:.72rem;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem;">How</p>
+      <p class="t-body">Show and tell — the process, the outputs, and why each step matters. Questions welcome as we go.</p>
+    </div>
+    <div class="card" style="border-left:4px solid var(--grey);padding:1.2rem 1.4rem;">
+      <p style="font-size:.72rem;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem;">Outcome</p>
+      <p class="t-body">A leave-behind with the full process. Know your best patterns, create posts faster, and repurpose older posts for higher engagement.</p>
+    </div>
+  </div>
+</div>
+<div class="slide bg-dark" data-sowhat="Not about the algorithm. About finding what works and building a system." data-notes="Quick disclaimer before we dive in. This is NOT a claim about how LinkedIn's algorithm works. I don't know why LinkedIn shows your post to more or fewer people. Nobody outside LinkedIn does. What this IS: a system to look at your own data, find what's actually working, and build a repeatable process around it. The result is higher quality output and faster production — better posts, written in less time." style="padding:2vh 3vw;">
+  <div class="fade-up" style="display:flex;align-items:center;justify-content:center;height:100%;">
+    <img src="what-this-is-and-isnt-gamma.png" alt="What This Is (and Isn't) — Not about the algorithm. A system to find what's working and replicate it." style="max-width:90%;max-height:88vh;object-fit:contain;border-radius:12px;box-shadow:0 8px 40px rgba(148,57,191,0.3);">
+  </div>
+</div>
+<div class="slide bg-off-white" data-sowhat="You're not alone — and the answer is simpler than you expect." data-notes="FACILITATION: Two questions. Take them slow. Question 1: Read it. Wait. Let almost every hand go up. Say: 'Good. That's why we're here.' Pause. Question 2: Read the intro line, then the options. Let them respond in chat or out loud. Acknowledge what you hear — 'A few A's, mostly B's — that's honest.' Then say: 'Here's what's interesting. Whether you answered A, B, C or something else — you all have the same underlying problem: you're posting based on gut, not patterns. What if I could show you how to fix that? How to find your competitive edge — and deploy content faster than you ever have?' Then advance.">
+  <div class="fade-up">
+    <div class="eyebrow">Before We Start</div>
+    <h2 class="t-h2">A Quick Question</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up" style="background:var(--p);border-radius:var(--r);padding:1.5rem 1.8rem;margin-bottom:1.4rem;">
+    <p style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-bottom:.8rem;">Raise your hand</p>
+    <p style="font-size:clamp(1.05rem,1.8vw,1.35rem);color:#fff;font-weight:500;line-height:1.45;">Who's looking for a competitive edge — to make their LinkedIn posts more compelling, more engaging, and ultimately drive more qualified leads?</p>
+  </div>
+  <div class="fade-up">
+    <p style="font-size:1.05rem;color:var(--p);font-weight:600;">What if you could find that edge — and deploy content in a fraction of the time?</p>
+  </div>
+</div>
+<div class="slide bg-white" data-sowhat="If you're in A, B, or C — there's a faster, more confident way to post." data-notes="FACILITATION: Two questions. Take them slow. Question 1: Read it. Wait. Let almost every hand go up. Say: 'Good. That's why we're here.' Pause. Question 2: Read the intro line, then the options. Let them respond in chat or out loud. Acknowledge what you hear — 'A few A's, mostly B's — that's honest.' Then say: 'Here's what's interesting. Whether you answered A, B, C or something else — you all have the same underlying problem: you're posting based on gut, not patterns. What if I could show you how to fix that? How to find your competitive edge — and deploy content faster than you ever have?' Then advance.">
+  <div class="fade-up">
+    <div class="eyebrow">One More Question</div>
+    <h2 class="t-h2">What does your LinkedIn posting strategy look like?</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up">
+    <div class="answer-opt"><span class="answer-letter">A.</span><p class="t-body" style="margin:0;">I post when I have time. Whatever comes to mind.</p></div>
+    <div class="answer-opt"><span class="answer-letter">B.</span><p class="t-body" style="margin:0;">I have a rough cadence, but every post feels like a guess.</p></div>
+    <div class="answer-opt"><span class="answer-letter">C.</span><p class="t-body" style="margin:0;">I have a system — I know what works and why.</p></div>
+    <div class="answer-opt"><span class="answer-letter">D.</span><p class="t-body" style="margin:0;">Something else entirely.</p></div>
+  </div>
+</div>
+<div class="slide bg-dark" data-sowhat="The best formula for your posts is already inside your best posts." data-notes="Quick context. I had posts that crushed it and posts that flopped. Same author, same platform, same topics. Why the difference? My first instinct was to study other people's viral posts. Claude pushed back. It said: you already have the data — your own posts already contain the patterns that work for YOUR audience, in YOUR voice. That's better data than anything a stranger's post can tell you. So we pivoted. Instead of copying other people's formulas, I reverse-engineered my own." style="padding:2vh 3vw;">
+  <div class="fade-up" style="display:flex;align-items:center;justify-content:center;height:100%;">
+    <img src="what-i-set-out-to-do-gamma.png" alt="What I Set Out to Do — Before: hours per post, inconsistent results. After: minutes per post, repeatable quality." style="max-width:90%;max-height:88vh;object-fit:contain;border-radius:12px;box-shadow:0 8px 40px rgba(148,57,191,0.3);">
+  </div>
+</div>
+<div class="slide bg-sand" data-sowhat="5× performance difference. Same author. Same platform. Different structure." data-notes="Here's what the data showed. I pulled my top 9 posts and my bottom 3 and compared them side by side. Top 9 posts: 9.4 average engagement rate. Bottom 3 posts: 1.9% average engagement rate. That's a 5x difference. Same topics. Same audience. Same writer. The ONLY difference was structural choices — the hook, the arc, the way I opened. That gap is the entire premise of today. When you do this with your own posts, the numbers will reflect YOUR content, YOUR audience, YOUR offer.">
+  <div class="fade-up">
+    <div class="eyebrow">The Data</div>
+    <h2 class="t-h2">Here's the Gap I Noticed Right Away</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up" style="display:grid;grid-template-columns:1fr auto 1fr;gap:1.2rem;align-items:center;margin-top:.5rem;">
+    <div style="background:rgba(148,57,191,.12);border-radius:var(--r);padding:1.8rem;text-align:center;border:2px solid var(--p);">
+      <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--p);margin-bottom:.8rem;">My Top 9 Posts</p>
+      <div class="stat-num" style="color:var(--p);">261</div>
+      <div class="stat-label">total engagements</div>
+      <div style="font-size:.78rem;opacity:.6;margin-top:.2rem;">27,893 impressions</div>
+      <div style="background:var(--p);color:#fff;font-size:.9rem;font-weight:700;border-radius:20px;padding:.35rem .9rem;margin-top:.9rem;display:inline-block;">~9.4% avg</div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-size:1.8rem;font-weight:800;color:var(--grey);opacity:.35;">vs</div>
+    </div>
+    <div style="background:rgba(102,97,92,.1);border-radius:var(--r);padding:1.8rem;text-align:center;border:2px solid rgba(102,97,92,.25);">
+      <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--grey);margin-bottom:.8rem;">My Bottom 3 Posts</p>
+      <div class="stat-num" style="color:var(--grey);">47</div>
+      <div class="stat-label">total engagements</div>
+      <div style="font-size:.78rem;opacity:.6;margin-top:.2rem;">620 impressions</div>
+      <div style="background:var(--grey);color:#fff;font-size:.9rem;font-weight:700;border-radius:20px;padding:.35rem .9rem;margin-top:.9rem;display:inline-block;">~1.9% avg</div>
+    </div>
+  </div>
+  <div class="fade-up" style="margin-top:1.2rem;background:#fff;border-radius:var(--r);padding:1rem 1.4rem;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;">
+    <p style="font-size:1rem;font-weight:600;color:var(--p);">Same writer. Same platform. Same topics.<br><span style="color:var(--grey);font-weight:400;font-size:.85rem;">The only difference: structural choices — hook, arc, format.</span></p>
+    <div style="text-align:center;flex-shrink:0;">
+      <div style="font-size:3rem;font-weight:800;color:var(--p);line-height:1;">5×</div>
+      <div style="font-size:.72rem;color:var(--grey);">engagement gap</div>
+    </div>
+  </div>
+</div>
+<div class="slide bg-dark" data-sowhat="3 hours once. 5 minutes per post, forever." data-notes="Here's the five-step process. I'll walk through each one — the actual tools, actual prompts, actual output. By the end you'll have everything you need to do this yourself. The time math: front-load 2-3 hours once, then save 30-40 minutes on every piece of content after that." style="padding:2vh 3vw;">
+  <div class="fade-up" style="display:flex;align-items:center;justify-content:center;height:100%;">
+    <img src="five-step-process-gemini.png" alt="The Five-Step Process: Collect, Extract, Analyze, Build, Apply" style="max-width:90%;max-height:88vh;object-fit:contain;border-radius:12px;box-shadow:0 8px 40px rgba(148,57,191,0.3);">
+  </div>
+</div>
+<div class="slide bg-off-white" data-sowhat="Your data is already there — two minutes to export it." data-notes="Step one: get your data. Two options. Option A: LinkedIn's built-in analytics. Go to linkedin.com, click 'Me', Analytics, then Posts. You'll see this screen — the Posts tab is selected, and there's a blue Export button in the top right. Click it, pick your date range, download the CSV. Takes two minutes. Option B: Shield. If you use shieldapp.ai, you get richer data in a cleaner layout. Same export button, better breakdown — you can see engagement rates right in the table. Either way, you're looking for your top 8-10 posts by engagement. Not impressions — engagement. Comments and shares tell you more than views.">
+  <div class="fade-up">
+    <div class="eyebrow">Step 1 of 5</div>
+    <h2 class="t-h2">Collect Your Data</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up cols-2">
+    <div>
+      <p style="font-size:.72rem;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;">Option A — LinkedIn Analytics</p>
+      <div class="browser">
+        <div class="browser-bar">
+          <div class="browser-dots"><div class="browser-dot" style="background:#ff5f57;"></div><div class="browser-dot" style="background:#ffbd2e;"></div><div class="browser-dot" style="background:#28c940;"></div></div>
+          <div class="url-bar">🔒 linkedin.com/analytics/creator/content</div>
+        </div>
+        <div style="padding:.6rem .8rem;background:#fff;">
+          <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.5rem;border-bottom:1px solid #e8e8e8;padding-bottom:.4rem;">
+            <div style="width:24px;height:24px;background:#0a66c2;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:.65rem;color:#fff;font-weight:700;">in</div>
+            <div style="display:flex;gap:.7rem;margin-left:.5rem;">
+              <span style="font-size:.62rem;color:#666;">Overview</span>
+              <span style="font-size:.62rem;font-weight:700;color:#0a66c2;border-bottom:2px solid #0a66c2;padding-bottom:.2rem;">Posts</span>
+              <span style="font-size:.62rem;color:#666;">Followers</span>
+            </div>
+            <div style="margin-left:auto;background:#0a66c2;color:#fff;padding:.25rem .7rem;border-radius:12px;font-size:.62rem;font-weight:700;box-shadow:0 0 0 3px #ff4444,0 0 0 6px rgba(255,68,68,.25);">⬇ Export ←</div>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:2px;height:32px;margin-top:.4rem;">
+            <div style="flex:1;background:#d0e1f9;border-radius:2px 2px 0 0;height:35%;"></div>
+            <div style="flex:1;background:#d0e1f9;border-radius:2px 2px 0 0;height:20%;"></div>
+            <div style="flex:1;background:#0a66c2;border-radius:2px 2px 0 0;height:90%;"></div>
+            <div style="flex:1;background:#d0e1f9;border-radius:2px 2px 0 0;height:50%;"></div>
+            <div style="flex:1;background:#d0e1f9;border-radius:2px 2px 0 0;height:30%;"></div>
+            <div style="flex:1;background:#d0e1f9;border-radius:2px 2px 0 0;height:60%;"></div>
+          </div>
+          <p style="font-size:.58rem;color:#333;margin-top:.3rem;font-weight:600;">15,600 <span style="font-weight:400;color:#666;">total impressions</span></p>
+        </div>
+      </div>
+      <p style="margin-top:.4rem;font-size:.73rem;color:var(--p);font-weight:500;">↑ Click Export. Pick date range. Download CSV. 2 min.</p>
+    </div>
+    <div>
+      <p style="font-size:.72rem;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;">Option B — Shield (richer data)</p>
+      <div style="background:#0f0f23;border-radius:var(--r);overflow:hidden;box-shadow:var(--shd);">
+        <div style="padding:.45rem .8rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1a1a35;">
+          <span style="color:#e2e8f0;font-size:.7rem;font-weight:600;">Posts</span>
+          <div style="display:flex;gap:.4rem;">
+            <span style="background:#1e1e3a;color:#a5b4fc;padding:.15rem .5rem;border-radius:4px;font-size:.55rem;">Last 90 days ▾</span>
+            <span style="background:#6366f1;color:#fff;padding:.15rem .5rem;border-radius:4px;font-size:.55rem;box-shadow:0 0 0 2px #ff4444,0 0 0 5px rgba(255,68,68,.25);">⬇ Export ←</span>
+          </div>
+        </div>
+        <div style="padding:.4rem .8rem .6rem;">
+          <div style="display:grid;grid-template-columns:2.5fr .8fr .5fr .5fr .6fr;gap:.25rem;font-size:.5rem;color:#64748b;padding:.3rem 0;border-bottom:1px solid #1a1a35;text-transform:uppercase;letter-spacing:.5px;">
+            <span>Post</span><span>Date</span><span>Views</span><span>Cmts</span><span>Eng %</span>
+          </div>
+          <div style="display:grid;grid-template-columns:2.5fr .8fr .5fr .5fr .6fr;gap:.25rem;font-size:.58rem;color:#e2e8f0;padding:.3rem 0;border-bottom:1px solid #111128;">
+            <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Could your $100 webcam be cos…</span><span style="color:#94a3b8;">Mar 12</span><span>14.8k</span><span>23</span><span style="color:#4ade80;font-weight:700;">10.3%</span>
+          </div>
+          <div style="display:grid;grid-template-columns:2.5fr .8fr .5fr .5fr .6fr;gap:.25rem;font-size:.58rem;color:#e2e8f0;padding:.3rem 0;border-bottom:1px solid #111128;">
+            <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Executives don't reject ideas…</span><span style="color:#94a3b8;">Feb 28</span><span>2.1k</span><span>18</span><span style="color:#4ade80;font-weight:700;">8.7%</span>
+          </div>
+          <div style="display:grid;grid-template-columns:2.5fr .8fr .5fr .5fr .6fr;gap:.25rem;font-size:.58rem;color:#e2e8f0;padding:.3rem 0;">
+            <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">I owe a massive thanks to my…</span><span style="color:#94a3b8;">Feb 15</span><span>1.4k</span><span>14</span><span style="color:#4ade80;font-weight:700;">7.6%</span>
+          </div>
+        </div>
+      </div>
+      <p style="margin-top:.4rem;font-size:.73rem;color:var(--p);font-weight:500;">↑ Engagement % visible per post. Richer breakdown.</p>
+    </div>
+  </div>
+  <div class="fade-up callout-p" style="margin-top:1rem;">
+    <p class="t-small"><strong>Either tool works.</strong> You're looking for your top 8–10 posts by engagement — comments + shares, not just views.</p>
+  </div>
+</div>
+<div class="slide bg-white" data-sowhat="One prompt. Your posts. Your patterns — made explicit." data-notes="Step two: take those posts — the full text plus the engagement numbers — and feed them to Claude. Here's roughly the prompt I used. Nothing fancy. The key is giving it YOUR data — your actual posts with real numbers — and asking for patterns, not tips. This takes about ten minutes. You paste the posts, hit enter, and Claude does in ten minutes what would take you hours of manual analysis. This is where you start saving serious time.">
+  <div class="fade-up">
+    <div class="eyebrow">Step 2 of 5</div>
+    <h2 class="t-h2">Feed It to Claude</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up">
+    <p class="t-small" style="margin-bottom:.8rem;opacity:.7;">Here's roughly the prompt I used:</p>
+    <div class="prompt-block">Here are my top 9 LinkedIn posts by engagement, and my 3 worst performers.
+
+Analyze what the top posts have in common that the underperformers don't. Look at:
+- Hook structure (what makes you stop scrolling?)
+- Post format (how does it unfold?)
+- Language patterns (sentence length, word choice, specificity)
+- Topic patterns (what themes drive engagement?)
+- CTA patterns (how do they close?)
+
+Be specific — show me the actual patterns, not generic advice.
+
+Also look at any visuals or images that accompanied each post — that's a critical engagement signal too.</div>
+  </div>
+  <div class="fade-up stat-row" style="margin-top:1.2rem;">
+    <div class="stat-box"><div class="n">~10 min</div><div class="l">To paste &amp; get analysis</div></div>
+    <div class="stat-box"><div class="n">vs 4+ hrs</div><div class="l">Manual analysis</div></div>
+    <div class="stat-box"><div class="n">Your data</div><div class="l">Not generic tips</div></div>
+  </div>
+</div>
+<div class="slide bg-off-white" data-sowhat="Your formula, visible for the first time." data-notes="Here's what came back. Claude analyzed all twelve posts and broke them into clear pattern categories. Hook patterns — four distinct types that worked for me. Structure patterns — three formats that drove engagement. Language signals — sentence length, specificity, the words that showed up in every top post. And a diagnostic of what the underperformers did differently. Remember: these aren't generic LinkedIn tips. These are patterns extracted from MY actual posts, MY actual data. When you do this, you'll get YOUR patterns — tuned to YOUR voice and YOUR audience.">
+  <div class="fade-up">
+    <div class="eyebrow">Step 2 Output</div>
+    <h2 class="t-h2">What Claude Returned</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up">
+    <div style="background:#2b2b2b;border-radius:var(--r);overflow:hidden;box-shadow:var(--shd);">
+      <div style="background:#1b1b1b;padding:.4rem 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #333;">
+        <div style="display:flex;align-items:center;gap:.45rem;">
+          <div style="width:16px;height:16px;border-radius:50%;background:linear-gradient(135deg,#d4a574,#c4956a);display:flex;align-items:center;justify-content:center;font-size:.45rem;color:#fff;">✦</div>
+          <span style="color:#e8e8e8;font-size:.72rem;font-weight:500;">Claude</span>
+        </div>
+        <span style="color:#666;font-size:.58rem;">LinkedIn Post Analysis · Opus 4.6</span>
+      </div>
+      <div style="padding:.6rem 1rem;">
+        <div style="background:#3a3a4a;border-radius:10px 10px 3px 10px;padding:.45rem .8rem;margin-bottom:.55rem;max-width:78%;margin-left:auto;">
+          <p style="color:#e8e8e8;font-size:.58rem;line-height:1.5;margin:0;">Here are my top 9 LinkedIn posts by engagement, and my 3 worst performers… <span style="color:#888;">[+ 12 posts with metrics]</span></p>
+        </div>
+        <div style="display:flex;gap:.4rem;align-items:flex-start;">
+          <div style="width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#d4a574,#c4956a);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.45rem;color:#fff;margin-top:.1rem;">✦</div>
+          <div style="background:#333;border-radius:3px 10px 10px 10px;padding:.6rem .9rem;flex:1;">
+            <p style="color:#e8e8e8;font-size:.62rem;font-weight:700;margin:0 0 .35rem;border-bottom:1px solid #444;padding-bottom:.25rem;">📊 PATTERN EXTRACTION ANALYSIS</p>
+            <p style="color:#d4a574;font-size:.58rem;font-weight:700;margin:.25rem 0 .1rem;">HOOK PATTERNS (4 types identified)</p>
+            <p style="color:#bbb;font-size:.54rem;line-height:1.45;margin:0;">Pattern 1: <strong style="color:#ddd;">The Specific, Costly Question</strong> — "Could your $100 webcam be costing you $100k deals?" (14.8k impressions, 10.3%)</p>
+            <p style="color:#bbb;font-size:.54rem;line-height:1.45;margin:.18rem 0 0;">Pattern 2: <strong style="color:#ddd;">The Contrarian Reframe</strong> — "Executives don't reject ideas because of missing information…"</p>
+            <p style="color:#d4a574;font-size:.58rem;font-weight:700;margin:.35rem 0 .1rem;">STRUCTURE PATTERNS (3 formats)</p>
+            <p style="color:#bbb;font-size:.54rem;line-height:1.45;margin:0;">60% Observation/Insight · 30% Story→Lesson · 10% Contrarian Reframe</p>
+            <p style="color:#d4a574;font-size:.58rem;font-weight:700;margin:.35rem 0 .1rem;">UNDERPERFORMER DIAGNOSTIC</p>
+            <p style="color:#bbb;font-size:.54rem;line-height:1.45;margin:0;">Missing cost thread, scattered ideas, telling instead of showing…</p>
+            <p style="color:#555;font-size:.5rem;margin:.25rem 0 0;">+ language patterns, topic signals, CTA analysis…</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fade-up callout" style="margin-top:.9rem;">
+    <p class="t-small"><strong>Key:</strong> These aren't generic LinkedIn tips. These are patterns extracted from <em>my</em> actual posts. When you do this, you'll get <em>your</em> patterns — tuned to <em>your</em> voice and <em>your</em> audience.</p>
+  </div>
+</div>
+<div class="slide bg-white" data-sowhat="You've been doing this right — you just couldn't see why." data-notes="Step three is where you start connecting dots. Claude gave me the raw patterns — now I need to understand what they mean. My top posts all threaded a cost. They all used concrete language — 'the $100 webcam' not 'poor communication.' They all had a reframe moment where the reader's perspective shifts. And they all made the reader feel seen — not lectured. This is YOUR version of 'what works.' Not what works on LinkedIn generally. What works when YOU post. For YOUR ICP. For YOUR offer. That's where the confidence comes from.">
+  <div class="fade-up">
+    <div class="eyebrow">Step 3 of 5</div>
+    <h2 class="t-h2">Analyze — What Did I Find?</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up cols-2">
+    <div class="card card-pt"><h3 class="t-h3" style="color:var(--p);margin-bottom:.55rem;">4 Hook Types</h3><p class="t-small">The Specific, Costly Question · The Contrarian Reframe · The Observed Moment · The Data Point with Surprise</p></div>
+    <div class="card card-pt"><h3 class="t-h3" style="color:var(--p);margin-bottom:.55rem;">3 Winning Structures</h3><p class="t-small">Observation → Insight (60%) · Story → Lesson (30%) · Contrarian Reframe (10%)</p></div>
+    <div class="card card-pt"><h3 class="t-h3" style="color:var(--p);margin-bottom:.55rem;">The Cost Thread</h3><p class="t-small">90% of my top posts connected communication to a business outcome: revenue, career speed, decision velocity.</p></div>
+    <div class="card card-pt"><h3 class="t-h3" style="color:var(--p);margin-bottom:.55rem;">What Underperformers Did</h3><p class="t-small">Vague openings. Scattered ideas. Told instead of showed. Missing the cost layer entirely.</p></div>
+  </div>
+  <div class="fade-up callout-p" style="margin-top:1rem;">
+    <p class="t-small">This is <strong>your</strong> version of "what works." Not what works on LinkedIn generally — what works when <strong>you</strong> post, for <strong>your</strong> ICP, for <strong>your</strong> offer. That's where the confidence comes from.</p>
+  </div>
+</div>
+<div class="slide bg-off-white" data-sowhat="A system that knows your voice. Not a generic template." data-notes="Step four: take those patterns and ask Claude to turn them into a reusable skill — basically a custom instruction set. I asked Claude to codify everything we'd found into a document that it follows every time I ask it to write a post. Voice guardrails — what I sound like and what I don't. Craft principles — short sentences for emphasis, concrete language, always thread the cost. A format library based on my top structures. And a pre-publish checklist. Think of it as a recipe card built from my own best cooking. Now I don't start from scratch. I start from a system that already knows my patterns.">
+  <div class="fade-up">
+    <div class="eyebrow">Step 4 of 5</div>
+    <h2 class="t-h2">Build Your Skill</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up">
+    <p class="t-small" style="margin-bottom:.9rem;opacity:.7;">Turn patterns into a reusable system — a Claude skill document:</p>
+    <div class="prompt-block">Based on these patterns, build me a custom skill for writing LinkedIn posts. It should include:
+- Voice guardrails (what I sound like and what I don't)
+- Craft principles (sentence length, specificity, cost-threading)
+- A format library based on my top structures
+- A pre-publish checklist
+
+The skill should be specific to MY voice and MY audience — not generic.</div>
+  </div>
+  <div class="fade-up cols-4" style="margin-top:1.1rem;">
+    <div class="card card-pt" style="text-align:center;"><div style="font-size:.78rem;font-weight:700;color:var(--p);">Voice Guardrails</div><div class="t-small" style="margin-top:.3rem;opacity:.65;">What you sound like (and don't)</div></div>
+    <div class="card card-pt" style="text-align:center;"><div style="font-size:.78rem;font-weight:700;color:var(--p);">Craft Principles</div><div class="t-small" style="margin-top:.3rem;opacity:.65;">Your specific writing rules</div></div>
+    <div class="card card-pt" style="text-align:center;"><div style="font-size:.78rem;font-weight:700;color:var(--p);">Format Library</div><div class="t-small" style="margin-top:.3rem;opacity:.65;">Your proven structures</div></div>
+    <div class="card card-pt" style="text-align:center;"><div style="font-size:.78rem;font-weight:700;color:var(--p);">Pre-Publish Check</div><div class="t-small" style="margin-top:.3rem;opacity:.65;">Quality control from your data</div></div>
+  </div>
+  <div class="fade-up" style="margin-top:1rem;">
+    <p class="t-small" style="opacity:.8;">Think of it as a recipe card built from your own best cooking. You don't start from scratch — you start from a system that already knows <strong>your</strong> patterns.</p>
+  </div>
+</div>
+<div class="slide bg-white" data-sowhat="Same idea. Better structure. More decisions made." data-notes="Step five: use it. Two ways. One — give the skill a rough idea, two or three sentences, and it comes back with a structured post using your patterns. Two — take an old underperformer and rewrite it using the formula. Same ideas, different structure. This is where the time savings become real. Instead of staring at a blank page for 45 minutes, you give the system a seed idea and get a structured draft in five minutes. You still edit. You still refine. But you're editing 80% of the way there instead of starting from zero.">
+  <div class="fade-up">
+    <div class="eyebrow">Step 5 of 5</div>
+    <h2 class="t-h2">Apply — Write and Rewrite</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up cols-2">
+    <div>
+      <h3 class="t-h3" style="color:var(--p);margin-bottom:.7rem;">New Posts</h3>
+      <div class="card-sand" style="padding:1.2rem 1.3rem;">
+        <p style="font-size:.9rem;color:var(--p);font-weight:700;margin:0;">Seed idea:</p>
+      </div>
+    </div>
+    <div>
+      <h3 class="t-h3" style="color:var(--p);margin-bottom:.7rem;">Rewrites</h3>
+      <div class="card-sand" style="padding:1.2rem 1.3rem;">
+        <p style="font-size:.9rem;color:var(--p);font-weight:700;margin:0;">You're sitting on a library</p>
+      </div>
+    </div>
+  </div>
+  <div class="fade-up" style="margin-top:1.2rem;background:var(--sand);border-radius:var(--rs);padding:.9rem 1.2rem;display:flex;align-items:center;gap:1.5rem;">
+    <div style="flex-shrink:0;text-align:center;">
+      <span style="font-size:1.7rem;font-weight:800;color:var(--p);">45 min → 5 min</span>
+    </div>
+    <p class="t-small" style="opacity:.8;">You still edit. You still refine. But you're editing 80% of the way there instead of staring at a blank page.</p>
+  </div>
+  <div class="fade-up" style="margin-top:1rem;background:var(--pd);border-radius:var(--rs);padding:.85rem 1.2rem;text-align:center;">
+    <p style="color:#fff;font-size:1rem;font-weight:600;margin:0;">Why this matters: this is your system — it gets better over time.</p>
+  </div>
+</div>
+<div class="slide bg-sand" data-sowhat="6.8% engagement. 3.4× lift. 5 minutes to write." data-notes="Here's the proof. I took an underperforming post — 2% engagement — and rewrote it using the patterns we extracted. Same message. Same audience. Different structure. Result: 6.8% engagement. That's a 3.4x improvement from one rewrite. And look at the broader picture. My top 9 posts averaged 29 engagements each from 3,100 impressions. My bottom 3 averaged 16 engagements from 207 impressions. The patterns are the difference. And here's the time math: the full extraction took me about 2-3 hours. You do that once. After that, every piece of content goes from 45 minutes to 5. That's not a LinkedIn trick. That's a content system that pays for itself on the second post.">
+  <div class="fade-up">
+    <div class="eyebrow">The Proof</div>
+    <h2 class="t-h2">Before and After</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up compare">
+    <div class="compare-col" style="background:rgba(102,97,92,.1);border-left:4px solid var(--grey);">
+      <h3 class="t-h3" style="color:var(--grey);margin-bottom:.7rem;">Before — Underperformer</h3>
+      <p class="t-small" style="margin-bottom:.35rem;"><strong>Hook:</strong> Generic stat, no stakes</p>
+      <p class="t-small" style="margin-bottom:.35rem;"><strong>Arc:</strong> Scattered — multiple ideas</p>
+      <p class="t-small" style="margin-bottom:.35rem;"><strong>Cost thread:</strong> Missing</p>
+      <div style="margin-top:.8rem;display:flex;align-items:baseline;gap:.5rem;">
+        <span style="font-size:2.8rem;font-weight:800;color:var(--grey);line-height:1;">2%</span>
+        <span class="t-small" style="color:var(--grey);">engagement rate</span>
+      </div>
+    </div>
+    <div class="compare-col" style="background:rgba(148,57,191,.1);border-left:4px solid var(--p);">
+      <h3 class="t-h3" style="color:var(--p);margin-bottom:.7rem;">After — Rewritten with Patterns</h3>
+      <p class="t-small" style="margin-bottom:.35rem;"><strong>Hook:</strong> Observation-based, specific cost</p>
+      <p class="t-small" style="margin-bottom:.35rem;"><strong>Arc:</strong> Tension → release → reframe</p>
+      <p class="t-small" style="margin-bottom:.35rem;"><strong>Cost thread:</strong> Revenue, decision speed</p>
+      <div style="margin-top:.8rem;display:flex;align-items:baseline;gap:.5rem;">
+        <span style="font-size:2.8rem;font-weight:800;color:var(--p);line-height:1;">6.8%</span>
+        <span class="t-small" style="color:var(--p);">engagement rate</span>
+      </div>
+    </div>
+  </div>
+  <div class="fade-up" style="text-align:center;margin-top:1rem;">
+    <span style="font-size:2rem;font-weight:800;color:var(--p);">3.4× lift.</span>
+    <span class="t-body" style="opacity:.75;margin-left:.7rem;">Same message. Same audience. Different structure.</span>
+  </div>
+</div>
+<div class="slide bg-dark" data-sowhat="LinkedIn tells you WHICH posts performed. This tells you WHY." data-notes="LinkedIn's analytics tell you what performed — a number, a ranking. This process extracts why it performed — the hook structure, the narrative arc, the cost thread that made it land. Pattern intelligence, not just performance data.">
+  <div class="fade-up" style="text-align:center;margin-bottom:1.5rem;">
+    <div class="eyebrow" style="color:rgba(255,255,255,.5);text-align:center;">The Critical Distinction</div>
+    <h2 class="t-h2" style="color:#fff;">LinkedIn Tells You What. This Tells You Why.</h2>
+    <div class="accent-bar" style="margin:1rem auto 0;"></div>
+  </div>
+  <div class="fade-up" style="display:grid;grid-template-columns:1fr 60px 1fr;gap:1.2rem;align-items:center;margin-bottom:1.8rem;">
+    <div style="background:rgba(255,255,255,.06);border-radius:var(--r);padding:2.5rem;text-align:center;border:1px solid rgba(255,255,255,.1);">
+      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.4);margin-bottom:1rem;">LinkedIn Analytics</div>
+      <div style="font-size:clamp(2.5rem,5vw,3.5rem);font-weight:800;color:rgba(255,255,255,.5);">WHICH</div>
+      <p style="font-size:.95rem;color:rgba(255,255,255,.4);margin-top:.8rem;">posts performed</p>
+    </div>
+    <div style="text-align:center;font-size:2rem;color:rgba(255,255,255,.2);">→</div>
+    <div style="background:rgba(148,57,191,.3);border-radius:var(--r);padding:2.5rem;text-align:center;border:2px solid var(--p);">
+      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--pl);margin-bottom:1rem;">This Process</div>
+      <div style="font-size:clamp(2.5rem,5vw,3.5rem);font-weight:800;color:#fff;">WHY</div>
+      <p style="font-size:.95rem;color:rgba(255,255,255,.8);margin-top:.8rem;">the hook, the arc, the cost thread</p>
+    </div>
+  </div>
+  <div class="fade-up" style="text-align:center;">
+    <p style="font-size:clamp(1rem,1.6vw,1.15rem);color:var(--pl);font-weight:600;">Pattern intelligence — not just performance data.</p>
+  </div>
+</div>
+<div class="slide bg-dark" data-sowhat="15 minutes every 60 days. That's the entire maintenance cost." data-notes="Projects, Custom Instructions, Skills, Memory — these are the four features that keep the system alive. The 60-day cycle keeps it sharp. Show the phone screenshots here — voice-texted an idea while waiting for groceries, post was written in seconds." style="padding:2vh 3vw;">
+  <div class="fade-up" style="display:flex;align-items:center;justify-content:center;height:100%;">
+    <img src="keeping-the-system-alive-gamma.png" alt="Keeping the System Alive — Projects, Custom Instructions, Skills, Memory. Refresh every 60 days. Seed idea in, post out." style="max-width:90%;max-height:88vh;object-fit:contain;border-radius:12px;box-shadow:0 8px 40px rgba(148,57,191,0.3);">
+  </div>
+</div>
+<div class="slide bg-white" data-sowhat="The patterns that work in posts work in pitches and proposals too." data-notes="And here's what's important: this isn't just about LinkedIn. LinkedIn was my dataset. But the methodology works anywhere you have past examples and want to find what's working. Newsletters. Proposals. Pitch emails. Client communications. Sales decks. The principle is the same: analyze your best work, extract the patterns, apply them deliberately. LinkedIn just happens to give you the cleanest engagement data to start with.">
+  <div class="fade-up">
+    <div class="eyebrow">Broader Application</div>
+    <h2 class="t-h2">Not Just LinkedIn</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up" style="margin-bottom:1.2rem;">
+    <p class="t-body" style="opacity:.75;">LinkedIn was my dataset. The methodology works anywhere you have past examples:</p>
+  </div>
+  <div class="fade-up cols-3">
+    <div class="card-tint" style="text-align:center;padding:1.2rem;">
+      <div style="font-size:1.6rem;margin-bottom:.5rem;">📧</div>
+      <p style="font-size:.88rem;font-weight:600;">Pitch emails &amp; proposals</p>
+      <p class="t-small" style="opacity:.65;margin-top:.3rem;">Which ones got responses? Why?</p>
+    </div>
+    <div class="card-tint" style="text-align:center;padding:1.2rem;">
+      <div style="font-size:1.6rem;margin-bottom:.5rem;">📰</div>
+      <p style="font-size:.88rem;font-weight:600;">Newsletters &amp; articles</p>
+      <p class="t-small" style="opacity:.65;margin-top:.3rem;">Open rates, click-through, replies</p>
+    </div>
+    <div class="card-tint" style="text-align:center;padding:1.2rem;">
+      <div style="font-size:1.6rem;margin-bottom:.5rem;">🎤</div>
+      <p style="font-size:.88rem;font-weight:600;">Client communications</p>
+      <p class="t-small" style="opacity:.65;margin-top:.3rem;">Decks, follow-ups, status updates</p>
+    </div>
+  </div>
+  <div class="fade-up callout-p" style="margin-top:1.2rem;">
+    <p class="t-small"><strong>The principle:</strong> Analyze your best work. Extract the patterns. Apply deliberately. LinkedIn just gives you the cleanest data to start with.</p>
+  </div>
+</div>
+<div class="slide bg-purple" data-sowhat="Speed. Confidence. Engagement. System. All four, from your own data." data-notes="Here's the take-home. AI doesn't replace your thinking. It amplifies it. It gives you speed — 45 minutes to 5. It gives you confidence — because you're following patterns proven by your own data. And it gives you a system — one that improves every time you use it. Analyze your best work. Extract the patterns. Apply deliberately. The difference between hoping your content lands and knowing it will is data. Your data. Questions? Let's dig in.">
+  <div class="fade-up">
+    <div class="eyebrow">Take-Home</div>
+    <h2 class="t-h2" style="color:#fff;">AI doesn't replace your thinking. It amplifies it.</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up cols-4" style="margin-bottom:1.3rem;">
+    <div class="card-frost" style="text-align:center;">
+      <div style="font-size:1.4rem;margin-bottom:.4rem;">⚡</div>
+      <div style="font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:.3rem;">Speed</div>
+      <p style="font-size:.78rem;color:rgba(255,255,255,.72);">45 min → 5 min per post</p>
+    </div>
+    <div class="card-frost" style="text-align:center;">
+      <div style="font-size:1.4rem;margin-bottom:.4rem;">🎯</div>
+      <div style="font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:.3rem;">Confidence</div>
+      <p style="font-size:.78rem;color:rgba(255,255,255,.72);">Proven frameworks from your own data</p>
+    </div>
+    <div class="card-frost" style="text-align:center;">
+      <div style="font-size:1.4rem;margin-bottom:.4rem;">📈</div>
+      <div style="font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:.3rem;">Engagement</div>
+      <p style="font-size:.78rem;color:rgba(255,255,255,.72);">Structure-first content outperforms every time</p>
+    </div>
+    <div class="card-frost" style="text-align:center;">
+      <div style="font-size:1.4rem;margin-bottom:.4rem;">🔄</div>
+      <div style="font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:.3rem;">System</div>
+      <p style="font-size:.78rem;color:rgba(255,255,255,.72);">One that improves every time you use it</p>
+    </div>
+  </div>
+  <div class="fade-up" style="text-align:center;padding:1rem 2rem;background:rgba(255,255,255,.1);border-radius:var(--r);">
+    <p style="font-size:clamp(.95rem,1.7vw,1.15rem);color:#fff;font-weight:600;line-height:1.55;">Analyze your best work. Extract the patterns. Apply deliberately.<br><span style="font-weight:400;opacity:.8;">The difference between hoping your content lands and knowing it will — is data. Your data.</span></p>
+  </div>
+</div>
+<div class="slide bg-off-white" data-sowhat="You could start tonight. The first step takes 10 minutes." data-notes="Here are three things you can do this week. Tonight — export your LinkedIn data. Go to Analytics, Posts, Export. Takes two minutes. This week — paste your best five posts into Claude. Use the prompt I showed you. Ask for patterns, not tips. Next week — use those patterns to rewrite one old underperformer. See the difference for yourself. That's it. Three steps. You'll have the beginnings of your own content system.">
+  <div class="fade-up">
+    <div class="eyebrow">Your Next Steps</div>
+    <h2 class="t-h2">Three Things You Can Do This Week</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up cols-3" style="margin-bottom:1.3rem;">
+    <div class="card card-pt" style="position:relative;">
+      <div style="position:absolute;top:-1px;left:1.2rem;background:var(--p);color:#fff;font-size:.65rem;font-weight:800;padding:.2rem .6rem;border-radius:0 0 6px 6px;letter-spacing:.05em;">TONIGHT</div>
+      <div style="margin-top:.8rem;"><p class="t-small" style="color:var(--grey);">Export your LinkedIn data. Analytics → Posts → Export. Two minutes.</p></div>
+    </div>
+    <div class="card card-pt" style="position:relative;">
+      <div style="position:absolute;top:-1px;left:1.2rem;background:var(--p);color:#fff;font-size:.65rem;font-weight:800;padding:.2rem .6rem;border-radius:0 0 6px 6px;letter-spacing:.05em;">THIS WEEK</div>
+      <div style="margin-top:.8rem;"><p class="t-small" style="color:var(--grey);">Paste your best 5 posts into Claude. Use the prompt I showed you. Ask for patterns, not tips.</p></div>
+    </div>
+    <div class="card card-pt" style="position:relative;">
+      <div style="position:absolute;top:-1px;left:1.2rem;background:var(--p);color:#fff;font-size:.65rem;font-weight:800;padding:.2rem .6rem;border-radius:0 0 6px 6px;letter-spacing:.05em;">NEXT WEEK</div>
+      <div style="margin-top:.8rem;"><p class="t-small" style="color:var(--grey);">Rewrite one old underperformer with your patterns. See the difference yourself.</p></div>
+    </div>
+  </div>
+  </div>
+</div>
+<div class="slide bg-white" data-sowhat="Three paths depending on how much support you want." data-notes="Want to go deeper? Three paths. DIY — run this yourself with the steps and prompts from today. Walk Me Through It — a few working sessions together. Just Handle It — hand me your LinkedIn, I hand you back a content system.">
+  <div class="fade-up" style="text-align:center;margin-bottom:1.5rem;">
+    <h2 class="t-h2">Want to Go Deeper?</h2>
+    <p class="t-body" style="opacity:.65;margin-top:.5rem;">Three paths:</p>
+  </div>
+  <div class="fade-up paths">
+    <div class="path" style="padding:2rem 1.2rem;"><h3 style="font-size:1.2rem;">DIY</h3><p style="font-size:.85rem;opacity:.6;margin-top:.4rem;">"Show me once."</p></div>
+    <div class="path" style="border-top:3px solid var(--pd);background:var(--pd);padding:2rem 1.2rem;"><h3 style="color:var(--pl);font-size:1.2rem;">Walk Me Through It</h3><p style="font-size:.85rem;color:rgba(255,255,255,.5);margin-top:.4rem;">A few working sessions together.</p></div>
+    <div class="path" style="padding:2rem 1.2rem;"><h3 style="font-size:1.2rem;">Just Handle It</h3><p style="font-size:.85rem;opacity:.6;margin-top:.4rem;">Hand it off. Get a system back.</p></div>
+  </div>
+</div>
+<div class="slide bg-dark" data-sowhat="The most effective people in your field are already doing this." data-notes="Transition: 'Before I close — I want you to hear something. Steven Bartlett — Diary of a CEO, one of the biggest podcasts in the world — was asked what he looks for when hiring 20 people a month. Listen to what he said. It's 90 seconds.' PLAY THE VIDEO from the 3-minute mark (https://youtu.be/92XVHHN9KKE?si=e7Q7Ou8klTMbjWje&t=183). Let it play for ~90 seconds. IMPORTANT: Let the clip finish. Don't talk over it. The audience will hear Bartlett describe someone who did EXACTLY what you just showed them — feeding LinkedIn posts into Claude and discovering which ones actually performed best. When the clip ends, PAUSE. Let it land. Then say: 'She did by dessert what would have taken someone else four weeks. Not because she had the skills — because she had the curiosity to try. That's what you just learned how to do. The question isn't whether the tool works. It's whether you'll try it tonight.' Then advance.">
+  <div class="fade-up">
+    <div class="eyebrow">Social Proof</div>
+    <h2 class="t-h2" style="color:#fff;margin-bottom:.5rem;">Even Those at the Leading Edge Are Adopting This Approach.</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up cols-2" style="align-items:center;gap:2rem;">
+    <div>
+      <div style="border-left:4px solid var(--p);padding-left:1.2rem;margin-bottom:1.2rem;">
+        <p style="font-size:clamp(1rem,1.8vw,1.2rem);color:#fff;font-style:italic;line-height:1.5;font-weight:300;">"Not because she had the skills — because she had the <strong style="font-weight:700;font-style:normal;">curiosity to try.</strong>"</p>
+        <p style="font-size:.78rem;color:rgba(255,255,255,.45);margin-top:.6rem;">— Steven Bartlett, Diary of a CEO</p>
+      </div>
+      <p class="t-small" style="color:rgba(255,255,255,.6);">Bartlett was asked what he looks for when hiring. He described a candidate who fed her LinkedIn posts into Claude, found which ones actually performed, and used the patterns to write better content.</p>
+      <p class="t-small" style="color:rgba(255,255,255,.45);margin-top:.6rem;font-style:italic;">"She did that by dessert."</p>
+    </div>
+    <div>
+      <a href="https://youtu.be/92XVHHN9KKE?t=183" target="_blank" style="text-decoration:none;display:block;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--r);padding:2rem;text-align:center;cursor:pointer;transition:background .2s;">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--p);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.4rem;">▶</div>
+        <p style="color:rgba(255,255,255,.85);font-size:.88rem;font-weight:500;margin-bottom:.4rem;">Steven Bartlett — Diary of a CEO</p>
+        <p style="color:rgba(255,255,255,.45);font-size:.72rem;">Start at 3:00 — play ~90 seconds</p>
+        <p style="color:rgba(255,255,255,.35);font-size:.65rem;margin-top:.5rem;">youtu.be/92XVHHN9KKE?t=183</p>
+        <p style="color:var(--pl);font-size:.72rem;margin-top:.7rem;font-weight:500;">Click to open in YouTube →</p>
+      </a>
+    </div>
+  </div>
+</div>
+<div class="slide bg-white" data-sowhat="Same building blocks. Entirely different problems solved." data-notes="This process — extract, codify, deploy — doesn't stop at LinkedIn posts. These are real tools I've built inside Claude using the same infrastructure. Each one started as a problem I wanted to solve faster.">
+  <div class="fade-up">
+    <div class="eyebrow">The Bigger Picture</div>
+    <h2 class="t-h2">What Else Can You Build?</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
+    <div class="card-dark" style="padding:1.3rem;text-align:center;display:flex;align-items:center;justify-content:center;min-height:80px;"><div style="font-size:.82rem;color:#fff;font-weight:700;">Meeting Prep &amp; Post-Call Builder</div></div>
+    <div class="card-dark" style="padding:1.3rem;text-align:center;display:flex;align-items:center;justify-content:center;min-height:80px;"><div style="font-size:.82rem;color:#fff;font-weight:700;">Proposal Builder</div></div>
+    <div class="card-dark" style="padding:1.3rem;text-align:center;display:flex;align-items:center;justify-content:center;min-height:80px;"><div style="font-size:.82rem;color:#fff;font-weight:700;">Pitch Positioning Builder</div></div>
+    <div class="card-dark" style="padding:1.3rem;text-align:center;display:flex;align-items:center;justify-content:center;min-height:80px;"><div style="font-size:.82rem;color:#fff;font-weight:700;">Post Analyzer</div></div>
+    <div class="card-dark" style="padding:1.3rem;text-align:center;display:flex;align-items:center;justify-content:center;min-height:80px;"><div style="font-size:.82rem;color:#fff;font-weight:700;">Cost of Poor Communication Calculator</div></div>
+    <div class="card-dark" style="padding:1.3rem;text-align:center;display:flex;align-items:center;justify-content:center;min-height:80px;"><div style="font-size:.82rem;color:#fff;font-weight:700;">Prospecting Tool</div></div>
+  </div>
+</div>
+<div class="slide bg-off-white" data-sowhat="A different way to think about Claude — as inspiration, not just a tool." data-notes="Final thought. You know K'NEX? Same pieces, infinite builds. That's Claude. Projects, Skills, Memory, tools — same infrastructure, entirely different outputs depending on what you imagine. Nobody's going to hand you the manual for your specific business problems. But once you understand the pieces, the builds get faster every month.">
+  <div class="fade-up">
+    <div class="eyebrow">A Different Way to See It</div>
+    <h2 class="t-h2">The Inspiration</h2>
+    <div class="accent-bar"></div>
+  </div>
+  <div class="fade-up cols-32">
+    <div>
+      <p style="font-size:clamp(1.3rem,2.5vw,1.8rem);font-weight:700;color:var(--p);margin-bottom:.8rem;line-height:1.3;">Same pieces. Infinite builds.</p>
+      <p class="t-body" style="margin-bottom:1rem;opacity:.8;">Nobody's going to hand you the manual for your specific business problems. But once you understand the pieces, the builds get faster, smarter, and more powerful every month.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem;">
+        <span style="background:var(--p);color:#fff;font-size:.72rem;font-weight:600;padding:.3rem .8rem;border-radius:20px;">Projects</span>
+        <span style="background:var(--p);color:#fff;font-size:.72rem;font-weight:600;padding:.3rem .8rem;border-radius:20px;">Skills</span>
+        <span style="background:var(--p);color:#fff;font-size:.72rem;font-weight:600;padding:.3rem .8rem;border-radius:20px;">Memory</span>
+        <span style="background:var(--p);color:#fff;font-size:.72rem;font-weight:600;padding:.3rem .8rem;border-radius:20px;">Custom Instructions</span>
+        <span style="background:var(--p);color:#fff;font-size:.72rem;font-weight:600;padding:.3rem .8rem;border-radius:20px;">Tools</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="data:image/jpeg;base64,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" alt="K'NEX building blocks" style="max-width:100%;max-height:36vh;object-fit:contain;border-radius:var(--r);">
+    </div>
+  </div>
+</div>
+<div class="slide bg-dark" data-sowhat="15 minutes. Your posts. Let's see what your patterns say." data-notes="Thank you for being here. If any of you are curious what your own patterns look like, I'm happy to do a quick 15-minute walkthrough with your posts. No strings — just your data, your patterns. Grab a time or send me a message. Thanks again.">
+  <div style="text-align:center;">
+    <div class="fade-up" style="margin-bottom:1.8rem;">
+      <div style="font-size:2rem;font-weight:800;color:#fff;letter-spacing:-.02em;">GO TO 11</div>
+      <div style="font-size:.65rem;color:rgba(255,255,255,.4);letter-spacing:.15em;text-transform:uppercase;margin-top:.2rem;">Communication Training</div>
+    </div>
+    <div class="fade-up" style="margin-bottom:2rem;">
+      <h2 class="t-h2" style="color:#fff;margin-bottom:.5rem;">Thank You</h2>
+      <p style="font-size:clamp(1.1rem,2vw,1.4rem);color:rgba(255,255,255,.55);font-style:italic;font-weight:300;">Your best posts already know what to do. Let's make them visible.</p>
+    </div>
+    <div class="fade-up" style="margin-bottom:2rem;">
+      <p class="t-small" style="color:rgba(255,255,255,.65);font-size:.95rem;">If you're curious what your own patterns look like, grab 15 minutes with me — and that's it.</p>
+    </div>
+    <div class="fade-up" style="display:inline-flex;flex-direction:column;gap:.5rem;align-items:center;">
+      <p style="font-size:.95rem;font-weight:600;color:#fff;">Kenny Solway</p>
+      <p style="font-size:.82rem;color:rgba(255,255,255,.55);"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="dbb0beb5b5a2a8b4b7acbaa29bbcb4afb4eaeaf5b8ba">[email&#160;protected]</a></p>
+      <p style="font-size:.82rem;color:rgba(255,255,255,.55);">goto11.ca</p>
+      <p style="font-size:.82rem;color:rgba(255,255,255,.55);">linkedin.com/in/kennysolway</p>
+    </div>
+  </div>
+</div>
+</div>
+<div class="notes-panel">
+  <div class="notes-lbl">Presenter Notes — Press N to hide</div>
+  <div id="notes-txt"></div>
+</div>
+<div class="sowhat-bar">
+  <span class="sowhat-lbl">SO WHAT?</span>
+  <span class="sowhat-sep"></span>
+  <span class="sowhat-txt" id="sw-txt"></span>
+</div>
+<div class="slide-counter" id="slide-counter">1 / 24</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const prog=document.getElementById('prog');
+
+const slides=document.querySelectorAll('.slide');
+const total=slides.length;
+let cur=0;
+const sowhat=document.getElementById('sw-txt');
+const notes=document.querySelector('.notes-panel');
+const notesTxt=document.getElementById('notes-txt');
+const counter=document.getElementById('slide-counter');
+function go(i){
+  slides.forEach((s,j)=>s.classList.toggle('active',j===i));
+  const s=slides[i];
+  sowhat.textContent=s.dataset.sowhat||'';
+  notesTxt.textContent=s.dataset.notes||'';
+  prog.style.width=((i+1)/total*100)+'%';
+  counter.textContent=(i+1)+' / '+total;
+}
+function next(){if(cur<total-1)go(++cur);}
+function prev(){if(cur>0)go(--cur);}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();next();}
+  else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();prev();}
+  else if(e.key==='Home'){e.preventDefault();cur=0;go(0);}
+  else if(e.key==='End'){e.preventDefault();cur=total-1;go(cur);}
+  else if(e.key==='n'||e.key==='N'){notes.classList.toggle('visible');}
+});
+let tx=0;
+document.addEventListene

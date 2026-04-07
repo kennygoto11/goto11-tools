@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Go To 11 — Proposal Generation Process</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%239439bf'/><text x='50' y='70' font-family='Nunito,Arial,sans-serif' font-size='50' font-weight='700' text-anchor='middle' fill='white'>Pr</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: landscape; margin: 0.3in; }
+
+  :root {
+    --purple: #9439bf;
+    --purple-light: #bfb1c4;
+    --sand: #f4d4b7;
+    --grey: #66615c;
+    --offwhite: #ebeaeb;
+    --white: #ffffff;
+    --purple-glow: rgba(148, 57, 191, 0.12);
+    --sand-glow: rgba(244, 212, 183, 0.18);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--offwhite);
+    color: var(--grey);
+    line-height: 1.5;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, var(--purple) 0%, #7a2da3 100%);
+    color: var(--white);
+    padding: 18px 32px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .header-text h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .header-text p {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.8rem;
+    opacity: 0.85;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .legend {
+    display: flex;
+    gap: 16px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+  }
+  .legend-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .legend-dot.kenny { background: var(--sand); }
+  .legend-dot.claude { background: rgba(255,255,255,0.9); }
+  .legend-dot.both { background: linear-gradient(135deg, var(--sand) 50%, rgba(255,255,255,0.9) 50%); }
+
+  .toggle-controls {
+    display: flex;
+    gap: 6px;
+  }
+  .toggle-btn {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--white);
+    background: rgba(255,255,255,0.15);
+    border: 1.5px solid rgba(255,255,255,0.35);
+    border-radius: 6px;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .toggle-btn:hover {
+    background: rgba(255,255,255,0.25);
+    border-color: rgba(255,255,255,0.6);
+  }
+
+  /* ── GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 10px 0;
+    padding: 16px 24px;
+    align-items: start;
+  }
+
+  /* ── ARROW (horizontal) ── */
+  .arrow-h {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 36px;
+  }
+  .arrow-h svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--purple-light);
+  }
+
+  /* ── ROW CONNECTOR (between rows) ── */
+  .row-connector {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    padding: 2px 0;
+  }
+  .row-connector svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--purple-light);
+  }
+
+  /* ── STEP CARD ── */
+  .step {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .step-inner {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .step-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--white);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-number.kenny { background: linear-gradient(135deg, #d4a96e, #c49458); }
+  .step-number.claude { background: linear-gradient(135deg, var(--purple), #7a2da3); }
+  .step-number.both { background: linear-gradient(135deg, #d4a96e 0%, var(--purple) 100%); }
+
+  .step-card {
+    flex: 1;
+    background: var(--white);
+    border-radius: 10px;
+    padding: 12px 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    border-left: 3px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-height: 64px;
+  }
+  .step-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+  }
+  .step.kenny .step-card  { border-left-color: var(--sand); }
+  .step.claude .step-card { border-left-color: var(--purple); }
+  .step.both .step-card   { border-left-color: var(--purple-light); }
+
+  .step-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .step-owner {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.58rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1px;
+  }
+  .step.kenny .step-owner  { color: #c49458; }
+  .step.claude .step-owner { color: var(--purple); }
+  .step.both .step-owner   { color: var(--purple-light); }
+
+  .step-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--grey);
+    line-height: 1.25;
+  }
+
+  .step-chevron {
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+  .step-chevron svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--purple-light);
+    transition: transform 0.3s ease;
+  }
+  .step.open .step-chevron svg {
+    transform: rotate(180deg);
+  }
+
+  /* ── EXPANDABLE BODY ── */
+  .step-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.3s ease;
+    opacity: 0;
+  }
+  .step.open .step-body {
+    max-height: 400px;
+    opacity: 1;
+  }
+
+  .step-desc {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.72rem;
+    color: #888;
+    line-height: 1.4;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--offwhite);
+  }
+
+  .step-detail {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.68rem;
+    line-height: 1.5;
+  }
+  .step.kenny .step-detail  { background: var(--sand-glow); color: #8a6a3e; }
+  .step.claude .step-detail { background: var(--purple-glow); color: #6e3a8a; }
+  .step.both .step-detail   { background: linear-gradient(135deg, var(--sand-glow), var(--purple-glow)); color: var(--grey); }
+
+  .detail-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .detail-list li {
+    padding: 1px 0;
+    position: relative;
+    padding-left: 14px;
+  }
+  .detail-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+  }
+
+  .tool-callout {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--purple-glow);
+    border: 1px solid rgba(148, 57, 191, 0.2);
+    border-radius: 5px;
+    padding: 3px 7px;
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: var(--purple);
+    margin-top: 6px;
+    line-height: 1.3;
+  }
+  .tool-callout svg {
+    width: 11px;
+    height: 11px;
+    fill: var(--purple);
+    flex-shrink: 0;
+  }
+
+  /* ── RESULT BANNER ── */
+  .result-banner {
+    background: linear-gradient(135deg, var(--purple) 0%, #7a2da3 100%);
+    margin: 4px 24px 12px;
+    border-radius: 10px;
+    padding: 12px 24px;
+    text-align: center;
+    color: var(--white);
+    box-shadow: 0 3px 14px rgba(148, 57, 191, 0.25);
+  }
+  .result-banner h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .result-banner p {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.75rem;
+    opacity: 0.9;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 6px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.65rem;
+    color: var(--purple-light);
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .toggle-controls { display: none; }
+    .step-body { max-height: none !important; opacity: 1 !important; }
+    .step-chevron { display: none; }
+  }
+
+  /* ── PORTRAIT FALLBACK ── */
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .arrow-h, .row-connector { display: none; }
+    .header { flex-direction: column; text-align: center; }
+    .header-right { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+<a href="/" style="display:inline-flex;align-items:center;gap:6px;font-family:-apple-system,system-ui,sans-serif;font-size:13px;color:#9439bf;text-decoration:none;font-weight:700;padding:12px 16px">&larr; Back to Hub</a>
+
+<div class="header">
+  <div class="header-text">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;"><svg width="32" height="32" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="34" stroke="#9439bf" stroke-width="5"/><circle cx="58" cy="52" r="4" stroke="#9439bf" stroke-width="2.5"/><line x1="50" y1="6" x2="50" y2="16" stroke="#9439bf" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="84" x2="50" y2="94" stroke="#9439bf" stroke-width="4" stroke-linecap="round"/><line x1="6" y1="50" x2="16" y2="50" stroke="#9439bf" stroke-width="4" stroke-linecap="round"/><line x1="84" y1="50" x2="94" y2="50" stroke="#9439bf" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="19" x2="26" y2="26" stroke="#9439bf" stroke-width="4" stroke-linecap="round"/><line x1="74" y1="74" x2="81" y2="81" stroke="#9439bf" stroke-width="4" stroke-linecap="round"/><line x1="81" y1="19" x2="74" y2="26" stroke="#9439bf" stroke-width="4" stroke-linecap="round"/><line x1="26" y1="74" x2="19" y2="81" stroke="#9439bf" stroke-width="4" stroke-linecap="round"/></svg><span style="font-family: Nunito, sans-serif; font-weight: 700; font-size: 14px; color: #9439bf;">Go To 11</span></div>
+    <h1>How a Go To 11 Proposal Gets Built</h1>
+    <p>From client conversation to finished proposal deck — every step of the process.</p>
+  </div>
+  <div class="header-right">
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot kenny"></span> Kenny</div>
+      <div class="legend-item"><span class="legend-dot claude"></span> Claude</div>
+      <div class="legend-item"><span class="legend-dot both"></span> Collaborative</div>
+    </div>
+    <div class="toggle-controls">
+      <button class="toggle-btn" onclick="expandAll()">Expand All</button>
+      <button class="toggle-btn" onclick="collapseAll()">Collapse All</button>
+    </div>
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- ═══ ROW 1: Steps 1 → 2 → 3 ═══ -->
+
+  <!-- STEP 1 -->
+  <div class="step kenny" onclick="toggleStep(this)">
+    <div class="step-inner">
+      <div class="step-number kenny">1</div>
+      <div class="step-card">
+        <div class="step-card-header">
+          <div>
+            <div class="step-owner">Kenny</div>
+            <div class="step-title">Have the Client Conversation</div>
+          </div>
+          <div class="step-chevron"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc">Discovery call, intro meeting, or follow-up — learn what the client actually needs.</div>
+          <div class="step-detail">
+            <ul class="detail-list">
+              <li>Listen for the real problem behind the ask</li>
+              <li>Note audience size, timeline, budget signals</li>
+              <li>Record with Granola, Fathom, or similar</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-h"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></div>
+
+  <!-- STEP 2 -->
+  <div class="step kenny" onclick="toggleStep(this)">
+    <div class="step-inner">
+      <div class="step-number kenny">2</div>
+      <div class="step-card">
+        <div class="step-card-header">
+          <div>
+            <div class="step-owner">Kenny</div>
+            <div class="step-title">Grab the Transcript</div>
+          </div>
+          <div class="step-chevron"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc">Pull the transcript from your recording tool. Raw notes work too — Claude will sort through them.</div>
+          <div class="step-detail">
+            <ul class="detail-list">
+              <li>Copy full transcript (no cleanup needed)</li>
+              <li>No recording? Jot notes on company, problem, scope, timeline, budget</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-h"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></div>
+
+  <!-- STEP 3 -->
+  <div class="step kenny" onclick="toggleStep(this)">
+    <div class="step-inner">
+      <div class="step-number kenny">3</div>
+      <div class="step-card">
+        <div class="step-card-header">
+          <div>
+            <div class="step-owner">Kenny</div>
+            <div class="step-title">Paste into Cowork &amp; Say "Build a Proposal"</div>
+          </div>
+          <div class="step-chevron"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc">One message kicks off the entire process.</div>
+          <div class="step-detail">
+            <ul class="detail-list">
+              <li>"Build a proposal for [Company]. Here's the transcript: …"</li>
+              <li>Also: "draft a proposal," "put something together," "Gamma prompt for [Client]"</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ ROW CONNECTOR ═══ -->
+  <div class="row-connector"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
+
+  <!-- ═══ ROW 2: Steps 4 → 5 → 6 ═══ -->
+
+  <!-- STEP 4 -->
+  <div class="step claude" onclick="toggleStep(this)">
+    <div class="step-inner">
+      <div class="step-number claude">4</div>
+      <div class="step-card">
+        <div class="step-card-header">
+          <div>
+            <div class="step-owner">Claude</div>
+            <div class="step-title">Extract Key Details</div>
+          </div>
+          <div class="step-chevron"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc">Claude reads the transcript and pulls out everything needed to build the proposal.</div>
+          <div class="step-detail">
+            <ul class="detail-list">
+              <li>Company, industry, contact info</li>
+              <li>Core problem &amp; success criteria</li>
+              <li>Audience size, level, format</li>
+              <li>Timeline, urgency, budget range</li>
+              <li>Competitive alternatives mentioned</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-h"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></div>
+
+  <!-- STEP 5 -->
+  <div class="step both" onclick="toggleStep(this)">
+    <div class="step-inner">
+      <div class="step-number both">5</div>
+      <div class="step-card">
+        <div class="step-card-header">
+          <div>
+            <div class="step-owner">Collaborative</div>
+            <div class="step-title">Gap Analysis &amp; Follow-Up Questions</div>
+          </div>
+          <div class="step-chevron"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc">Claude flags what's missing. You decide how to handle it.</div>
+          <div class="step-detail">
+            <ul class="detail-list">
+              <li>Missing info? Claude drafts follow-up questions</li>
+              <li>Have the answers? Drop them in</li>
+              <li>Good enough? Say "go ahead"</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-h"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></div>
+
+  <!-- STEP 6 -->
+  <div class="step claude" onclick="toggleStep(this)">
+    <div class="step-inner">
+      <div class="step-number claude">6</div>
+      <div class="step-card">
+        <div class="step-card-header">
+          <div>
+            <div class="step-owner">Claude</div>
+            <div class="step-title">Determine Tier &amp; Calculate Pricing</div>
+          </div>
+          <div class="step-chevron"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc">Recommends a tier and builds the investment section using the pricing engine.</div>
+          <div class="step-detail">
+            <ul class="detail-list">
+              <li><strong>T1</strong> Focused (~$7.5K)</li>
+              <li><strong>T2</strong> Growth (~$25K)</li>
+              <li><strong>T3</strong> Enterprise (~$60K)</li>
+            </ul>
+          </div>
+          <div class="tool-callout">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            Pricing Calculator
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ ROW CONNECTOR ═══ -->
+  <div class="row-connector"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
+
+  <!-- ═══ ROW 3: Steps 7 → 8 → 9 ═══ -->
+
+  <!-- STEP 7 -->
+  <div class="step claude" onclick="toggleStep(this)">
+    <div class="step-inner">
+      <div class="step-number claude">7</div>
+      <div class="step-card">
+        <div class="step-card-header">
+          <div>
+            <div class="step-owner">Claude</div>
+            <div class="step-title">Assemble the Full Proposal</div>
+          </div>
+          <div class="step-chevron"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc">Up to 12 sections for formal proposals, 6–10 for discussion documents.</div>
+          <div class="step-detail">
+            <ul class="detail-list">
+              <li>Opens with client's problem (never credentials)</li>
+              <li>Trust Multiplier embedded throughout</li>
+              <li>Three Pillars methodology applied</li>
+              <li>Kenny's voice — direct, warm, no fluff</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-h"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></div>
+
+  <!-- STEP 8 -->
+  <div class="step claude" onclick="toggleStep(this)">
+    <div class="step-inner">
+      <div class="step-number claude">8</div>
+      <div class="step-card">
+        <div class="step-card-header">
+          <div>
+            <div class="step-owner">Claude</div>
+            <div class="step-title">Generate the Gamma Deck</div>
+          </div>
+          <div class="step-chevron"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc">Produces a Gamma-ready prompt for a designed, branded proposal deck.</div>
+          <div class="step-detail">
+            <ul class="detail-list">
+              <li>Structured for Gamma's builder</li>
+              <li>Go To 11 brand colours applied</li>
+              <li>One click to generate at gamma.app</li>
+            </ul>
+          </div>
+          <div class="tool-callout">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            Paste into gamma.app
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-h"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></div>
+
+  <!-- STEP 9 -->
+  <div class="step kenny" onclick="toggleStep(this)">
+    <div class="step-inner">
+      <div class="step-number kenny">9</div>
+      <div class="step-card">
+        <div class="step-card-header">
+          <div>
+            <div class="step-owner">Kenny</div>
+            <div class="step-title">Review, Adjust &amp; Send</div>
+          </div>
+          <div class="step-chevron"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc">Review the deck, tweak, and send. Under 30 minutes total.</div>
+          <div class="step-detail">
+            <ul class="detail-list">
+              <li>Check pricing, scope, tone</li>
+              <li>Adjust from your call instinct</li>
+              <li>Generate in Gamma, review design</li>
+              <li>Send with a warm follow-up note</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /grid -->
+
+<div class="result-banner">
+  <h3>Conversation → Proposal in Under 30 Minutes</h3>
+  <p>You focus on the relationship — the system handles the document.</p>
+</div>
+
+<div class="footer">
+  Go To 11 Communication Training &middot; goto11.ca &middot; Proposal Builder System
+</div>
+
+<script>
+function toggleStep(el) {
+  el.classList.toggle('open');
+}
+function expandAll() {
+  document.querySelectorAll('.step').forEach(function(s) { s.classList.add('open'); });
+}
+function collapseAll() {
+  document.querySelectorAll('.step').forEach(function(s) { s.classList.remove('open'); });
+}
+</script>
+
+</body>
+</html>
