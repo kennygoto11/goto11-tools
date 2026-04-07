@@ -135,6 +135,20 @@ body {
 .gate-status { font-size: 13px; font-weight: 700; color: var(--text-tertiary); text-align: center; margin-bottom: 8px; transition: color 0.2s; }
 .gate-status.ready { color: var(--purple); }
 .btn-s.gated { opacity: 0.45; pointer-events: none; background: var(--bg-subtle); color: var(--text-tertiary); }
+.flag-box { border: 1px solid var(--border-med); border-radius: 10px; padding: 12px; margin-bottom: 14px; background: var(--bg-subtle); }
+.flag-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 8px; }
+.flag-input-row { display: flex; gap: 6px; margin-bottom: 10px; }
+.flag-input { flex: 1; padding: 8px 12px; border: 1px solid var(--border-med); border-radius: 8px; background: white; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 600; color: var(--text-primary); outline: none; }
+.flag-input:focus { border-color: var(--purple-light); }
+.flag-add { padding: 8px 14px; border-radius: 8px; border: none; background: var(--purple); color: white; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; }
+.flag-add:hover { opacity: 0.88; }
+.flag-chips { display: flex; flex-wrap: wrap; gap: 6px; min-height: 4px; }
+.flag-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px 5px 12px; border-radius: 20px; background: var(--purple-light); color: #3d2a4a; font-size: 12px; font-weight: 700; }
+.flag-chip.usable { cursor: pointer; transition: all 0.15s; }
+.flag-chip.usable:hover { background: var(--purple); color: white; }
+.flag-chip-x { width: 14px; height: 14px; border-radius: 50%; background: rgba(0,0,0,0.15); color: inherit; border: none; cursor: pointer; font-size: 11px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+.flag-chip-x:hover { background: rgba(0,0,0,0.3); }
+.flag-empty { font-size: 12px; color: var(--text-tertiary); font-style: italic; }
 </style>
 </head>
 <body>
@@ -190,7 +204,15 @@ body {
         <div class="inst-text"><strong>Changes</strong> — any Working List contact with a new role, promotion, or company news?</div>
       </div>
     </div>
-    <div class="hint"><strong>Trigger spotted?</strong> Note the name. They go first in step 2. Keep scanning — you want up to three.</div>
+    <div class="flag-box">
+      <div class="flag-label">Flag names as you scan</div>
+      <div class="flag-input-row">
+        <input class="flag-input" id="flag-input" type="text" placeholder="Type a name and press Enter" onkeydown="if(event.key==='Enter'){addFlag();event.preventDefault();}">
+        <button class="flag-add" onclick="addFlag()">+ Add</button>
+      </div>
+      <div class="flag-chips" id="flag-chips"><span class="flag-empty">No names flagged yet.</span></div>
+    </div>
+    <div class="hint"><strong>Trigger spotted?</strong> Flag the name above. Keep scanning — flag as many as you want, then pick your top 3 in step 2.</div>
     <div class="btn-row">
       <button class="btn-p" id="bs1" onclick="startTimer(1)">Start timer</button>
       <button class="btn-s" onclick="goStep(2)">Done — next step →</button>
@@ -207,6 +229,10 @@ body {
     <hr class="divider">
     <div class="hint" style="margin-bottom:13px;border-left-color:var(--purple-light);"><strong>What to do:</strong> Enter 3 contacts from your Working List. For each one, type their name, select why you're reaching out (Trigger is best, then Filter, then Relationship), paste any context (a LinkedIn post, a note about them), then hit "Draft with Claude" to copy a ready-made prompt you can paste into Claude Chat to generate your outreach message.</div>
     <p style="font-size:13px;color:var(--text-secondary);margin-bottom:11px;">Pick the highest available reason for each person:</p>
+    <div class="flag-box" id="flag-box-2" style="display:none;">
+      <div class="flag-label">Flagged from step 1 — click to add</div>
+      <div class="flag-chips" id="flag-chips-2"></div>
+    </div>
     <div class="priority-bar">
       <div class="pri-chip t">Trigger</div>
       <div class="pri-arrow">→</div>
@@ -301,6 +327,7 @@ body {
 
 <script>
 var contacts = [{name:'',reason:'',context:''},{name:'',reason:'',context:''},{name:'',reason:'',context:''}];
+var flagged = [];
 var tsecs = {1:180,2:120,3:600};
 var tints = {};
 var curStep = 1;
@@ -398,6 +425,62 @@ function updateGate(){
   if(cb) { cb.className = sent >= 3 ? 'btn-s' : 'btn-s gated'; }
 }
 
+function addFlag(){
+  var inp = document.getElementById('flag-input');
+  var v = (inp.value || '').trim();
+  if(!v) return;
+  if(flagged.indexOf(v) === -1) flagged.push(v);
+  inp.value = '';
+  renderFlags();
+}
+function removeFlag(idx){
+  flagged.splice(idx, 1);
+  renderFlags();
+}
+function useFlag(idx){
+  var name = flagged[idx];
+  for(var i = 0; i < 3; i++){
+    if(!contacts[i].name){
+      contacts[i].name = name;
+      var el = document.getElementById('cn'+i);
+      if(el) el.value = name;
+      fillCR(i);
+      flagged.splice(idx, 1);
+      renderFlags();
+      return;
+    }
+  }
+}
+function renderFlags(){
+  var c1 = document.getElementById('flag-chips');
+  if(c1){
+    if(flagged.length === 0){
+      c1.innerHTML = '<span class="flag-empty">No names flagged yet.</span>';
+    } else {
+      c1.innerHTML = flagged.map(function(n,i){
+        return '<span class="flag-chip">'+escapeHtml(n)+'<button class="flag-chip-x" onclick="removeFlag('+i+')">\u00d7</button></span>';
+      }).join('');
+    }
+  }
+  var box2 = document.getElementById('flag-box-2');
+  var c2 = document.getElementById('flag-chips-2');
+  if(box2 && c2){
+    if(flagged.length === 0){
+      box2.style.display = 'none';
+    } else {
+      box2.style.display = 'block';
+      c2.innerHTML = flagged.map(function(n,i){
+        return '<span class="flag-chip usable" onclick="useFlag('+i+')">'+escapeHtml(n)+' +</span>';
+      }).join('');
+    }
+  }
+}
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
 function draftClaude(i){
   var ct = contacts[i];
   var name = ct.name || 'Contact ' + (i+1);
@@ -441,6 +524,7 @@ function goStep(n){
       var el = document.getElementById(id);
       el.className = 'pp'+(i<stepN-1?' done':i===stepN-1?' active':'');
     });
+    if(n===2) renderFlags();
     if(n===3) buildSlots();
   }
   curStep=n;
@@ -449,6 +533,9 @@ function goStep(n){
 
 function resetBrief(){
   contacts=[{name:'',reason:'',context:''},{name:'',reason:'',context:''},{name:'',reason:'',context:''}];
+  flagged=[];
+  var fi=document.getElementById('flag-input');if(fi)fi.value='';
+  renderFlags();
   Object.keys(tints).forEach(function(k){ clearInterval(tints[k]); delete tints[k]; });
   tsecs={1:180,2:120,3:600};
   [1,2,3].forEach(function(n){
