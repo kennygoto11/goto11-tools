@@ -3,83 +3,230 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Go To 11 — App Hub</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%239439bf'/><text x='50' y='70' font-family='Nunito,Arial,sans-serif' font-size='54' font-weight='700' text-anchor='middle' fill='white'>11</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+<title>Rowen's Interview Cheat Sheets</title>
 <style>
-  :root { --purple: #9439bf; --purple-dark: #7a2fa3; --purple-faint: rgba(148,57,191,0.08); --light-purple: #bfb1c4; --sand: #f4d4b7; --sand-faint: rgba(244,212,183,0.08); --grey: #66615c; --dark: #2d2a2e; --offwhite: #ebeaeb; --white: #ffffff; --surface: var(--white); --surface-hover: rgba(148,57,191,0.04); --border: rgba(102,97,92,0.12); --border-hover: rgba(148,57,191,0.35); }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'PT Sans', sans-serif; background: var(--offwhite); color: var(--dark); min-height: 100vh; }
-  .page { max-width: 920px; margin: 0 auto; padding: 48px 24px 64px; }
-  .header { text-align: center; margin-bottom: 48px; }
-  .logo { display: inline-flex; align-items: center; gap: 14px; margin-bottom: 6px; text-decoration: none; }
-  .logo-mark { width: 48px; height: 48px; background: var(--purple); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 800; font-family: 'Poppins', sans-serif; line-height: 1.1; flex-shrink: 0; }
-  .logo-text { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.6rem; color: var(--dark); letter-spacing: -0.5px; }
-  .header-sub { font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 600; color: var(--light-purple); letter-spacing: 1px; text-transform: uppercase; }
-  .section { margin-bottom: 36px; }
-  .section-label { font-family: 'Nunito', sans-serif; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; color: var(--grey); margin-bottom: 12px; padding-left: 4px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
-  .card { display: flex; flex-direction: column; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; text-decoration: none; color: var(--dark); transition: all 0.2s ease; cursor: pointer; min-height: 100px; }
-  .card:hover { background: var(--surface-hover); border-color: var(--border-hover); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(148,57,191,0.10); }
-  .card-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; background: var(--purple-faint); flex-shrink: 0; }
-  .card-icon.sand { background: var(--sand-faint); }
-  .card-icon.grey { background: rgba(102,97,92,0.06); }
-  .card-title { font-family: 'Nunito', sans-serif; font-size: 0.88rem; font-weight: 700; color: var(--dark); line-height: 1.3; }
-  .card-desc { font-size: 0.74rem; color: var(--grey); line-height: 1.45; }
-  .footer { text-align: center; margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border); }
-  .footer p { font-size: 0.72rem; color: var(--light-purple); }
-  .footer a { color: var(--purple); text-decoration: none; }
-  .card { opacity: 0; animation: fadeUp 0.3s ease forwards; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-  .grid .card:nth-child(1) { animation-delay: 0.02s; } .grid .card:nth-child(2) { animation-delay: 0.04s; } .grid .card:nth-child(3) { animation-delay: 0.06s; } .grid .card:nth-child(4) { animation-delay: 0.08s; } .grid .card:nth-child(5) { animation-delay: 0.10s; } .grid .card:nth-child(6) { animation-delay: 0.12s; }
-  @media (max-width: 500px) { .grid { grid-template-columns: repeat(2, 1fr); } .card { padding: 14px; min-height: 90px; } .page { padding: 28px 16px 48px; } }
+:root{--purple:#9439bf;--light-purple:#bfb1c4;--sand:#f4d4b7;--dark-grey:#66615c;--off-white:#ebeaeb;--b:#6C5CE7;--i:#0F6E56;--m:#B8860B}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,system-ui,'Segoe UI',sans-serif;background:#f5f3f7;color:#2c2c2c;-webkit-font-smoothing:antialiased}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--purple);text-decoration:none;font-weight:700;padding:12px 16px}
+.back-link:hover{text-decoration:underline}
+.tabs{display:flex;position:sticky;top:0;z-index:100;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.tab{flex:1;padding:16px 0;text-align:center;font-size:14px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;color:#999;transition:all .2s}
+.tab.active-forum{color:var(--purple);border-color:var(--purple)}
+.tab.active-lincoln{color:var(--i);border-color:var(--i)}
+.panel{display:none;padding:16px;max-width:680px;margin:0 auto}
+.panel.active{display:block}
+.hero{padding:24px 20px;border-radius:16px;margin-bottom:16px;position:relative;overflow:hidden}
+.hero-forum{background:linear-gradient(135deg,#f3eef8 0%,#faf8fc 100%);border:1px solid #e0d4ec}
+.hero-lincoln{background:linear-gradient(135deg,#e8f5ef 0%,#f5fcf8 100%);border:1px solid #c5e8d5}
+.hero-tag{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:10px;opacity:.7}
+.hero h2{font-size:24px;font-weight:700;margin-bottom:8px}
+.hero-forum h2{color:var(--purple)}
+.hero-lincoln h2{color:var(--i)}
+.hero-row{font-size:13px;color:#666;line-height:1.7}
+.hero-row strong{color:#333;font-weight:600}
+.section-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#aaa;margin:20px 0 10px;padding-left:2px}
+.tfd-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px}
+@media(max-width:500px){.tfd-grid{grid-template-columns:1fr}}
+.tfd-card{padding:14px;border-radius:12px;border:1px solid}
+.tfd-card h3{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;margin-bottom:6px}
+.tfd-card p{font-size:12.5px;line-height:1.5;color:#555}
+.tfd-think{background:#f3edf9;border-color:#dcc8ed}.tfd-think h3{color:#7b3fa5}
+.tfd-feel{background:#fef0ea;border-color:#f0c4ad}.tfd-feel h3{color:#c4511a}
+.tfd-do{background:#e6f6ef;border-color:#b5e0cb}.tfd-do h3{color:#0a7b52}
+.bim-pillar{margin-bottom:16px;border-radius:14px;overflow:hidden;border:1px solid #e0e0e0;background:#fff}
+.bim-header{padding:14px 18px;display:flex;align-items:baseline;gap:10px}
+.bim-header .letter{font-size:32px;font-weight:800;line-height:1}
+.bim-header .word{font-size:16px;font-weight:700}
+.bim-b .bim-header{background:linear-gradient(90deg,#f0edfe,#f8f7ff)}.bim-b .letter,.bim-b .word{color:var(--b)}
+.bim-i .bim-header{background:linear-gradient(90deg,#e4f5ed,#f2faf6)}.bim-i .letter,.bim-i .word{color:var(--i)}
+.bim-m .bim-header{background:linear-gradient(90deg,#fdf4e0,#fefbf2)}.bim-m .letter,.bim-m .word{color:var(--m)}
+.bim-body{padding:4px 16px 16px}
+.ev{margin-top:12px;padding:12px 14px;border-radius:10px;background:#fafafa;border:1px solid #eee}
+.ev h5{font-size:13px;font-weight:700;color:#333;margin-bottom:8px}
+.car{font-size:12px;line-height:1.6;color:#666;margin-bottom:4px}
+.car:last-child{margin-bottom:0}
+.car b{font-weight:700;color:#444}
+.callout{margin:16px 0;padding:16px 18px;border-radius:12px;border-left:4px solid;font-size:12.5px;line-height:1.65;color:#555}
+.callout strong{font-weight:700;color:#333}
+.callout-forum{border-color:var(--purple);background:#f8f3fc}
+.callout-lincoln{border-color:var(--i);background:#eef8f2}
+.tips{padding:16px 18px;border-radius:12px;background:#fff;border:1px solid #e8e8e8;margin-bottom:20px}
+.tips h4{font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:#aaa;margin-bottom:10px}
+.tips p{font-size:12.5px;line-height:1.6;color:#555;margin-bottom:8px}
+.tips p:last-child{margin-bottom:0}
+.tips p strong{font-weight:700;color:#333}
+.car-badge{display:inline-block;width:18px;height:18px;border-radius:4px;text-align:center;line-height:18px;font-size:10px;font-weight:800;color:#fff;margin-right:4px;vertical-align:middle}
+.car-c{background:#e74c3c}
+.car-a{background:#f39c12}
+.car-r{background:#27ae60}
 </style>
 </head>
 <body>
-<div class="page">
-  <div class="header">
-    <div class="logo"><div class="logo-mark">GO<br>TO 11</div><div class="logo-text">Go To 11</div></div>
-    <div class="header-sub">Internal App Hub</div>
-  </div>
-  <div class="section">
-    <div class="section-label">Content</div>
-    <div class="grid">
-      <a class="card" href="https://goto11-li-post-dashboard.netlify.app/" target="_blank"><div class="card-icon">✍️</div><div class="card-title">LinkedIn Writer & Analyst</div><div class="card-desc">Write, track, and analyse posts with AI</div></a>
-      <a class="card" href="https://goto11-newsletter-studio.netlify.app/" target="_blank"><div class="card-icon">📧</div><div class="card-title">Newsletter Studio</div><div class="card-desc">Draft and manage email newsletters</div></a>
-    </div>
-  </div>
-  <div class="section">
-    <div class="section-label">Sales & Positioning</div>
-    <div class="grid">
-      <a class="card" href="https://goto11-cost-calculator.netlify.app/tool.html?demo=goto11" target="_blank"><div class="card-icon sand">💰</div><div class="card-title">Cost Calculator</div><div class="card-desc">Inefficiency cost calculator — direct access</div></a>
-      <a class="card" href="https://positioning-pitch-builder-go-to-11.netlify.app/" target="_blank"><div class="card-icon">🎯</div><div class="card-title">Pitch Builder</div><div class="card-desc">Go To 11 positioning pitch</div></a>
-      <a class="card" href="/how-it-all-works.html" target="_blank"><div class="card-icon grey">🔍</div><div class="card-title">How It All Works</div><div class="card-desc">Proposal builder overview</div></a>
-      <a class="card" href="/proposal-generation-process.html" target="_blank"><div class="card-icon grey">📄</div><div class="card-title">Proposal Process</div><div class="card-desc">Step-by-step workflow</div></a>
-    </div>
-  </div>
-  <div class="section">
-    <div class="section-label">Training & Resources</div>
-    <div class="grid">
-      <a class="card" href="https://masterclass-dashboard.netlify.app/" target="_blank"><div class="card-icon">🎓</div><div class="card-title">Master Class</div><div class="card-desc">Master class launch hub</div></a>
-      <a class="card" href="/to-get-to-11.html" target="_blank"><div class="card-icon">🚀</div><div class="card-title">To Get To 11</div><div class="card-desc">Interactive methodology</div></a>
-      <a class="card" href="/lunch-and-learn-presentation-april-2-2026.html" target="_blank"><div class="card-icon sand">📊</div><div class="card-title">Lunch & Learn</div><div class="card-desc">LinkedIn Optimisation deck</div></a>
-      <a class="card" href="/claude-setup-guide.html" target="_blank"><div class="card-icon grey">🤖</div><div class="card-title">Claude Setup Guide</div><div class="card-desc">Visual onboarding guide</div></a>
-      <a class="card" href="/tech-stack.html" target="_blank"><div class="card-icon grey">⚙️</div><div class="card-title">Tech Stack Guide</div><div class="card-desc">How GitHub, Netlify, Claude, APIs & MCP work together</div></a>
-    </div>
-  </div>
-  <div class="section">
-    <div class="section-label">Client Work</div>
-    <div class="grid">
-      <a class="card" href="/interview-prep.html" target="_blank"><div class="card-icon sand">🎤</div><div class="card-title">Interview Prep — Rowen</div><div class="card-desc">Forum & Lincoln cheat sheets with BIM framework</div></a>
-    </div>
-  </div>
-  <div class="section">
-    <div class="section-label">Client Tools Site</div>
-    <div class="grid">
-      <a class="card" href="https://tools.goto11.ca" target="_blank"><div class="card-icon sand">🌐</div><div class="card-title">tools.goto11.ca</div><div class="card-desc">Manage your public-facing tools</div></a>
-    </div>
-  </div>
-  <div class="footer"><p>Go To 11 Communication Training &mdash; <a href="https://goto11.ca" target="_blank">goto11.ca</a></p></div>
+
+<a class="back-link" href="/">&#8592; Back to Hub</a>
+
+<div class="tabs">
+  <div class="tab active-forum" id="tab-forum" onclick="switchTab('forum')">Wed &middot; Forum</div>
+  <div class="tab" id="tab-lincoln" onclick="switchTab('lincoln')">Thu &middot; Lincoln</div>
 </div>
+
+<div class="panel active" id="panel-forum">
+<div class="hero hero-forum">
+  <div class="hero-tag">Interview 1 of 2</div>
+  <h2>Forum Asset Management</h2>
+  <div class="hero-row">
+    <strong>Wednesday, April 8 &middot; 11:00 AM</strong><br>
+    Interviewer: <strong>Susan</strong> &mdash; People &amp; Culture / Talent Acquisition<br>
+    Role: Student housing &middot; 18-month contract &middot; $45&ndash;55K CAD<br>
+    Vibe: <strong>Behavioral.</strong> &ldquo;Tell me about a time&rdquo; questions.<br>
+    Angle: <strong>Applied Ottawa, screening for Toronto.</strong> Show you&rsquo;re worth investing in.
+  </div>
+</div>
+<div class="section-label">What do you want them to&hellip;</div>
+<div class="tfd-grid">
+  <div class="tfd-card tfd-think"><h3>Think</h3><p>He&rsquo;s knowledgeable about CRE fundamentals. More than qualified. Great fit.</p></div>
+  <div class="tfd-card tfd-feel"><h3>Feel</h3><p>Excited to groom someone long-term who&rsquo;ll grow within the company.</p></div>
+  <div class="tfd-card tfd-do"><h3>Do</h3><p>Advance me to the next round. Speak highly to decision-makers.</p></div>
+</div>
+<div class="section-label">BIM &mdash; Your three pillars</div>
+<div class="bim-pillar bim-b">
+<div class="bim-header"><span class="letter">B</span><span class="word">Balance</span></div>
+<div class="bim-body">
+  <div class="ev"><h5>The full plate</h5>
+    <div class="car"><span class="car-badge car-c">C</span> Running SharpShot (dev team, partnerships, product, social), 5 courses + film thesis, full-time job search &mdash; all simultaneously.</div>
+    <div class="car"><span class="car-badge car-a">A</span> Prioritized ruthlessly. Gave each commitment focused attention &mdash; not multitasking, but knowing where energy matters most.</div>
+    <div class="car"><span class="car-badge car-r">R</span> Outperformed in all courses, grew the business, secured multiple interviews. Nothing dropped.</div>
+  </div>
+  <div class="ev"><h5>SharpShot&rsquo;s many arms</h5>
+    <div class="car"><span class="car-badge car-c">C</span> Business spans dev management, social media, outreach, partnerships, product dev &mdash; each could be full-time.</div>
+    <div class="car"><span class="car-badge car-a">A</span> Treated each as a singular focused task. Cycled efficiently rather than spreading thin.</div>
+    <div class="car"><span class="car-badge car-r">R</span> 11 months, 7 days/week &mdash; every arm moved forward while maintaining school, social life, fitness, and community.</div>
+  </div>
+</div></div>
+<div class="bim-pillar bim-i">
+<div class="bim-header"><span class="letter">I</span><span class="word">Independence</span></div>
+<div class="bim-body">
+  <div class="ev"><h5>Building from zero</h5>
+    <div class="car"><span class="car-badge car-c">C</span> Starting SharpShot with no playbook, no manager, no structure.</div>
+    <div class="car"><span class="car-badge car-a">A</span> Proactive across every arm &mdash; created processes, made decisions, built systems independently.</div>
+    <div class="car"><span class="car-badge car-r">R</span> Functioning startup with dev team, partnerships, and product &mdash; proof I don&rsquo;t need hand-holding.</div>
+  </div>
+  <div class="ev"><h5>Fast ramp-up</h5>
+    <div class="car"><span class="car-badge car-c">C</span> Every new role requires learning the system before you can run independently.</div>
+    <div class="car"><span class="car-badge car-a">A</span> In every job, moved from dependent to independent quickly &mdash; learned the structure, then ran with it.</div>
+    <div class="car"><span class="car-badge car-r">R</span> Freed up managers&rsquo; time. Within a month of starting any role, I&rsquo;m operating autonomously.</div>
+  </div>
+</div></div>
+<div class="bim-pillar bim-m">
+<div class="bim-header"><span class="letter">M</span><span class="word">Metrics</span></div>
+<div class="bim-body">
+  <div class="ev"><h5>Commencement Group sales</h5>
+    <div class="car"><span class="car-badge car-c">C</span> Sent to ceremonies across Ontario with inventory and daily benchmarks. Bonus tiers at target + double target.</div>
+    <div class="car"><span class="car-badge car-a">A</span> Consistently hit and exceeded benchmarks. Didn&rsquo;t coast post-target like others &mdash; kept pushing.</div>
+    <div class="car"><span class="car-badge car-r">R</span> Placed on high-importance, high-upside roles. My groups beat prior-year crews at the same schools.</div>
+  </div>
+  <div class="ev"><h5>Reading the numbers</h5>
+    <div class="car"><span class="car-badge car-c">C</span> Numbers aren&rsquo;t just targets &mdash; you need to interpret what they mean and where to adjust.</div>
+    <div class="car"><span class="car-badge car-a">A</span> Learned to tell the story data tells &mdash; what&rsquo;s working, what&rsquo;s not, where to pivot. Applied across SharpShot and sales.</div>
+    <div class="car"><span class="car-badge car-r">R</span> Can speak to KPIs, track leasing metrics, manage pipelines &mdash; exactly the profile this role asks for.</div>
+  </div>
+</div></div>
+<div class="callout callout-forum">
+  <strong>Framing note:</strong> &ldquo;Most of my strongest examples come from 11 months building SharpShot 7 days a week &mdash; a small startup gave me exposure to every facet of business and let me expand on and refine skills from previous roles.&rdquo;
+</div>
+<div class="tips">
+  <h4>Forum-specific reminders</h4>
+  <p><strong>Don&rsquo;t say &ldquo;overqualified&rdquo;</strong> &mdash; signals flight risk. Say &ldquo;more than qualified.&rdquo;</p>
+  <p><strong>Don&rsquo;t say &ldquo;multitasking&rdquo;</strong> &mdash; signals shallow. Say balanced, focused, efficient, prioritized.</p>
+  <p><strong>This is a screen for Toronto.</strong> Show you&rsquo;re worth investing in &mdash; coachable, driven, long-term thinker.</p>
+  <p><strong>Mitch said</strong> you probably won&rsquo;t need deep technical knowledge for this round. Don&rsquo;t force it.</p>
+  <p><strong>Salary: $45&ndash;55K.</strong> Manage expectations. Comparable to first 7 months at Insight Global.</p>
+</div>
+</div>
+
+<div class="panel" id="panel-lincoln">
+<div class="hero hero-lincoln">
+  <div class="hero-tag">Interview 2 of 2</div>
+  <h2>Lincoln Investments</h2>
+  <div class="hero-row">
+    <strong>Thursday, April 9</strong><br>
+    Interviewer: <strong>VP-level</strong> &mdash; expect more substance than HR screen<br>
+    Role: Junior analyst &middot; Posted position<br>
+    Vibe: <strong>Potentially more technical.</strong> Analytical thinking, CRE fundamentals.<br>
+    Angle: <strong>Real posted position.</strong> Energy = &ldquo;I&rsquo;m ready to contribute&rdquo; not &ldquo;take a chance on me.&rdquo;
+  </div>
+</div>
+<div class="section-label">What do you want them to&hellip;</div>
+<div class="tfd-grid">
+  <div class="tfd-card tfd-think"><h3>Think</h3><p>He&rsquo;s analytical, sharp, and understands how to work with data in a CRE context.</p></div>
+  <div class="tfd-card tfd-feel"><h3>Feel</h3><p>Confident he can contribute quickly and grow into a strong analyst.</p></div>
+  <div class="tfd-card tfd-do"><h3>Do</h3><p>Move me forward in the hiring process. Advocate for me to the team.</p></div>
+</div>
+<div class="section-label">BIM &mdash; Your three pillars</div>
+<div class="bim-pillar bim-b">
+<div class="bim-header"><span class="letter">B</span><span class="word">Balance</span></div>
+<div class="bim-body">
+  <div class="ev"><h5>The full plate</h5>
+    <div class="car"><span class="car-badge car-c">C</span> Running SharpShot (dev team, partnerships, product, social), 5 courses + film thesis, full-time job search &mdash; all simultaneously.</div>
+    <div class="car"><span class="car-badge car-a">A</span> Prioritized ruthlessly. Gave each commitment focused attention &mdash; not multitasking, but knowing where energy matters most.</div>
+    <div class="car"><span class="car-badge car-r">R</span> Outperformed in all courses, grew the business, secured multiple interviews. Nothing dropped.</div>
+  </div>
+  <div class="ev"><h5>SharpShot&rsquo;s many arms</h5>
+    <div class="car"><span class="car-badge car-c">C</span> Business spans dev management, social media, outreach, partnerships, product dev.</div>
+    <div class="car"><span class="car-badge car-a">A</span> Treated each as a singular focused task. Cycled efficiently rather than spreading thin.</div>
+    <div class="car"><span class="car-badge car-r">R</span> 11 months, 7 days/week &mdash; every arm moved forward. Shows I can manage the multiple workstreams an analyst juggles.</div>
+  </div>
+</div></div>
+<div class="bim-pillar bim-i">
+<div class="bim-header"><span class="letter">I</span><span class="word">Independence</span></div>
+<div class="bim-body">
+  <div class="ev"><h5>Building from zero</h5>
+    <div class="car"><span class="car-badge car-c">C</span> Starting SharpShot with no playbook, no manager, no structure.</div>
+    <div class="car"><span class="car-badge car-a">A</span> Proactive across every arm &mdash; created processes, made decisions, built systems independently.</div>
+    <div class="car"><span class="car-badge car-r">R</span> Functioning startup with dev team, partnerships, and product &mdash; proof I can own workstreams without oversight.</div>
+  </div>
+  <div class="ev"><h5>Fast ramp-up</h5>
+    <div class="car"><span class="car-badge car-c">C</span> Every new role requires learning the system before you can run independently.</div>
+    <div class="car"><span class="car-badge car-a">A</span> In every job, moved from dependent to independent quickly &mdash; learned the structure, then ran with it.</div>
+    <div class="car"><span class="car-badge car-r">R</span> Freed up managers&rsquo; time. Within a month, I&rsquo;m operating autonomously &mdash; valuable for a VP who doesn&rsquo;t want to micromanage a junior.</div>
+  </div>
+</div></div>
+<div class="bim-pillar bim-m">
+<div class="bim-header"><span class="letter">M</span><span class="word">Metrics</span></div>
+<div class="bim-body">
+  <div class="ev"><h5>Commencement Group sales</h5>
+    <div class="car"><span class="car-badge car-c">C</span> Daily benchmarks, bonus tiers, competition against prior-year crews at the same schools.</div>
+    <div class="car"><span class="car-badge car-a">A</span> Consistently exceeded targets. Didn&rsquo;t coast post-benchmark &mdash; kept pushing when others stopped.</div>
+    <div class="car"><span class="car-badge car-r">R</span> Placed on high-upside roles. Groups beat prior-year numbers. Proves I&rsquo;m KPI-driven &mdash; directly relevant to analyst work.</div>
+  </div>
+  <div class="ev"><h5>Data storytelling</h5>
+    <div class="car"><span class="car-badge car-c">C</span> An analyst doesn&rsquo;t just track numbers &mdash; they need to interpret and present what the data means.</div>
+    <div class="car"><span class="car-badge car-a">A</span> Learned to read analytics and tell the story behind the numbers &mdash; what&rsquo;s working, what&rsquo;s not, where to adjust.</div>
+    <div class="car"><span class="car-badge car-r">R</span> Can walk a VP through what the data says and recommend action &mdash; not just report it. That&rsquo;s the difference between a clerk and an analyst.</div>
+  </div>
+</div></div>
+<div class="callout callout-lincoln">
+  <strong>Framing note:</strong> &ldquo;Being immersed in a startup for the past year gave me a crash course in every facet of business &mdash; but more importantly, it taught me to be analytical about what&rsquo;s working and what isn&rsquo;t, because when it&rsquo;s your own business, the numbers aren&rsquo;t abstract.&rdquo;
+</div>
+<div class="tips">
+  <h4>Lincoln-specific reminders</h4>
+  <p><strong>This is a VP interview &mdash; show don&rsquo;t tell.</strong> Walk through specific examples with numbers.</p>
+  <p><strong>Lean into Metrics harder here.</strong> Balance and Independence are table stakes. Metrics is your differentiator.</p>
+  <p><strong>This is a posted position.</strong> They have a seat to fill. Energy = &ldquo;I&rsquo;m ready to contribute.&rdquo;</p>
+  <p><strong>Prep Mitch did with you</strong> &mdash; most of what you discussed won&rsquo;t be needed round 1. But drop a smart comment to signal you&rsquo;ve done homework.</p>
+  <p><strong>Don&rsquo;t say &ldquo;overqualified&rdquo; or &ldquo;multitasking&rdquo;</strong> &mdash; same rules as Forum.</p>
+</div>
+</div>
+
+<script>
+function switchTab(which){
+  document.getElementById('panel-forum').classList.toggle('active',which==='forum');
+  document.getElementById('panel-lincoln').classList.toggle('active',which==='lincoln');
+  document.getElementById('tab-forum').className=which==='forum'?'tab active-forum':'tab';
+  document.getElementById('tab-lincoln').className=which==='lincoln'?'tab active-lincoln':'tab';
+  window.scrollTo(0,0);
+}
+</script>
 </body>
 </html>
