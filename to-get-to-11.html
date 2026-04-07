@@ -228,7 +228,7 @@ body {
       <div class="timer" id="t2">2:00</div>
     </div>
     <hr class="divider">
-    <div class="hint" style="margin-bottom:13px;border-left-color:var(--purple-light);"><strong>What to do:</strong> Enter 3 contacts. For each: type the name, pick a reason (Trigger > Filter > Relationship), paste context (a LinkedIn post, a note). Then hit <strong>Copy prompt + open Claude</strong> — this copies a ready-made prompt to your clipboard and opens a new Claude.ai chat in another tab. Paste (Cmd+V) into Claude, and Claude drafts your DM there. Come back here when you're ready to send.</div>
+    <div class="hint" style="margin-bottom:13px;border-left-color:var(--purple-light);"><strong>What to do:</strong> Enter 3 contacts. For each: type the name, pick a reason (Trigger > Filter > Relationship), paste context (a LinkedIn post, a note). Then hit <strong>Draft in Claude</strong> — it opens a new Claude.ai chat with the prompt already filled in. Just hit Enter to send it. The prompt is also copied to your clipboard as a backup. Come back here when you're ready to send the DM on LinkedIn.</div>
     <p style="font-size:13px;color:var(--text-secondary);margin-bottom:11px;">Pick the highest available reason for each person:</p>
     <div class="flag-box" id="flag-box-2" style="display:none;">
       <div class="flag-label">Flagged from step 1 — click to add</div>
@@ -253,7 +253,7 @@ body {
           <span class="pill pr" id="p0r" onclick="setR(0,'relationship')">Relationship</span>
         </div>
         <textarea class="cr-context" id="ctx0" placeholder="Paste context — LinkedIn post, trigger note, or anything relevant." oninput="contacts[0].context=this.value"></textarea>
-        <button class="draft-btn" id="db0" onclick="draftClaude(0)">Copy prompt + open Claude ↗</button>
+        <button class="draft-btn" id="db0" onclick="draftClaude(0)">Draft in Claude ↗</button>
       </div>
       <div class="cr" id="cr1">
         <div class="cr-top">
@@ -266,7 +266,7 @@ body {
           <span class="pill pr" id="p1r" onclick="setR(1,'relationship')">Relationship</span>
         </div>
         <textarea class="cr-context" id="ctx1" placeholder="Paste context — LinkedIn post, trigger note, or anything relevant." oninput="contacts[1].context=this.value"></textarea>
-        <button class="draft-btn" id="db1" onclick="draftClaude(1)">Copy prompt + open Claude ↗</button>
+        <button class="draft-btn" id="db1" onclick="draftClaude(1)">Draft in Claude ↗</button>
       </div>
       <div class="cr" id="cr2">
         <div class="cr-top">
@@ -279,7 +279,7 @@ body {
           <span class="pill pr" id="p2r" onclick="setR(2,'relationship')">Relationship</span>
         </div>
         <textarea class="cr-context" id="ctx2" placeholder="Paste context — LinkedIn post, trigger note, or anything relevant." oninput="contacts[2].context=this.value"></textarea>
-        <button class="draft-btn" id="db2" onclick="draftClaude(2)">Copy prompt + open Claude ↗</button>
+        <button class="draft-btn" id="db2" onclick="draftClaude(2)">Draft in Claude ↗</button>
       </div>
     </div>
     <div class="hint" style="margin-bottom:1rem;">No trigger or filter for someone? Skip them and pick the next person on your Working List.</div>
@@ -490,13 +490,16 @@ function draftClaude(i){
   var reason = ct.reason || 'none selected';
   var context = ct.context || 'none provided';
   var prompt = 'I want to reach out to ' + name + '. Reason: ' + reason + '. Context: ' + context + '. Use the outreach-message skill and my proof bank to draft a LinkedIn DM.';
-  navigator.clipboard.writeText(prompt).then(function(){
-    var btn = document.getElementById('db'+i);
-    btn.textContent = 'Copied \u2713 Opening Claude...';
-    btn.classList.add('copied');
-    window.open('https://claude.ai/new', '_blank');
-    setTimeout(function(){ btn.textContent = 'Copy prompt + open Claude \u2197'; btn.classList.remove('copied'); }, 3000);
-  });
+  // Pre-fill Claude.ai's prompt box via the q parameter, and also copy to clipboard as a fallback
+  var url = 'https://claude.ai/new?q=' + encodeURIComponent(prompt);
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(prompt);
+  }
+  window.open(url, '_blank');
+  var btn = document.getElementById('db'+i);
+  btn.textContent = 'Opening Claude \u2713';
+  btn.classList.add('copied');
+  setTimeout(function(){ btn.textContent = 'Draft in Claude \u2197'; btn.classList.remove('copied'); }, 2500);
 }
 
 function buildSummary(){
