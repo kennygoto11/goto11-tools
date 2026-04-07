@@ -175,7 +175,8 @@ body {
   <div class="quick-links">
     <a href="https://www.linkedin.com/notifications/" target="_blank" class="ql notion"><div class="ql-dot"></div>Notifications</a>
     <a href="https://www.linkedin.com/search/results/people/" target="_blank" class="ql notion"><div class="ql-dot"></div>Find a contact</a>
-    <a href="https://www.linkedin.com/search/results/content/?origin=FACETED_SEARCH&sortBy=%5B%22date_posted%22%5D&datePosted=%5B%22past-week%22%5D&postedBy=%5B%22first%22%5D" target="_blank" class="ql notion"><div class="ql-dot"></div>Recent posts (7d)</a>
+    <a href="https://www.linkedin.com/search/results/content/?origin=FACETED_SEARCH&sortBy=%5B%22date_posted%22%5D&datePosted=%5B%22past-24h%22%5D&postedBy=%5B%22first%22%5D" target="_blank" class="ql notion"><div class="ql-dot"></div>Today (24h)</a>
+    <a href="https://www.linkedin.com/search/results/content/?origin=FACETED_SEARCH&sortBy=%5B%22date_posted%22%5D&datePosted=%5B%22past-week%22%5D&postedBy=%5B%22first%22%5D" target="_blank" class="ql notion"><div class="ql-dot"></div>Catch-up (7d)</a>
     <a href="https://www.notion.so/goto11ca/165674c26436818383ace0fee24735d4?v=165674c264368185831a000ce8f05a40" target="_blank" class="ql notion"><div class="ql-dot"></div>Working list</a>
     <a href="https://www.notion.so/goto11ca/165674c264368185874cfd0198b1d832?v=16c674c264368077af4f000c9971364c" target="_blank" class="ql notion"><div class="ql-dot"></div>My tasks</a>
   </div>
@@ -197,7 +198,7 @@ body {
       </div>
       <div class="inst-row">
         <div class="num-badge">2</div>
-        <div class="inst-text"><strong>Recent posts (7d)</strong> — first connections only, past week, chronological. Scan for Working List names. Skip the rest.</div>
+        <div class="inst-text"><strong>Today (24h)</strong> — first connections, last 24 hours, chronological. Use <strong>Catch-up (7d)</strong> on Mondays or after time off.</div>
       </div>
       <div class="inst-row">
         <div class="num-badge">3</div>
@@ -227,7 +228,7 @@ body {
       <div class="timer" id="t2">2:00</div>
     </div>
     <hr class="divider">
-    <div class="hint" style="margin-bottom:13px;border-left-color:var(--purple-light);"><strong>What to do:</strong> Enter 3 contacts from your Working List. For each one, type their name, select why you're reaching out (Trigger is best, then Filter, then Relationship), paste any context (a LinkedIn post, a note about them), then hit "Draft with Claude" to copy a ready-made prompt you can paste into Claude Chat to generate your outreach message.</div>
+    <div class="hint" style="margin-bottom:13px;border-left-color:var(--purple-light);"><strong>What to do:</strong> Enter 3 contacts. For each: type the name, pick a reason (Trigger > Filter > Relationship), paste context (a LinkedIn post, a note). Then hit <strong>Copy prompt + open Claude</strong> — this copies a ready-made prompt to your clipboard and opens a new Claude.ai chat in another tab. Paste (Cmd+V) into Claude, and Claude drafts your DM there. Come back here when you're ready to send.</div>
     <p style="font-size:13px;color:var(--text-secondary);margin-bottom:11px;">Pick the highest available reason for each person:</p>
     <div class="flag-box" id="flag-box-2" style="display:none;">
       <div class="flag-label">Flagged from step 1 — click to add</div>
@@ -252,7 +253,7 @@ body {
           <span class="pill pr" id="p0r" onclick="setR(0,'relationship')">Relationship</span>
         </div>
         <textarea class="cr-context" id="ctx0" placeholder="Paste context — LinkedIn post, trigger note, or anything relevant." oninput="contacts[0].context=this.value"></textarea>
-        <button class="draft-btn" id="db0" onclick="draftClaude(0)">Draft with Claude ↗</button>
+        <button class="draft-btn" id="db0" onclick="draftClaude(0)">Copy prompt + open Claude ↗</button>
       </div>
       <div class="cr" id="cr1">
         <div class="cr-top">
@@ -265,7 +266,7 @@ body {
           <span class="pill pr" id="p1r" onclick="setR(1,'relationship')">Relationship</span>
         </div>
         <textarea class="cr-context" id="ctx1" placeholder="Paste context — LinkedIn post, trigger note, or anything relevant." oninput="contacts[1].context=this.value"></textarea>
-        <button class="draft-btn" id="db1" onclick="draftClaude(1)">Draft with Claude ↗</button>
+        <button class="draft-btn" id="db1" onclick="draftClaude(1)">Copy prompt + open Claude ↗</button>
       </div>
       <div class="cr" id="cr2">
         <div class="cr-top">
@@ -278,11 +279,12 @@ body {
           <span class="pill pr" id="p2r" onclick="setR(2,'relationship')">Relationship</span>
         </div>
         <textarea class="cr-context" id="ctx2" placeholder="Paste context — LinkedIn post, trigger note, or anything relevant." oninput="contacts[2].context=this.value"></textarea>
-        <button class="draft-btn" id="db2" onclick="draftClaude(2)">Draft with Claude ↗</button>
+        <button class="draft-btn" id="db2" onclick="draftClaude(2)">Copy prompt + open Claude ↗</button>
       </div>
     </div>
     <div class="hint" style="margin-bottom:1rem;">No trigger or filter for someone? Skip them and pick the next person on your Working List.</div>
     <div class="btn-row">
+      <button class="btn-s" onclick="goStep(1)" style="flex:0 0 auto;padding:12px 16px;">← Back</button>
       <button class="btn-p" id="bs2" onclick="startTimer(2)">Start timer</button>
       <button class="btn-s" onclick="goStep(3)">Done — next step →</button>
     </div>
@@ -301,6 +303,7 @@ body {
     <div id="send-slots" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
     <div class="gate-status" id="gate-status">0 of 3 sent</div>
     <div class="btn-row">
+      <button class="btn-s" onclick="goStep(2)" style="flex:0 0 auto;padding:12px 16px;">← Back</button>
       <button class="btn-p" id="bs3" onclick="startTimer(3)">Start timer</button>
       <button class="btn-s gated" id="complete-btn" onclick="goStep('complete')">Brief complete →</button>
     </div>
@@ -489,9 +492,10 @@ function draftClaude(i){
   var prompt = 'I want to reach out to ' + name + '. Reason: ' + reason + '. Context: ' + context + '. Use the outreach-message skill and my proof bank to draft a LinkedIn DM.';
   navigator.clipboard.writeText(prompt).then(function(){
     var btn = document.getElementById('db'+i);
-    btn.textContent = 'Copied \u2713';
+    btn.textContent = 'Copied \u2713 Opening Claude...';
     btn.classList.add('copied');
-    setTimeout(function(){ btn.textContent = 'Draft with Claude \u2197'; btn.classList.remove('copied'); }, 2000);
+    window.open('https://claude.ai/new', '_blank');
+    setTimeout(function(){ btn.textContent = 'Copy prompt + open Claude \u2197'; btn.classList.remove('copied'); }, 3000);
   });
 }
 
