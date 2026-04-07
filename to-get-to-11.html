@@ -149,6 +149,17 @@ body {
 .flag-chip-x { width: 14px; height: 14px; border-radius: 50%; background: rgba(0,0,0,0.15); color: inherit; border: none; cursor: pointer; font-size: 11px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
 .flag-chip-x:hover { background: rgba(0,0,0,0.3); }
 .flag-empty { font-size: 12px; color: var(--text-tertiary); font-style: italic; }
+.draft-out { display: none; margin-top: 10px; padding: 11px 12px; background: #faf5fd; border: 1px solid var(--purple-light); border-radius: 8px; font-size: 13px; color: var(--text-primary); line-height: 1.55; white-space: pre-wrap; font-family: 'Nunito', sans-serif; resize: vertical; min-height: 90px; width: 100%; outline: none; }
+.draft-out:focus { border-color: var(--purple); }
+.draft-out.visible { display: block; }
+.draft-actions { display: none; gap: 6px; margin-top: 6px; }
+.draft-actions.visible { display: flex; }
+.draft-mini { padding: 5px 12px; border-radius: 16px; border: 1px solid var(--border-med); background: white; font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 700; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
+.draft-mini:hover { border-color: var(--purple); color: var(--purple); }
+.draft-mini.copied { border-color: var(--purple); color: var(--purple); background: #faf5fd; }
+.draft-btn.loading { opacity: 0.6; pointer-events: none; }
+.draft-error { display: none; margin-top: 8px; padding: 9px 12px; background: #fdf3f3; border: 1px solid #e8c4c4; border-radius: 8px; font-size: 12px; color: #8a3232; }
+.draft-error.visible { display: block; }
 </style>
 </head>
 <body>
@@ -228,7 +239,7 @@ body {
       <div class="timer" id="t2">2:00</div>
     </div>
     <hr class="divider">
-    <div class="hint" style="margin-bottom:13px;border-left-color:var(--purple-light);"><strong>What to do:</strong> Enter 3 contacts. For each: type the name, pick a reason (Trigger > Filter > Relationship), paste context (a LinkedIn post, a note). Then hit <strong>Draft in Claude</strong> — it opens a new Claude.ai chat with the prompt already filled in. Just hit Enter to send it. The prompt is also copied to your clipboard as a backup. Come back here when you're ready to send the DM on LinkedIn.</div>
+    <div class="hint" style="margin-bottom:13px;border-left-color:var(--purple-light);"><strong>What to do:</strong> Enter 3 contacts. For each: type the name, pick a reason (Trigger > Filter > Relationship), paste context (a LinkedIn post, a note). Then hit <strong>Draft DM</strong> — Claude writes the message right here in 3-5 seconds. Edit it inline if you want, then copy it and paste into LinkedIn.</div>
     <p style="font-size:13px;color:var(--text-secondary);margin-bottom:11px;">Pick the highest available reason for each person:</p>
     <div class="flag-box" id="flag-box-2" style="display:none;">
       <div class="flag-label">Flagged from step 1 — click to add</div>
@@ -253,7 +264,13 @@ body {
           <span class="pill pr" id="p0r" onclick="setR(0,'relationship')">Relationship</span>
         </div>
         <textarea class="cr-context" id="ctx0" placeholder="Paste context — LinkedIn post, trigger note, or anything relevant." oninput="contacts[0].context=this.value"></textarea>
-        <button class="draft-btn" id="db0" onclick="draftClaude(0)">Draft in Claude ↗</button>
+        <button class="draft-btn" id="db0" onclick="draftDM(0)">Draft DM</button>
+        <textarea class="draft-out" id="do0" placeholder="Draft will appear here..."></textarea>
+        <div class="draft-actions" id="da0">
+          <button class="draft-mini" id="dc0" onclick="copyDraft(0)">Copy</button>
+          <button class="draft-mini" onclick="draftDM(0)">Regenerate</button>
+        </div>
+        <div class="draft-error" id="de0"></div>
       </div>
       <div class="cr" id="cr1">
         <div class="cr-top">
@@ -266,7 +283,13 @@ body {
           <span class="pill pr" id="p1r" onclick="setR(1,'relationship')">Relationship</span>
         </div>
         <textarea class="cr-context" id="ctx1" placeholder="Paste context — LinkedIn post, trigger note, or anything relevant." oninput="contacts[1].context=this.value"></textarea>
-        <button class="draft-btn" id="db1" onclick="draftClaude(1)">Draft in Claude ↗</button>
+        <button class="draft-btn" id="db1" onclick="draftDM(1)">Draft DM</button>
+        <textarea class="draft-out" id="do1" placeholder="Draft will appear here..."></textarea>
+        <div class="draft-actions" id="da1">
+          <button class="draft-mini" id="dc1" onclick="copyDraft(1)">Copy</button>
+          <button class="draft-mini" onclick="draftDM(1)">Regenerate</button>
+        </div>
+        <div class="draft-error" id="de1"></div>
       </div>
       <div class="cr" id="cr2">
         <div class="cr-top">
@@ -279,7 +302,13 @@ body {
           <span class="pill pr" id="p2r" onclick="setR(2,'relationship')">Relationship</span>
         </div>
         <textarea class="cr-context" id="ctx2" placeholder="Paste context — LinkedIn post, trigger note, or anything relevant." oninput="contacts[2].context=this.value"></textarea>
-        <button class="draft-btn" id="db2" onclick="draftClaude(2)">Draft in Claude ↗</button>
+        <button class="draft-btn" id="db2" onclick="draftDM(2)">Draft DM</button>
+        <textarea class="draft-out" id="do2" placeholder="Draft will appear here..."></textarea>
+        <div class="draft-actions" id="da2">
+          <button class="draft-mini" id="dc2" onclick="copyDraft(2)">Copy</button>
+          <button class="draft-mini" onclick="draftDM(2)">Regenerate</button>
+        </div>
+        <div class="draft-error" id="de2"></div>
       </div>
     </div>
     <div class="hint" style="margin-bottom:1rem;">No trigger or filter for someone? Skip them and pick the next person on your Working List.</div>
@@ -484,22 +513,63 @@ function escapeHtml(s){
   });
 }
 
-function draftClaude(i){
+function draftDM(i){
   var ct = contacts[i];
-  var name = ct.name || 'Contact ' + (i+1);
-  var reason = ct.reason || 'none selected';
-  var context = ct.context || 'none provided';
-  var prompt = 'I want to reach out to ' + name + '. Reason: ' + reason + '. Context: ' + context + '. Use the outreach-message skill and my proof bank to draft a LinkedIn DM.';
-  // Pre-fill Claude.ai's prompt box via the q parameter, and also copy to clipboard as a fallback
-  var url = 'https://claude.ai/new?q=' + encodeURIComponent(prompt);
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(prompt);
+  if(!ct.name){
+    showDraftError(i, 'Add a contact name first.');
+    return;
   }
-  window.open(url, '_blank');
   var btn = document.getElementById('db'+i);
-  btn.textContent = 'Opening Claude \u2713';
-  btn.classList.add('copied');
-  setTimeout(function(){ btn.textContent = 'Draft in Claude \u2197'; btn.classList.remove('copied'); }, 2500);
+  var out = document.getElementById('do'+i);
+  var actions = document.getElementById('da'+i);
+  var err = document.getElementById('de'+i);
+  err.classList.remove('visible');
+  err.textContent = '';
+  btn.classList.add('loading');
+  btn.textContent = 'Drafting...';
+  out.classList.add('visible');
+  out.value = 'Claude is writing your DM...';
+  actions.classList.remove('visible');
+
+  fetch('/.netlify/functions/draft', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ name: ct.name, reason: ct.reason || '', context: ct.context || '' })
+  }).then(function(r){
+    return r.json().then(function(data){ return {ok: r.ok, data: data}; });
+  }).then(function(res){
+    btn.classList.remove('loading');
+    btn.textContent = 'Draft DM';
+    if(!res.ok){
+      out.classList.remove('visible');
+      out.value = '';
+      showDraftError(i, (res.data && res.data.error) || 'Something went wrong.');
+      return;
+    }
+    out.value = res.data.draft || '';
+    actions.classList.add('visible');
+  }).catch(function(e){
+    btn.classList.remove('loading');
+    btn.textContent = 'Draft DM';
+    out.classList.remove('visible');
+    out.value = '';
+    showDraftError(i, 'Network error: ' + (e.message || e));
+  });
+}
+function showDraftError(i, msg){
+  var err = document.getElementById('de'+i);
+  err.textContent = msg;
+  err.classList.add('visible');
+}
+function copyDraft(i){
+  var out = document.getElementById('do'+i);
+  var btn = document.getElementById('dc'+i);
+  if(!out || !out.value) return;
+  navigator.clipboard.writeText(out.value).then(function(){
+    btn.textContent = 'Copied \u2713';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
 }
 
 function buildSummary(){
@@ -553,6 +623,9 @@ function resetBrief(){
   });
   ['cn0','cn1','cn2'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   ['ctx0','ctx1','ctx2'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  ['do0','do1','do2'].forEach(function(id){var el=document.getElementById(id);if(el){el.value='';el.classList.remove('visible');}});
+  ['da0','da1','da2'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('visible');});
+  ['de0','de1','de2'].forEach(function(id){var el=document.getElementById(id);if(el){el.textContent='';el.classList.remove('visible');}});
   ['0','1','2'].forEach(function(i){
     contacts[parseInt(i)]={name:'',reason:'',context:''};
     var cr=document.getElementById('cr'+i);
