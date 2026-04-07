@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tech Stack | Go To 11</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%239439bf'/><text x='50' y='70' font-family='Nunito,Arial,sans-serif' font-size='54' font-weight='700' text-anchor='middle' fill='white'>11</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #9439bf;
+    --purple-faint: rgba(148,57,191,0.08);
+    --light-purple: #bfb1c4;
+    --sand: #f4d4b7;
+    --sand-faint: rgba(244,212,183,0.08);
+    --grey: #66615c;
+    --dark: #2d2a2e;
+    --offwhite: #ebeaeb;
+    --white: #ffffff;
+    --border: rgba(102,97,92,0.12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Nunito', sans-serif; background: var(--offwhite); color: var(--dark); min-height: 100vh; }
+  .page { max-width: 720px; margin: 0 auto; padding: 48px 24px 64px; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--purple); text-decoration: none; font-weight: 700; margin-bottom: 32px; }
+  .back:hover { text-decoration: underline; }
+  h1 { font-family: 'Poppins', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+  .subtitle { font-size: 0.95rem; color: var(--grey); margin-bottom: 32px; line-height: 1.6; }
+
+  .layer { margin-bottom: 20px; }
+  .layer-label { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; color: var(--grey); margin-bottom: 8px; padding-left: 4px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; }
+
+  .card {
+    background: var(--white); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 18px; cursor: pointer; transition: all 0.2s;
+  }
+  .card:hover { border-color: rgba(148,57,191,0.3); }
+  .card.active { border-color: var(--purple); border-width: 2px; }
+  .card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .dot { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; font-family: 'Poppins', sans-serif; flex-shrink: 0; }
+  .card-name { font-size: 0.9rem; font-weight: 700; }
+  .card-one { font-size: 0.78rem; color: var(--grey); line-height: 1.4; }
+
+  .detail {
+    background: var(--white); border-radius: 14px; border: 1px solid var(--border);
+    padding: 24px 28px; margin: 16px 0; display: none;
+  }
+  .detail.show { display: block; }
+  .detail h3 { font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; margin-bottom: 10px; }
+  .detail p { font-size: 0.85rem; color: var(--grey); line-height: 1.7; margin-bottom: 10px; }
+  .analogy {
+    font-size: 0.85rem; color: var(--dark); font-style: italic;
+    border-left: 3px solid var(--purple); padding: 10px 16px; margin: 14px 0;
+    background: var(--purple-faint); border-radius: 0 10px 10px 0;
+  }
+
+  .flow {
+    margin-top: 32px; padding: 24px 28px;
+    background: var(--white); border: 1px solid var(--border); border-radius: 14px;
+  }
+  .flow h3 { font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
+  .step { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+  .step:last-child { margin-bottom: 0; }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--purple); color: #fff;
+    font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .step-text { font-size: 0.85rem; color: var(--grey); line-height: 1.6; }
+  .step-text b { color: var(--dark); font-weight: 700; }
+
+  .footer { text-align: center; margin-top: 48px; font-size: 0.72rem; color: var(--light-purple); }
+  .footer a { color: var(--purple); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<a class="back" href="/">← Back to Hub</a>
+
+<h1>How the tech stack works</h1>
+<p class="subtitle">A plain-English guide to every tool in the Go To 11 system and how they connect. Click any tool to learn more.</p>
+
+<div class="layer">
+<div class="layer-label">You work here</div>
+<div class="cards">
+<div class="card" onclick="show('claude')">
+<div class="card-head"><div class="dot" style="background:#EEEDFE;color:#534AB7">C</div><div class="card-name">Claude</div></div>
+<div class="card-one">Your AI thinking partner that builds things</div>
+</div>
+</div>
+</div>
+
+<div class="layer">
+<div class="layer-label">Your files live here</div>
+<div class="cards">
+<div class="card" onclick="show('github')">
+<div class="card-head"><div class="dot" style="background:#E1F5EE;color:#0F6E56">G</div><div class="card-name">GitHub</div></div>
+<div class="card-one">Where your code files are stored and versioned</div>
+</div>
+</div>
+</div>
+
+<div class="layer">
+<div class="layer-label">Your sites run here</div>
+<div class="cards">
+<div class="card" onclick="show('netlify')">
+<div class="card-head"><div class="dot" style="background:#E6F1FB;color:#185FA5">N</div><div class="card-name">Netlify</div></div>
+<div class="card-one">Turns your files into live websites</div>
+</div>
+<div class="card" onclick="show('replit')">
+<div class="card-head"><div class="dot" style="background:#FAEEDA;color:#854F0B">R</div><div class="card-name">Replit</div></div>
+<div class="card-one">Code editor and hosting in one place</div>
+</div>
+</div>
+</div>
+
+<div class="layer">
+<div class="layer-label">Behind-the-scenes plumbing</div>
+<div class="cards">
+<div class="card" onclick="show('api')">
+<div class="card-head"><div class="dot" style="background:#FAECE7;color:#993C1D">A</div><div class="card-name">API</div></div>
+<div class="card-one">How software talks to other software</div>
+</div>
+<div class="card" onclick="show('mcp')">
+<div class="card-head"><div class="dot" style="background:#FBEAF0;color:#993556">M</div><div class="card-name">MCP</div></div>
+<div class="card-one">How Claude connects to your other tools</div>
+</div>
+</div>
+</div>
+
+<div class="detail" id="d-claude">
+<h3>Claude — your operator</h3>
+<div class="analogy">Think of Claude as a contractor you hire. You describe what you want built, Claude builds it and hands you the finished product.</div>
+<p>Claude writes the HTML, CSS, and JavaScript code that makes your tools work. It also connects to Notion, Slack, Gmail, Google Calendar, Netlify, and more through MCP connectors — so it can read your data and take actions on your behalf.</p>
+<p><b>What Claude can't do:</b> It can't directly push files to GitHub or Netlify. That's why you copy-paste code from Claude into GitHub, and GitHub auto-sends it to Netlify.</p>
+</div>
+
+<div class="detail" id="d-github">
+<h3>GitHub — your filing cabinet</h3>
+<div class="analogy">Think of GitHub as a cloud-based filing cabinet where every version of every file is saved. If you mess something up, you can always go back to the previous version.</div>
+<p>Your two GitHub repos right now:</p>
+<p><b>goto11-tools</b> — holds everything for app.goto11.ca (your internal hub)<br>
+<b>goto11-client-tools</b> — holds everything for tools.goto11.ca (client-facing tools)</p>
+<p>When you edit a file on GitHub and click "Commit," that's like clicking Save. Netlify watches these repos and automatically re-publishes your site whenever you save.</p>
+</div>
+
+<div class="detail" id="d-netlify">
+<h3>Netlify — your web host</h3>
+<div class="analogy">Think of Netlify as the building where your websites physically live. GitHub stores the blueprints; Netlify is the actual building people walk into.</div>
+<p>Netlify takes your HTML files from GitHub and makes them accessible at real URLs. It also handles your custom domains (app.goto11.ca, tools.goto11.ca), SSL certificates (the padlock icon), password protection, and form submissions from your gate pages.</p>
+<p>The magic: every time you save a file on GitHub, Netlify automatically rebuilds your site in about 15-30 seconds. You never have to manually "publish."</p>
+</div>
+
+<div class="detail" id="d-replit">
+<h3>Replit — a code playground</h3>
+<div class="analogy">Think of Replit as a workshop with tools already set up. You walk in, start building, and your creation is instantly live — no setup, no GitHub, no Netlify needed.</div>
+<p>Replit is an all-in-one code editor and hosting platform in the browser. It's useful for quick prototypes or apps that need a backend (server-side code), which Netlify doesn't handle well. You haven't used it much yet, but it's an option for more complex tools down the road.</p>
+</div>
+
+<div class="detail" id="d-api">
+<h3>API — application programming interface</h3>
+<div class="analogy">Think of an API as a restaurant menu. You don't walk into the kitchen — you read the menu (the API), place your order (send a request), and get your food back (receive a response). The kitchen does the work; you just interact through the menu.</div>
+<p>When your LinkedIn Writer tool talks to Claude's AI to generate a post, it's using Claude's API. When Netlify checks GitHub for new files, it's using GitHub's API. Every tool-to-tool connection runs through APIs.</p>
+<p>You don't need to build APIs yourself — you just use tools that already have them.</p>
+</div>
+
+<div class="detail" id="d-mcp">
+<h3>MCP — model context protocol</h3>
+<div class="analogy">Think of MCP as power adapters for Claude. Each adapter lets Claude plug into a different tool — Notion, Slack, Gmail, Netlify, Google Calendar — and read or do things inside it.</div>
+<p>MCP is what lets Claude create a Netlify site, search your Notion database, read your Slack messages, or check your calendar — all from inside this chat. Without MCP, Claude would just be a text generator with no ability to touch your real tools.</p>
+<p>You manage which connectors are active in Claude's settings. Each one you turn on is like plugging in another adapter.</p>
+</div>
+
+<div class="flow">
+<h3>How it all connects when you build a tool</h3>
+<div class="step"><div class="step-num">1</div><div class="step-text">You tell <b>Claude</b> what you want to build</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text"><b>Claude</b> writes the code (HTML/CSS/JS) and gives it to you</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-text">You paste the code into <b>GitHub</b> (your filing cabinet)</div></div>
+<div class="step"><div class="step-num">4</div><div class="step-text"><b>Netlify</b> sees the change and auto-publishes to your live site</div></div>
+<div class="step"><div class="step-num">5</div><div class="step-text">Your tool is live at <b>app.goto11.ca</b> or <b>tools.goto11.ca</b> in ~30 seconds</div></div>
+</div>
+
+<div class="footer">
+<p>Go To 11 Communication Training &mdash; <a href="https://goto11.ca" target="_blank">goto11.ca</a></p>
+</div>
+
+</div>
+
+<script>
+var active = null;
+function show(id) {
+  document.querySelectorAll('.detail').forEach(function(d) { d.classList.remove('show'); });
+  document.querySelectorAll('.card').forEach(function(c) { c.classList.remove('active'); });
+  if (active === id) { active = null; return; }
+  document.getElementById('d-' + id).classList.add('show');
+  event.currentTarget.classList.add('active');
+  active = id;
+}
+</script>
+</body>
+</html>
