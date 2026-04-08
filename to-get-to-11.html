@@ -161,6 +161,12 @@ body {
 .draft-btn.loading { opacity: 0.6; pointer-events: none; }
 .draft-error { display: none; margin-top: 8px; padding: 9px 12px; background: #fdf3f3; border: 1px solid #e8c4c4; border-radius: 8px; font-size: 12px; color: #8a3232; }
 .draft-error.visible { display: block; }
+.conn-toggle { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 12px; background: var(--bg-subtle); border: 1px solid var(--border-med); border-radius: 8px; }
+.conn-toggle-label { font-size: 12px; font-weight: 700; color: var(--text-secondary); flex: 1; }
+.conn-pills { display: flex; gap: 4px; }
+.conn-pill { font-size: 11px; font-weight: 700; padding: 4px 11px; border-radius: 14px; cursor: pointer; border: 1px solid var(--border-med); color: var(--text-secondary); background: white; transition: all 0.15s; user-select: none; }
+.conn-pill.on { background: var(--purple); border-color: var(--purple); color: white; }
+.mode-tag { display: inline-block; margin-left: 6px; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 12px; background: var(--purple-light); color: #3d2a4a; letter-spacing: 0.04em; text-transform: uppercase; }
 </style>
 </head>
 <body>
@@ -191,6 +197,7 @@ body {
     <a href="https://www.linkedin.com/search/results/content/?origin=FACETED_SEARCH&sortBy=%5B%22date_posted%22%5D&datePosted=%5B%22past-week%22%5D&postedBy=%5B%22first%22%5D" target="_blank" class="ql notion"><div class="ql-dot"></div>Catch-up (7d)</a>
     <a href="https://www.notion.so/goto11ca/165674c26436818383ace0fee24735d4?v=165674c264368185831a000ce8f05a40" target="_blank" class="ql notion"><div class="ql-dot"></div>Working list</a>
     <a href="https://www.notion.so/goto11ca/165674c264368185874cfd0198b1d832?v=16c674c264368077af4f000c9971364c" target="_blank" class="ql notion"><div class="ql-dot"></div>My tasks</a>
+    <a href="/comment-helper.html" target="_blank" class="ql notion"><div class="ql-dot"></div>Comment Helper</a>
   </div>
 
   <!-- STEP 1 -->
@@ -240,7 +247,7 @@ body {
       <div class="timer" id="t2">2:00</div>
     </div>
     <hr class="divider">
-    <div class="hint" style="margin-bottom:13px;border-left-color:var(--purple-light);"><strong>What to do:</strong> Enter 3 contacts. For each: type the name, pick a reason (Trigger > Filter > Relationship), and <strong>paste the full LinkedIn post text</strong> (or a rich, specific note) into the context box. The richer the context, the more Claude can tie the draft to your work. Then hit <strong>Draft DM</strong>. Claude writes the message inline in 3 to 5 seconds. Edit it, copy it, paste into LinkedIn.</div>
+    <div class="hint" style="margin-bottom:13px;border-left-color:var(--purple-light);"><strong>What to do:</strong> Enter 3 contacts. For each: type the name, pick a reason, paste the full post text or detailed note as context, set the <strong>Connected? Yes/No</strong> toggle, then hit <strong>Draft</strong>. Claude writes either a DM (if connected) or a 280-char connection request note (if not). Edit it, copy it, paste into LinkedIn.<br><br><strong>Reason definitions:</strong><br><span style="color:var(--purple);font-weight:700;">Trigger</span> = something that just happened (job change, post, promotion, acquisition, market news)<br><span style="color:var(--purple);font-weight:700;">Filter</span> = how you know them (worked together, met somewhere, mutual connection, prior client)<br><span style="color:var(--purple);font-weight:700;">Relationship</span> = re-engaging after a gap with someone you actually know</div>
     <p style="font-size:13px;color:var(--text-secondary);margin-bottom:11px;">Pick the highest available reason for each person:</p>
     <div class="flag-box" id="flag-box-2" style="display:none;">
       <div class="flag-label">Flagged from step 1 — click to add</div>
@@ -265,7 +272,14 @@ body {
           <span class="pill pr" id="p0r" onclick="setR(0,'relationship')">Relationship</span>
         </div>
         <textarea class="cr-context" id="ctx0" placeholder="Paste the FULL post text or a detailed note. The more concrete the context, the better Claude can connect it to your work." oninput="contacts[0].context=this.value"></textarea>
-        <button class="draft-btn" id="db0" onclick="draftDM(0)">Draft DM</button>
+        <div class="conn-toggle">
+          <div class="conn-toggle-label">Already connected on LinkedIn?</div>
+          <div class="conn-pills">
+            <span class="conn-pill on" id="cy0" onclick="setConn(0,true)">Yes</span>
+            <span class="conn-pill" id="cn0n" onclick="setConn(0,false)">No</span>
+          </div>
+        </div>
+        <button class="draft-btn" id="db0" onclick="draftDM(0)">Draft <span id="dm0">DM</span></button>
         <textarea class="draft-out" id="do0" placeholder="Draft will appear here..."></textarea>
         <div class="draft-actions" id="da0">
           <button class="draft-mini" id="dc0" onclick="copyDraft(0)">Copy</button>
@@ -284,7 +298,14 @@ body {
           <span class="pill pr" id="p1r" onclick="setR(1,'relationship')">Relationship</span>
         </div>
         <textarea class="cr-context" id="ctx1" placeholder="Paste the FULL post text or a detailed note. The more concrete the context, the better Claude can connect it to your work." oninput="contacts[1].context=this.value"></textarea>
-        <button class="draft-btn" id="db1" onclick="draftDM(1)">Draft DM</button>
+        <div class="conn-toggle">
+          <div class="conn-toggle-label">Already connected on LinkedIn?</div>
+          <div class="conn-pills">
+            <span class="conn-pill on" id="cy1" onclick="setConn(1,true)">Yes</span>
+            <span class="conn-pill" id="cn1n" onclick="setConn(1,false)">No</span>
+          </div>
+        </div>
+        <button class="draft-btn" id="db1" onclick="draftDM(1)">Draft <span id="dm1">DM</span></button>
         <textarea class="draft-out" id="do1" placeholder="Draft will appear here..."></textarea>
         <div class="draft-actions" id="da1">
           <button class="draft-mini" id="dc1" onclick="copyDraft(1)">Copy</button>
@@ -303,7 +324,14 @@ body {
           <span class="pill pr" id="p2r" onclick="setR(2,'relationship')">Relationship</span>
         </div>
         <textarea class="cr-context" id="ctx2" placeholder="Paste the FULL post text or a detailed note. The more concrete the context, the better Claude can connect it to your work." oninput="contacts[2].context=this.value"></textarea>
-        <button class="draft-btn" id="db2" onclick="draftDM(2)">Draft DM</button>
+        <div class="conn-toggle">
+          <div class="conn-toggle-label">Already connected on LinkedIn?</div>
+          <div class="conn-pills">
+            <span class="conn-pill on" id="cy2" onclick="setConn(2,true)">Yes</span>
+            <span class="conn-pill" id="cn2n" onclick="setConn(2,false)">No</span>
+          </div>
+        </div>
+        <button class="draft-btn" id="db2" onclick="draftDM(2)">Draft <span id="dm2">DM</span></button>
         <textarea class="draft-out" id="do2" placeholder="Draft will appear here..."></textarea>
         <div class="draft-actions" id="da2">
           <button class="draft-mini" id="dc2" onclick="copyDraft(2)">Copy</button>
@@ -359,7 +387,7 @@ body {
 </div>
 
 <script>
-var contacts = [{name:'',reason:'',context:''},{name:'',reason:'',context:''},{name:'',reason:'',context:''}];
+var contacts = [{name:'',reason:'',context:'',connected:true},{name:'',reason:'',context:'',connected:true},{name:'',reason:'',context:'',connected:true}];
 var flagged = [];
 var tsecs = {1:180,2:120,3:600};
 var tints = {};
@@ -514,12 +542,22 @@ function escapeHtml(s){
   });
 }
 
+function setConn(i, connected){
+  contacts[i].connected = connected;
+  var yes = document.getElementById('cy'+i);
+  var no = document.getElementById('cn'+i+'n');
+  if(yes) yes.className = 'conn-pill' + (connected ? ' on' : '');
+  if(no) no.className = 'conn-pill' + (!connected ? ' on' : '');
+  var label = document.getElementById('dm'+i);
+  if(label) label.textContent = connected ? 'DM' : 'Connection Note';
+}
 function draftDM(i){
   var ct = contacts[i];
   if(!ct.name){
     showDraftError(i, 'Add a contact name first.');
     return;
   }
+  var modeLabel = ct.connected ? 'DM' : 'Connection Note';
   var btn = document.getElementById('db'+i);
   var out = document.getElementById('do'+i);
   var actions = document.getElementById('da'+i);
@@ -527,20 +565,20 @@ function draftDM(i){
   err.classList.remove('visible');
   err.textContent = '';
   btn.classList.add('loading');
-  btn.textContent = 'Drafting...';
+  btn.innerHTML = 'Drafting...';
   out.classList.add('visible');
-  out.value = 'Claude is writing your DM...';
+  out.value = ct.connected ? 'Claude is writing your DM...' : 'Claude is writing your connection request...';
   actions.classList.remove('visible');
 
   fetch('/.netlify/functions/draft', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ name: ct.name, reason: ct.reason || '', context: ct.context || '' })
+    body: JSON.stringify({ name: ct.name, reason: ct.reason || '', context: ct.context || '', connected: ct.connected !== false })
   }).then(function(r){
     return r.json().then(function(data){ return {ok: r.ok, data: data}; });
   }).then(function(res){
     btn.classList.remove('loading');
-    btn.textContent = 'Draft DM';
+    btn.innerHTML = 'Draft <span id="dm'+i+'">'+modeLabel+'</span>';
     if(!res.ok){
       out.classList.remove('visible');
       out.value = '';
@@ -551,7 +589,7 @@ function draftDM(i){
     actions.classList.add('visible');
   }).catch(function(e){
     btn.classList.remove('loading');
-    btn.textContent = 'Draft DM';
+    btn.innerHTML = 'Draft <span id="dm'+i+'">'+modeLabel+'</span>';
     out.classList.remove('visible');
     out.value = '';
     showDraftError(i, 'Network error: ' + (e.message || e));
@@ -610,7 +648,7 @@ function goStep(n){
 }
 
 function resetBrief(){
-  contacts=[{name:'',reason:'',context:''},{name:'',reason:'',context:''},{name:'',reason:'',context:''}];
+  contacts=[{name:'',reason:'',context:'',connected:true},{name:'',reason:'',context:'',connected:true},{name:'',reason:'',context:'',connected:true}];
   flagged=[];
   var fi=document.getElementById('flag-input');if(fi)fi.value='';
   renderFlags();
@@ -628,7 +666,10 @@ function resetBrief(){
   ['da0','da1','da2'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('visible');});
   ['de0','de1','de2'].forEach(function(id){var el=document.getElementById(id);if(el){el.textContent='';el.classList.remove('visible');}});
   ['0','1','2'].forEach(function(i){
-    contacts[parseInt(i)]={name:'',reason:'',context:''};
+    contacts[parseInt(i)]={name:'',reason:'',context:'',connected:true};
+    var cy=document.getElementById('cy'+i);if(cy)cy.className='conn-pill on';
+    var cnn=document.getElementById('cn'+i+'n');if(cnn)cnn.className='conn-pill';
+    var dml=document.getElementById('dm'+i);if(dml)dml.textContent='DM';
     var cr=document.getElementById('cr'+i);
     if(cr)cr.className='cr';
     var map=[['p'+i+'t','pt'],['p'+i+'f','pf'],['p'+i+'r','pr']];

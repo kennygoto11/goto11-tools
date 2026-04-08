@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comment Helper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --purple: #9439bf;
+  --purple-mid: #b06ad6;
+  --purple-light: #bfb1c4;
+  --sand: #f4d4b7;
+  --sand-dark: #e0bc99;
+  --grey: #66615c;
+  --off-white: #ebeaeb;
+  --text-primary: #1c1a1e;
+  --text-secondary: #66615c;
+  --text-tertiary: #9a9596;
+  --card: #ffffff;
+  --border: rgba(102,97,92,0.14);
+  --border-med: rgba(102,97,92,0.28);
+  --bg-subtle: #f7f6f7;
+}
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--off-white);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.5rem 1.25rem 5rem;
+}
+.wrapper { width: 100%; max-width: 560px; }
+.header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
+.brand { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-tertiary); font-weight: 700; margin-bottom: 5px; }
+.today { font-size: 24px; font-weight: 700; color: var(--text-primary); }
+.back-link { font-size: 12px; font-weight: 700; color: var(--text-tertiary); text-decoration: none; }
+.back-link:hover { color: var(--purple); }
+.card {
+  background: var(--card); border-radius: 16px; padding: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 0 0 1px var(--border);
+}
+.step-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--purple); font-weight: 700; margin-bottom: 6px; }
+.title { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
+.divider { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+.hint { font-size: 13px; color: var(--text-secondary); background: var(--bg-subtle); border-radius: 10px; padding: 12px 14px; line-height: 1.55; margin-bottom: 1rem; border-left: 3px solid var(--purple-light); }
+.hint strong { color: var(--text-primary); font-weight: 700; }
+.field-label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; margin-top: 14px; }
+.field-label:first-of-type { margin-top: 0; }
+.input, .textarea {
+  width: 100%; padding: 10px 13px; border: 1px solid var(--border-med); border-radius: 8px;
+  background: var(--card); font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--text-primary);
+  outline: none; transition: border-color 0.15s;
+}
+.textarea { min-height: 160px; resize: vertical; line-height: 1.5; }
+.input:focus, .textarea:focus { border-color: var(--purple-light); }
+.btn-row { display: flex; gap: 8px; margin-top: 16px; }
+.btn-p { flex: 1; padding: 13px; border-radius: 10px; border: none; background: var(--purple); color: white; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
+.btn-p:hover { opacity: 0.88; }
+.btn-p.loading { opacity: 0.6; pointer-events: none; }
+.btn-s { padding: 13px 18px; border-radius: 10px; border: 1px solid var(--border-med); background: transparent; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-primary); cursor: pointer; transition: all 0.15s; }
+.btn-s:hover { background: var(--bg-subtle); }
+.output-section { margin-top: 18px; display: none; }
+.output-section.visible { display: block; }
+.output-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--purple); margin-bottom: 6px; }
+.output-area {
+  width: 100%; padding: 14px 15px; background: #faf5fd; border: 1px solid var(--purple-light);
+  border-radius: 10px; font-family: 'Nunito', sans-serif; font-size: 14px; line-height: 1.6;
+  color: var(--text-primary); resize: vertical; min-height: 140px; outline: none; white-space: pre-wrap;
+}
+.output-area:focus { border-color: var(--purple); }
+.output-actions { display: flex; gap: 6px; margin-top: 8px; }
+.mini-btn { padding: 6px 14px; border-radius: 16px; border: 1px solid var(--border-med); background: white; font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
+.mini-btn:hover { border-color: var(--purple); color: var(--purple); }
+.mini-btn.copied { border-color: var(--purple); color: var(--purple); background: #faf5fd; }
+.error { display: none; margin-top: 10px; padding: 10px 13px; background: #fdf3f3; border: 1px solid #e8c4c4; border-radius: 8px; font-size: 12px; color: #8a3232; }
+.error.visible { display: block; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="header">
+    <div>
+      <div class="brand">Go To 11 — Comment Helper</div>
+      <div class="today">Comment in your voice</div>
+    </div>
+    <a href="/" class="back-link">← Tools home</a>
+  </div>
+
+  <div class="card">
+    <div class="step-label">LinkedIn comment generator</div>
+    <div class="title">Drop a post. Get a comment.</div>
+    <hr class="divider">
+
+    <div class="hint">
+      <strong>What this does:</strong> Paste a LinkedIn post you want to comment on. Claude writes a short, sharp public comment in your voice as Decision Acceleration Partner. Adds value, no kissing-up, no questions for the poster (this is public, not a DM). Use this to build visibility with your ICP without spending 30 minutes drafting comments by hand.
+    </div>
+
+    <label class="field-label">Post text (paste the full post)</label>
+    <textarea class="textarea" id="post" placeholder="Paste the full text of the LinkedIn post you want to comment on."></textarea>
+
+    <label class="field-label">Poster name (optional)</label>
+    <input class="input" id="poster" type="text" placeholder="e.g. Sarah Chen">
+
+    <label class="field-label">Your angle (optional)</label>
+    <input class="input" id="angle" type="text" placeholder="Optional: a specific point you want to make, or leave blank to let Claude pick.">
+
+    <div class="btn-row">
+      <button class="btn-p" id="gen-btn" onclick="generate()">Draft comment</button>
+      <button class="btn-s" onclick="resetForm()">Clear</button>
+    </div>
+
+    <div class="error" id="error"></div>
+
+    <div class="output-section" id="out-section">
+      <div class="output-label">Your comment</div>
+      <textarea class="output-area" id="output" placeholder="Comment will appear here..."></textarea>
+      <div class="output-actions">
+        <button class="mini-btn" id="copy-btn" onclick="copyOutput()">Copy</button>
+        <button class="mini-btn" onclick="generate()">Regenerate</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function generate(){
+  var post = document.getElementById('post').value.trim();
+  var poster = document.getElementById('poster').value.trim();
+  var angle = document.getElementById('angle').value.trim();
+  var err = document.getElementById('error');
+  var btn = document.getElementById('gen-btn');
+  var section = document.getElementById('out-section');
+  var output = document.getElementById('output');
+
+  err.classList.remove('visible');
+  err.textContent = '';
+
+  if(!post){
+    err.textContent = 'Paste a post first.';
+    err.classList.add('visible');
+    return;
+  }
+
+  btn.classList.add('loading');
+  btn.textContent = 'Drafting...';
+  section.classList.add('visible');
+  output.value = 'Claude is writing your comment...';
+
+  fetch('/.netlify/functions/comment', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ post: post, poster: poster, angle: angle })
+  }).then(function(r){
+    return r.json().then(function(data){ return {ok: r.ok, data: data}; });
+  }).then(function(res){
+    btn.classList.remove('loading');
+    btn.textContent = 'Draft comment';
+    if(!res.ok){
+      section.classList.remove('visible');
+      output.value = '';
+      err.textContent = (res.data && res.data.error) || 'Something went wrong.';
+      err.classList.add('visible');
+      return;
+    }
+    output.value = res.data.comment || '';
+  }).catch(function(e){
+    btn.classList.remove('loading');
+    btn.textContent = 'Draft comment';
+    section.classList.remove('visible');
+    output.value = '';
+    err.textContent = 'Network error: ' + (e.message || e);
+    err.classList.add('visible');
+  });
+}
+
+function copyOutput(){
+  var output = document.getElementById('output');
+  var btn = document.getElementById('copy-btn');
+  if(!output.value) return;
+  navigator.clipboard.writeText(output.value).then(function(){
+    btn.textContent = 'Copied \u2713';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function resetForm(){
+  document.getElementById('post').value = '';
+  document.getElementById('poster').value = '';
+  document.getElementById('angle').value = '';
+  document.getElementById('output').value = '';
+  document.getElementById('out-section').classList.remove('visible');
+  document.getElementById('error').classList.remove('visible');
+}
+</script>
+</body>
+</html>
