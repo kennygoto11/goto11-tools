@@ -250,7 +250,7 @@ body {
     <div class="hint" style="margin-bottom:13px;border-left-color:var(--purple-light);"><strong>What to do:</strong> Enter 3 contacts. For each: type the name, pick a reason, paste the full post text or detailed note as context, set the <strong>Connected? Yes/No</strong> toggle, then hit <strong>Draft</strong>. Claude writes either a DM (if connected) or a 280-char connection request note (if not). Edit it, copy it, paste into LinkedIn.<br><br><strong>Reason definitions:</strong><br><span style="color:var(--purple);font-weight:700;">Trigger</span> = something that just happened (job change, post, promotion, acquisition, market news)<br><span style="color:var(--purple);font-weight:700;">Filter</span> = how you know them (worked together, met somewhere, mutual connection, prior client)<br><span style="color:var(--purple);font-weight:700;">Relationship</span> = re-engaging after a gap with someone you actually know</div>
     <p style="font-size:13px;color:var(--text-secondary);margin-bottom:11px;">Pick the highest available reason for each person:</p>
     <div class="leads-bar" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;background:#faf5fd;border:1px solid var(--purple-light);border-radius:10px;margin-bottom:13px;">
-      <div style="font-size:12px;color:var(--text-primary);font-weight:600;">Pull 3 qualified leads from Notion (Lead/Nurture, longest-untouched first)</div>
+      <div style="font-size:12px;color:var(--text-primary);font-weight:600;">Pull 3 qualified leads from Notion (Status = Lead, longest-untouched first)</div>
       <button class="btn-p" id="leads-btn" onclick="loadLeads()" style="flex:0 0 auto;padding:8px 14px;font-size:12px;">Pull from Notion</button>
     </div>
     <div class="leads-status" id="leads-status" style="display:none;font-size:12px;color:var(--text-secondary);margin-bottom:10px;"></div>
@@ -675,7 +675,7 @@ function loadLeads(){
     }
     var leads = (res.data && res.data.leads) || [];
     if(leads.length === 0){
-      status.textContent = 'No qualified leads found. Make sure contacts have Status=Lead/Nurture and the Filter field is filled in Notion.';
+      status.textContent = 'No qualified leads found. Make sure contacts have Status=Lead and the Filter field is filled in Notion.';
       status.style.color = '#8a3232';
       return;
     }

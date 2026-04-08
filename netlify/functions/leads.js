@@ -21,12 +21,7 @@ export default async (req) => {
       body: JSON.stringify({
         filter: {
           and: [
-            {
-              or: [
-                { property: "Status", select: { equals: "Lead" } },
-                { property: "Status", select: { equals: "Nurture" } },
-              ],
-            },
+            { property: "Status", select: { equals: "Lead" } },
             { property: "Archive", checkbox: { equals: false } },
             { property: "Filter", rich_text: { is_not_empty: true } },
           ],
