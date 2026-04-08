@@ -1,0 +1,140 @@
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+.wrap{font-family:var(--font-sans);max-width:640px;padding:1rem 0}
+.intro{font-size:14px;color:var(--color-text-secondary);margin-bottom:1.5rem;line-height:1.6}
+.layer{margin-bottom:12px}
+.layer-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:2px;color:var(--color-text-tertiary);margin-bottom:8px;padding-left:4px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px;cursor:pointer;transition:all .2s}
+.card:hover{border-color:var(--color-border-secondary)}
+.card.active{border-color:#9439bf;border-width:1.5px}
+.card-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.dot{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.card-name{font-size:14px;font-weight:500}
+.card-one{font-size:12px;color:var(--color-text-secondary);line-height:1.4}
+.detail{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:20px 24px;margin:16px 0;display:none}
+.detail.show{display:block}
+.detail h3{font-size:15px;font-weight:500;margin-bottom:8px}
+.detail p{font-size:13px;color:var(--color-text-secondary);line-height:1.7;margin-bottom:8px}
+.detail .analogy{font-size:13px;color:var(--color-text-primary);font-style:italic;border-left:2px solid #9439bf;padding-left:12px;margin:12px 0}
+.flow{margin-top:24px;padding:16px 20px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg)}
+.flow h3{font-size:14px;font-weight:500;margin-bottom:12px}
+.step{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.step-num{width:24px;height:24px;border-radius:50%;background:#9439bf;color:#fff;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-text{font-size:13px;color:var(--color-text-secondary);line-height:1.5}
+.step-text b{color:var(--color-text-primary);font-weight:500}
+</style>
+<div class="wrap">
+<p class="intro">Click any tool below to see what it does, why you use it, and how it fits in your setup.</p>
+
+<div class="layer">
+<div class="layer-label">You work here</div>
+<div class="cards">
+<div class="card" onclick="show('claude')">
+<div class="card-head"><div class="dot" style="background:#EEEDFE">C</div><div class="card-name">Claude</div></div>
+<div class="card-one">Your AI thinking partner that builds things</div>
+</div>
+</div>
+</div>
+
+<div class="layer">
+<div class="layer-label">Your files live here</div>
+<div class="cards">
+<div class="card" onclick="show('github')">
+<div class="card-head"><div class="dot" style="background:#E1F5EE">G</div><div class="card-name">GitHub</div></div>
+<div class="card-one">Where your code files are stored and versioned</div>
+</div>
+</div>
+</div>
+
+<div class="layer">
+<div class="layer-label">Your sites run here</div>
+<div class="cards">
+<div class="card" onclick="show('netlify')">
+<div class="card-head"><div class="dot" style="background:#E6F1FB">N</div><div class="card-name">Netlify</div></div>
+<div class="card-one">Turns your files into live websites</div>
+</div>
+<div class="card" onclick="show('replit')">
+<div class="card-head"><div class="dot" style="background:#FAEEDA">R</div><div class="card-name">Replit</div></div>
+<div class="card-one">Code editor and hosting in one place</div>
+</div>
+</div>
+</div>
+
+<div class="layer">
+<div class="layer-label">Behind-the-scenes plumbing</div>
+<div class="cards">
+<div class="card" onclick="show('api')">
+<div class="card-head"><div class="dot" style="background:#FAECE7">A</div><div class="card-name">API</div></div>
+<div class="card-one">How software talks to other software</div>
+</div>
+<div class="card" onclick="show('mcp')">
+<div class="card-head"><div class="dot" style="background:#FBEAF0">M</div><div class="card-name">MCP</div></div>
+<div class="card-one">How Claude connects to your other tools</div>
+</div>
+</div>
+</div>
+
+<div class="detail" id="d-claude">
+<h3>Claude — your operator</h3>
+<div class="analogy">Think of Claude as a contractor you hire. You describe what you want, Claude builds it and hands you the finished product.</div>
+<p>Claude writes the HTML, CSS, and JavaScript code that makes your tools work. It also connects to Notion, Slack, Gmail, Google Calendar, Netlify, and more through MCP connectors — so it can read your data and take actions on your behalf.</p>
+<p><b>What Claude can't do:</b> It can't directly push files to GitHub or Netlify. That's why you copy-paste code from Claude into GitHub, and GitHub auto-sends it to Netlify.</p>
+</div>
+
+<div class="detail" id="d-github">
+<h3>GitHub — your filing cabinet</h3>
+<div class="analogy">Think of GitHub as a cloud-based filing cabinet where every version of every file is saved. If you mess something up, you can always go back to the previous version.</div>
+<p>Your two GitHub repos right now:</p>
+<p><b>goto11-tools</b> — holds everything for app.goto11.ca (your internal hub)<br>
+<b>goto11-client-tools</b> — holds everything for tools.goto11.ca (client-facing tools)</p>
+<p>When you edit a file on GitHub and click "Commit," that's like clicking Save. Netlify watches these repos and automatically re-publishes your site whenever you save.</p>
+</div>
+
+<div class="detail" id="d-netlify">
+<h3>Netlify — your web host</h3>
+<div class="analogy">Think of Netlify as the building where your websites physically live. GitHub stores the blueprints; Netlify is the actual building people walk into.</div>
+<p>Netlify takes your HTML files from GitHub and makes them accessible at real URLs. It also handles your custom domains (app.goto11.ca, tools.goto11.ca), SSL certificates (the padlock icon), password protection, and form submissions from your gate pages.</p>
+<p>The magic: every time you save a file on GitHub, Netlify automatically rebuilds your site in about 15-30 seconds. You never have to manually "publish."</p>
+</div>
+
+<div class="detail" id="d-replit">
+<h3>Replit — a code playground</h3>
+<div class="analogy">Think of Replit as a workshop with tools already set up. You walk in, start building, and your creation is instantly live — no setup, no GitHub, no Netlify needed.</div>
+<p>Replit is an all-in-one code editor and hosting platform in the browser. It's useful for quick prototypes or apps that need a backend (server-side code), which Netlify doesn't handle well. You haven't used it much yet, but it's an option for more complex tools down the road.</p>
+</div>
+
+<div class="detail" id="d-api">
+<h3>API — application programming interface</h3>
+<div class="analogy">Think of an API as a restaurant menu. You don't walk into the kitchen — you read the menu (the API), place your order (send a request), and get your food back (receive a response). The kitchen does the work; you just interact through the menu.</div>
+<p>When your LinkedIn Writer tool talks to Claude's AI to generate a post, it's using Claude's API. When Netlify checks GitHub for new files, it's using GitHub's API. Every tool-to-tool connection runs through APIs.</p>
+<p>You don't need to build APIs yourself — you just use tools that already have them.</p>
+</div>
+
+<div class="detail" id="d-mcp">
+<h3>MCP — model context protocol</h3>
+<div class="analogy">Think of MCP as power adapters for Claude. Each adapter lets Claude plug into a different tool — Notion, Slack, Gmail, Netlify, Google Calendar — and read or do things inside it.</div>
+<p>MCP is what lets Claude create a Netlify site, search your Notion database, read your Slack messages, or check your calendar — all from inside this chat. Without MCP, Claude would just be a text generator with no ability to touch your real tools.</p>
+<p>You manage which connectors are active in Claude's settings. Each one you turn on is like plugging in another adapter.</p>
+</div>
+
+<div class="flow">
+<h3>How it all connects when you build a tool</h3>
+<div class="step"><div class="step-num">1</div><div class="step-text">You tell <b>Claude</b> what you want to build</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-text"><b>Claude</b> writes the code (HTML/CSS/JS) and gives it to you</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-text">You paste the code into <b>GitHub</b> (your filing cabinet)</div></div>
+<div class="step"><div class="step-num">4</div><div class="step-text"><b>Netlify</b> sees the change and auto-publishes to your live site</div></div>
+<div class="step"><div class="step-num">5</div><div class="step-text">Your tool is live at <b>app.goto11.ca</b> or <b>tools.goto11.ca</b> in ~30 seconds</div></div>
+</div>
+</div>
+<script>
+let active=null;
+function show(id){
+document.querySelectorAll('.detail').forEach(d=>d.classList.remove('show'));
+document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
+if(active===id){active=null;return}
+document.getElementById('d-'+id).classList.add('show');
+event.currentTarget.classList.add('active');
+active=id;
+}
+</script>

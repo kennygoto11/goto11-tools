@@ -249,6 +249,11 @@ body {
     <hr class="divider">
     <div class="hint" style="margin-bottom:13px;border-left-color:var(--purple-light);"><strong>What to do:</strong> Enter 3 contacts. For each: type the name, pick a reason, paste the full post text or detailed note as context, set the <strong>Connected? Yes/No</strong> toggle, then hit <strong>Draft</strong>. Claude writes either a DM (if connected) or a 280-char connection request note (if not). Edit it, copy it, paste into LinkedIn.<br><br><strong>Reason definitions:</strong><br><span style="color:var(--purple);font-weight:700;">Trigger</span> = something that just happened (job change, post, promotion, acquisition, market news)<br><span style="color:var(--purple);font-weight:700;">Filter</span> = how you know them (worked together, met somewhere, mutual connection, prior client)<br><span style="color:var(--purple);font-weight:700;">Relationship</span> = re-engaging after a gap with someone you actually know</div>
     <p style="font-size:13px;color:var(--text-secondary);margin-bottom:11px;">Pick the highest available reason for each person:</p>
+    <div class="leads-bar" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;background:#faf5fd;border:1px solid var(--purple-light);border-radius:10px;margin-bottom:13px;">
+      <div style="font-size:12px;color:var(--text-primary);font-weight:600;">Pull 3 qualified leads from Notion (Lead/Nurture, longest-untouched first)</div>
+      <button class="btn-p" id="leads-btn" onclick="loadLeads()" style="flex:0 0 auto;padding:8px 14px;font-size:12px;">Pull from Notion</button>
+    </div>
+    <div class="leads-status" id="leads-status" style="display:none;font-size:12px;color:var(--text-secondary);margin-bottom:10px;"></div>
     <div class="flag-box" id="flag-box-2" style="display:none;">
       <div class="flag-label">Flagged from step 1 — click to add</div>
       <div class="flag-chips" id="flag-chips-2"></div>
@@ -284,6 +289,7 @@ body {
         <div class="draft-actions" id="da0">
           <button class="draft-mini" id="dc0" onclick="copyDraft(0)">Copy</button>
           <button class="draft-mini" onclick="draftDM(0)">Regenerate</button>
+          <button class="draft-mini" id="ms0" onclick="markSent(0)">Mark as sent → log to Notion</button>
         </div>
         <div class="draft-error" id="de0"></div>
       </div>
@@ -310,6 +316,7 @@ body {
         <div class="draft-actions" id="da1">
           <button class="draft-mini" id="dc1" onclick="copyDraft(1)">Copy</button>
           <button class="draft-mini" onclick="draftDM(1)">Regenerate</button>
+          <button class="draft-mini" id="ms1" onclick="markSent(1)">Mark as sent → log to Notion</button>
         </div>
         <div class="draft-error" id="de1"></div>
       </div>
@@ -336,6 +343,7 @@ body {
         <div class="draft-actions" id="da2">
           <button class="draft-mini" id="dc2" onclick="copyDraft(2)">Copy</button>
           <button class="draft-mini" onclick="draftDM(2)">Regenerate</button>
+          <button class="draft-mini" id="ms2" onclick="markSent(2)">Mark as sent → log to Notion</button>
         </div>
         <div class="draft-error" id="de2"></div>
       </div>
@@ -387,7 +395,7 @@ body {
 </div>
 
 <script>
-var contacts = [{name:'',reason:'',context:'',connected:true},{name:'',reason:'',context:'',connected:true},{name:'',reason:'',context:'',connected:true}];
+var contacts = [{name:'',reason:'',context:'',connected:true,contactId:''},{name:'',reason:'',context:'',connected:true,contactId:''},{name:'',reason:'',context:'',connected:true,contactId:''}];
 var flagged = [];
 var tsecs = {1:180,2:120,3:600};
 var tints = {};
@@ -647,8 +655,100 @@ function goStep(n){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
+function loadLeads(){
+  var btn = document.getElementById('leads-btn');
+  var status = document.getElementById('leads-status');
+  btn.disabled = true;
+  btn.textContent = 'Loading...';
+  status.style.display = 'block';
+  status.textContent = 'Pulling leads from Notion...';
+  status.style.color = 'var(--text-secondary)';
+  fetch('/.netlify/functions/leads').then(function(r){
+    return r.json().then(function(data){ return {ok: r.ok, data: data}; });
+  }).then(function(res){
+    btn.disabled = false;
+    btn.textContent = 'Refresh from Notion';
+    if(!res.ok){
+      status.textContent = 'Error: ' + ((res.data && res.data.error) || 'Could not fetch leads');
+      status.style.color = '#8a3232';
+      return;
+    }
+    var leads = (res.data && res.data.leads) || [];
+    if(leads.length === 0){
+      status.textContent = 'No qualified leads found. Make sure contacts have Status=Lead/Nurture and the Filter field is filled in Notion.';
+      status.style.color = '#8a3232';
+      return;
+    }
+    leads.forEach(function(lead, i){
+      if(i > 2) return;
+      contacts[i].name = lead.name || '';
+      contacts[i].contactId = lead.id || '';
+      contacts[i].reason = 'filter';
+      contacts[i].context = (lead.title ? lead.title + '\n\n' : '') + 'Filter: ' + (lead.filter || '') + (lead.linkedin ? '\n\nLinkedIn: ' + lead.linkedin : '');
+      contacts[i].connected = true;
+      var nameEl = document.getElementById('cn'+i);
+      if(nameEl) nameEl.value = lead.name || '';
+      var ctxEl = document.getElementById('ctx'+i);
+      if(ctxEl) ctxEl.value = contacts[i].context;
+      setR(i, 'filter');
+      fillCR(i);
+    });
+    status.textContent = 'Loaded ' + leads.length + ' lead' + (leads.length===1?'':'s') + ' from Notion. Set Connected? for each, then Draft.';
+    status.style.color = 'var(--purple)';
+  }).catch(function(e){
+    btn.disabled = false;
+    btn.textContent = 'Pull from Notion';
+    status.textContent = 'Network error: ' + (e.message || e);
+    status.style.color = '#8a3232';
+  });
+}
+
+function markSent(i){
+  var ct = contacts[i];
+  var out = document.getElementById('do'+i);
+  var btn = document.getElementById('ms'+i);
+  var err = document.getElementById('de'+i);
+  err.classList.remove('visible');
+  if(!ct.contactId){
+    showDraftError(i, 'Mark as sent only works for contacts pulled from Notion (no contactId on this row).');
+    return;
+  }
+  if(!out || !out.value){
+    showDraftError(i, 'Draft a message first.');
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Logging...';
+  fetch('/.netlify/functions/log-outreach', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      contactId: ct.contactId,
+      contactName: ct.name,
+      message: out.value,
+      hook: ct.reason || '',
+      connectionNote: ct.connected === false
+    })
+  }).then(function(r){
+    return r.json().then(function(data){ return {ok: r.ok, data: data}; });
+  }).then(function(res){
+    if(!res.ok){
+      btn.disabled = false;
+      btn.textContent = 'Mark as sent → log to Notion';
+      showDraftError(i, 'Log failed: ' + ((res.data && res.data.error) || 'unknown'));
+      return;
+    }
+    btn.textContent = 'Logged ✓ Follow-up ' + (res.data.followUp || '');
+    btn.classList.add('copied');
+  }).catch(function(e){
+    btn.disabled = false;
+    btn.textContent = 'Mark as sent → log to Notion';
+    showDraftError(i, 'Network error: ' + (e.message || e));
+  });
+}
+
 function resetBrief(){
-  contacts=[{name:'',reason:'',context:'',connected:true},{name:'',reason:'',context:'',connected:true},{name:'',reason:'',context:'',connected:true}];
+  contacts=[{name:'',reason:'',context:'',connected:true,contactId:''},{name:'',reason:'',context:'',connected:true,contactId:''},{name:'',reason:'',context:'',connected:true,contactId:''}];
   flagged=[];
   var fi=document.getElementById('flag-input');if(fi)fi.value='';
   renderFlags();
@@ -666,7 +766,7 @@ function resetBrief(){
   ['da0','da1','da2'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('visible');});
   ['de0','de1','de2'].forEach(function(id){var el=document.getElementById(id);if(el){el.textContent='';el.classList.remove('visible');}});
   ['0','1','2'].forEach(function(i){
-    contacts[parseInt(i)]={name:'',reason:'',context:'',connected:true};
+    contacts[parseInt(i)]={name:'',reason:'',context:'',connected:true,contactId:''};
     var cy=document.getElementById('cy'+i);if(cy)cy.className='conn-pill on';
     var cnn=document.getElementById('cn'+i+'n');if(cnn)cnn.className='conn-pill';
     var dml=document.getElementById('dm'+i);if(dml)dml.textContent='DM';
