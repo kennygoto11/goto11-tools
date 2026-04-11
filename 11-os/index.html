@@ -199,6 +199,32 @@ textarea{resize:vertical}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:#d0ccc7;border-radius:3px}
 ::-webkit-scrollbar-thumb:hover{background:#b0aca7}
+
+/* Projects Tracker */
+.proj-filter-bar{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;margin-bottom:16px}
+.proj-filter-btn{padding:5px 12px;border-radius:20px;white-space:nowrap;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:transparent;color:var(--grey);transition:all .15s;font-family:var(--font)}
+.proj-filter-btn.active{border-color:var(--purple);background:rgba(148,57,191,0.08);color:var(--purple)}
+.proj-tracker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.proj-tracker-card{background:var(--card);border:0.5px solid var(--border);border-radius:0 var(--radius) var(--radius) 0;padding:18px 20px;display:flex;flex-direction:column;gap:12px;cursor:pointer;transition:border-color .15s}
+.proj-tracker-card:hover{border-color:var(--purple)}
+.proj-tracker-card.client-card-view{cursor:default}
+.proj-tracker-card.client-card-view:hover{border-color:var(--border)}
+.proj-status-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.proj-progress-bar{height:4px;background:#eee;border-radius:4px;overflow:hidden}
+.proj-progress-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.proj-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* Proposal Builder */
+.pb-step{display:none}.pb-step.active{display:block}
+.pb-form{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;display:flex;flex-direction:column;gap:20px}
+.pb-label{font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:block}
+.pb-input{width:100%;padding:12px 14px;background:#fff;border:1px solid var(--border);border-radius:10px;font-size:14px;color:#1a1a1a;font-family:var(--font);box-sizing:border-box;outline:none;transition:border-color .15s}
+.pb-input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(148,57,191,.1)}
+.pb-two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.pb-two-col{grid-template-columns:1fr}}
+.pb-output-box{font-size:13px;line-height:1.7;color:#1a1a1a;padding:20px;background:#fafafa;border-radius:10px;border-left:3px solid var(--purple);white-space:pre-wrap;max-height:500px;overflow-y:auto;margin-bottom:16px}
+.pb-section-label{font-size:10px;font-weight:600;color:var(--purple);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.pb-gap-list{background:#fef5e7;border:1px solid #fde68a;border-radius:10px;padding:16px 20px;font-size:13px;line-height:1.7;color:#92400e;margin-bottom:16px;white-space:pre-wrap}
 </style>
 </head>
 <body>
@@ -218,6 +244,7 @@ textarea{resize:vertical}
       <li><a href="#" data-page="to-get-to-11">To Get To 11</a></li>
       <li><a href="#" data-page="comment-helper">Comment Helper</a></li>
       <li><a href="#" data-page="email-outreach">Email Outreach</a></li>
+      <li><a href="#" data-page="proposal-builder">Proposal Builder</a></li>
       <li><a href="#" data-page="projects">Projects &amp; Builds</a></li>
       <li><a href="#" data-page="pipeline">Pipeline <span class="sb-badge">5</span></a></li>
       <li><a href="#" data-page="clients">Clients</a></li>
@@ -427,45 +454,32 @@ textarea{resize:vertical}
 
 <!-- Projects & Builds -->
 <div class="page" id="page-projects">
-  <h1 class="page-title">Projects &amp; Builds</h1>
-  <p class="page-sub">Everything in motion</p>
-  <div class="project-grid">
-    <div class="proj-card">
-      <h3>11 OS <span class="badge badge-purple">Active</span></h3>
-      <p style="font-size:13px;color:var(--grey)">Business operating system dashboard</p>
-      <div class="progress-bar"><div class="fill" style="width:40%"></div></div>
-      <div class="proj-meta">Claude + Netlify · Updated today</div>
-      <div class="proj-tags"><span class="tag">Internal</span><span class="tag">Dashboard</span></div>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+    <div>
+      <h1 class="page-title">Projects &amp; Builds</h1>
+      <p class="page-sub" id="projViewSub">Everything in motion</p>
     </div>
-    <div class="proj-card">
-      <h3>LinkedIn Analyzer v2 <span class="badge badge-gold">LICENSABLE</span></h3>
-      <p style="font-size:13px;color:var(--grey)">AI-powered post performance analysis tool</p>
-      <div class="progress-bar"><div class="fill" style="width:70%"></div></div>
-      <div class="proj-meta">Claude + Netlify · Updated 2 days ago</div>
-      <div class="proj-tags"><span class="tag">Product</span><span class="tag">AI</span><span class="tag">Revenue</span></div>
-    </div>
-    <div class="proj-card">
-      <h3>Rebuild goto11.ca <span class="badge badge-purple">Active</span></h3>
-      <p style="font-size:13px;color:var(--grey)">Full site redesign and content refresh</p>
-      <div class="progress-bar"><div class="fill" style="width:25%"></div></div>
-      <div class="proj-meta">Notion + Claude · Updated 5 days ago</div>
-      <div class="proj-tags"><span class="tag">Website</span><span class="tag">Brand</span></div>
-    </div>
-    <div class="proj-card">
-      <h3>Marcus Rivera Skill Build <span class="badge badge-green">Client</span></h3>
-      <p style="font-size:13px;color:var(--grey)">Custom LinkedIn + outreach skills for Marcus</p>
-      <div class="progress-bar"><div class="fill" style="width:60%"></div></div>
-      <div class="proj-meta">Claude + Notion · Updated 1 day ago</div>
-      <div class="proj-tags"><span class="tag">Client Work</span><span class="tag">Skills</span></div>
-    </div>
-    <div class="proj-card">
-      <h3>TechNova Proposal <span class="badge badge-amber">Draft</span></h3>
-      <p style="font-size:13px;color:var(--grey)">Strategy sprint proposal for TechNova leadership</p>
-      <div class="progress-bar"><div class="fill" style="width:15%"></div></div>
-      <div class="proj-meta">Claude · Updated 3 days ago</div>
-      <div class="proj-tags"><span class="tag">Proposal</span><span class="tag">Pipeline</span></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div style="display:flex;border:0.5px solid var(--border);border-radius:8px;overflow:hidden">
+        <button id="projMyViewBtn" onclick="setProjView(false)" style="padding:7px 13px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:var(--purple);color:#fff;font-family:var(--font)">My view</button>
+        <button id="projClientViewBtn" onclick="setProjView(true)" style="padding:7px 13px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--grey);font-family:var(--font)">Client view</button>
+      </div>
+      <button id="projAddBtn" onclick="projOpenForm('new')" style="padding:8px 14px;background:var(--purple);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font)">+ Add project</button>
     </div>
   </div>
+  <div class="stat-grid" id="projStats" style="margin-bottom:20px"></div>
+  <div class="proj-filter-bar" id="projFilterBar"></div>
+  <div id="projQuickCapture" style="margin-bottom:16px">
+    <input id="projQuickInput" placeholder="Got a new idea? Type it and press Enter to park it"
+      style="width:100%;padding:9px 14px;background:#fafafa;border:0.5px solid var(--border);border-radius:var(--radius);font-size:13px;color:#1a1a1a;font-family:var(--font);outline:none;box-sizing:border-box"
+      onkeydown="projQuickAdd(event)">
+  </div>
+  <div id="projClientBanner" style="display:none;padding:8px 0;margin-bottom:12px;align-items:center;gap:8px">
+    <span style="width:8px;height:8px;border-radius:50%;background:#f4d4b7;display:inline-block;flex-shrink:0"></span>
+    <span id="projClientBannerText" style="font-size:12px;font-weight:500;color:var(--grey)"></span>
+  </div>
+  <div id="projForm" style="display:none"></div>
+  <div id="projGrid"></div>
 </div>
 
 <!-- Pipeline -->
@@ -701,6 +715,85 @@ textarea{resize:vertical}
 <div class="page" id="page-network"><div class="placeholder-page"><div class="ph-icon">&#127760;</div><h2>Network</h2><p>Coming soon</p></div></div>
 <div class="page" id="page-playbooks"><div class="placeholder-page"><div class="ph-icon">&#128214;</div><h2>Playbooks</h2><p>Coming soon</p></div></div>
 <div class="page" id="page-finance"><div class="placeholder-page"><div class="ph-icon">&#128176;</div><h2>Finance</h2><p>Coming soon</p></div></div>
+
+
+<!-- Proposal Builder -->
+<div class="page" id="page-proposal-builder">
+  <div style="max-width:760px">
+    <div style="font-size:10px;font-weight:600;color:var(--purple);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px">Go To 11 — Proposal Builder</div>
+    <h1 class="page-title">Transcript to Proposal.</h1>
+    <p class="page-sub">Paste a meeting transcript or notes. Get a structured, client-ready Go To 11 proposal.</p>
+
+    <!-- Step 1: Paste transcript -->
+    <div class="pb-step active" id="pb-step1">
+      <div class="pb-form">
+        <div>
+          <label class="pb-label">Meeting transcript or notes *</label>
+          <textarea id="pbTranscript" class="pb-input" rows="12" placeholder="Paste the full transcript or your meeting notes here. The more context the better — names, titles, challenges described, scope hints, budget signals, timelines." style="resize:vertical;min-height:200px;line-height:1.6"></textarea>
+        </div>
+        <div class="pb-two-col">
+          <div>
+            <label class="pb-label">Client company name</label>
+            <input id="pbCompany" class="pb-input" placeholder="e.g. CIBC, Northvale Group">
+          </div>
+          <div>
+            <label class="pb-label">Primary contact</label>
+            <input id="pbContact" class="pb-input" placeholder="e.g. Dana Park, VP HR">
+          </div>
+        </div>
+        <div id="pbApiKeyPrompt" style="display:none;padding:16px 20px;background:#fef5e7;border:1px solid #fde68a;border-radius:10px">
+          <label class="pb-label" style="color:#92400e">API Key Required</label>
+          <p style="font-size:13px;color:#92400e;margin-bottom:10px">Enter your Anthropic API key to use the Proposal Builder.</p>
+          <input type="password" id="pbApiKey" class="pb-input" placeholder="sk-ant-..." style="margin-bottom:8px">
+          <button class="btn btn-primary btn-sm" onclick="savePbApiKey()">Save key</button>
+        </div>
+        <div style="display:flex;gap:10px;padding-top:4px">
+          <button id="pbExtractBtn" class="btn btn-primary" style="flex:1;padding:13px 20px;font-size:14px;border-radius:10px" onclick="pbExtract()">Extract &amp; Analyse</button>
+        </div>
+      </div>
+      <div id="pbError1" style="display:none;margin-top:16px;padding:12px 16px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;font-size:13px;color:#dc2626"></div>
+    </div>
+
+    <!-- Step 2: Review extraction + fill gaps -->
+    <div class="pb-step" id="pb-step2">
+      <div class="pb-form">
+        <div>
+          <div class="pb-section-label">What I found in the transcript</div>
+          <div id="pbExtraction" class="pb-output-box"></div>
+        </div>
+        <div id="pbGapsWrap" style="display:none">
+          <div class="pb-section-label">Gaps — answer these before I build the proposal</div>
+          <div id="pbGaps" class="pb-gap-list"></div>
+          <div>
+            <label class="pb-label">Your answers to the gaps above</label>
+            <textarea id="pbGapAnswers" class="pb-input" rows="5" placeholder="Answer each gap point. e.g. '1. 12 participants — all senior directors. 2. Start date mid-May. 3. Budget around $25k.'" style="resize:vertical;line-height:1.6"></textarea>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary" onclick="pbGoStep(1)">&#8592; Back</button>
+          <button id="pbBuildBtn" class="btn btn-primary" style="flex:1;padding:13px 20px;font-size:14px;border-radius:10px" onclick="pbBuild()">Build Proposal</button>
+        </div>
+      </div>
+      <div id="pbError2" style="display:none;margin-top:16px;padding:12px 16px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;font-size:13px;color:#dc2626"></div>
+    </div>
+
+    <!-- Step 3: Proposal output -->
+    <div class="pb-step" id="pb-step3">
+      <div class="pb-form">
+        <div>
+          <div class="pb-section-label">Gamma-ready proposal prompt</div>
+          <div id="pbProposalOut" class="pb-output-box"></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-primary" style="flex:1;padding:11px 16px;font-size:13px;border-radius:10px" onclick="pbCopy()">Copy proposal</button>
+          <a href="https://gamma.app" target="_blank" class="btn btn-secondary" style="padding:11px 16px;font-size:13px;border-radius:10px;text-decoration:none">Open Gamma &#8599;</a>
+          <button class="btn btn-outline" style="padding:11px 16px;font-size:13px;border-radius:10px" onclick="pbGoStep(1)">Start over</button>
+        </div>
+        <p style="font-size:12px;color:var(--grey);margin-top:4px">Copy the proposal text above, then paste it into Gamma as a prompt to generate the designed document.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
 </div><!-- /main -->
 </div><!-- /shell -->
@@ -1132,6 +1225,264 @@ function copyOutreachEmail() {
     setTimeout(function() { btn.textContent = 'Copy email'; }, 2000);
   });
 }
+
+// ===== PROJECTS TRACKER =====
+var PROJ_CATS = ["Sales","Content","Client Tools","Internal Ops","Client Projects"];
+var PROJ_STATUS_CFG = {
+  live:     { label:"Live",     bg:"#e8f8f0",               color:"#27ae60" },
+  building: { label:"Building", bg:"rgba(148,57,191,0.09)", color:"#9439bf" },
+  idea:     { label:"Idea",     bg:"#eaf2fb",               color:"#3498db" },
+  parked:   { label:"Parked",   bg:"#f0efed",               color:"#66615c" }
+};
+var PROJ_INITIAL = [
+  { id:"p1",  name:"11 HQ",                        subtitle:"Master Dashboard",   category:"Internal Ops",    status:"building", priority:1, progress:20, goal:"Central command hub for all Go To 11 tools. Internal ops view and client-facing portal.",                                                                                              url:null, tags:["infrastructure","flagship"], cv:false, cd:null },
+  { id:"p2",  name:"Outreach Message Builder",      subtitle:null,                 category:"Sales",           status:"live",     priority:1, progress:85, goal:"AI-powered personalised outbound messages. LinkedIn DMs and email. Relevance-led, proof-backed, prospect-specific.",                                                                  url:null, tags:["sales","AI"],              cv:true,  cd:"AI-powered outreach that opens doors. Personalised messages built around your prospect's world." },
+  { id:"p3",  name:"LinkedIn Post Creator",         subtitle:null,                 category:"Content",         status:"live",     priority:1, progress:90, goal:"Draft LinkedIn posts from seed idea to publish-ready, in your voice.",                                                                                                               url:null, tags:["content","LinkedIn"],     cv:true,  cd:"LinkedIn content that sounds like you. From idea to publish-ready in minutes." },
+  { id:"p4",  name:"LinkedIn Skill Builder",        subtitle:"Client Methodology", category:"Client Tools",    status:"live",     priority:2, progress:80, goal:"Build a custom LinkedIn content system for clients using the 4-step Harvest to Extract to Build to Produce methodology.",                                                            url:null, tags:["client","LinkedIn"],     cv:true,  cd:"A done-for-you LinkedIn content system built around your unique voice and audience." },
+  { id:"p5",  name:"Proposal Builder",              subtitle:null,                 category:"Sales",           status:"live",     priority:1, progress:80, goal:"Turn client meeting transcripts into polished Go To 11 proposals automatically.",                                                                                                     url:null, tags:["sales","client"],        cv:false, cd:null },
+  { id:"p6",  name:"Networking Coach",              subtitle:null,                 category:"Client Tools",    status:"live",     priority:2, progress:75, goal:"Help anyone network more effectively. Before, during, and after professional interactions.",                                                                                          url:null, tags:["coaching","client"],     cv:true,  cd:"Professional networking guidance from first contact to lasting relationships." },
+  { id:"p7",  name:"Skill Creator",                 subtitle:"Internal Tool",      category:"Internal Ops",    status:"live",     priority:2, progress:90, goal:"Build, modify, test, and package AI skill files for Claude. The engine behind every skill tool.",                                                                                     url:null, tags:["internal","AI"],         cv:false, cd:null },
+  { id:"p8",  name:"Sales Process Framework",       subtitle:"Pipeline Navigator", category:"Sales",           status:"building", priority:1, progress:40, goal:"Sequential pipeline tool from prospecting to account management. Tells you which tool to use at every stage.",                                                                       url:null, tags:["sales","pipeline"],     cv:true,  cd:"Your guided path from first contact to closed deal. The right tool at every step." },
+  { id:"p9",  name:"Prospector Tool",               subtitle:null,                 category:"Sales",           status:"building", priority:2, progress:15, goal:"Surface ideal-fit leads from LinkedIn and beyond before first touch.",                                                                                                               url:null, tags:["sales","leads"],        cv:false, cd:null },
+  { id:"p10", name:"Contact Audit & ICP Shortlist", subtitle:null,                 category:"Internal Ops",    status:"building", priority:2, progress:10, goal:"Audit contacts across Google, Notion, and Mailchimp. Score against ICP definition and surface top prospects.",                                                                       url:null, tags:["CRM","contacts"],        cv:false, cd:null },
+  { id:"p11", name:"Aiden's Record Database",       subtitle:null,                 category:"Client Projects", status:"idea",     priority:3, progress:0,  goal:"Personal vinyl/music record collection database. Browse, track, and organise a full library.",                                                                                       url:null, tags:["database","personal"],  cv:false, cd:null },
+  { id:"p12", name:"Aiden's Financial Hub",         subtitle:"Budget + Advisor",   category:"Client Projects", status:"idea",     priority:3, progress:0,  goal:"Personal budget tracker and financial advisor. Income, expenses, taxes, filing, and long-term financial strategy in one place.",                                                      url:null, tags:["finance","personal"],   cv:false, cd:null }
+];
+var projProjects = [];
+var projFilter = 'All';
+var projClientView = false;
+var projEditing = null;
+
+function projInit() {
+  try { var s = localStorage.getItem('gt11_projects_v1'); projProjects = s ? JSON.parse(s) : PROJ_INITIAL.map(function(p){return Object.assign({},p);}); }
+  catch(e) { projProjects = PROJ_INITIAL.map(function(p){return Object.assign({},p);}); }
+  projRender();
+}
+function projPersist() { try { localStorage.setItem('gt11_projects_v1', JSON.stringify(projProjects)); } catch(e) {} }
+function projCounts() {
+  return { total:projProjects.length, live:projProjects.filter(function(p){return p.status==='live';}).length, building:projProjects.filter(function(p){return p.status==='building';}).length, idea:projProjects.filter(function(p){return p.status==='idea';}).length, parked:projProjects.filter(function(p){return p.status==='parked';}).length };
+}
+function projVisible() {
+  return projProjects.filter(function(p) {
+    if (projClientView && !p.cv) return false;
+    if (projFilter==='All') return true;
+    if (['live','building','idea','parked'].indexOf(projFilter)!==-1) return p.status===projFilter;
+    return p.category===projFilter;
+  }).sort(function(a,b) {
+    var so={live:0,building:1,idea:2,parked:3};
+    if (a.priority!==b.priority) return a.priority-b.priority;
+    return (so[a.status]||9)-(so[b.status]||9);
+  });
+}
+function projRender() {
+  var c = projCounts();
+  var statsEl = document.getElementById('projStats');
+  if (statsEl) statsEl.innerHTML = [{label:'Total',value:c.total,color:'#1a1a1a'},{label:'Live',value:c.live,color:'#27ae60'},{label:'Building',value:c.building,color:'#9439bf'},{label:'Ideas',value:c.idea,color:'#3498db'}].map(function(s){return '<div class="stat-card"><div class="label">'+s.label+'</div><div class="value" style="color:'+s.color+'">'+s.value+'</div></div>';}).join('');
+  var fb = document.getElementById('projFilterBar');
+  if (fb) {
+    var tabs=[{key:'All',label:'All ('+c.total+')'},{key:'Sales',label:'Sales'},{key:'Content',label:'Content'},{key:'Client Tools',label:'Client Tools'},{key:'Internal Ops',label:'Internal Ops'},{key:'Client Projects',label:'Client Projects'},{key:'live',label:'Live ('+c.live+')'},{key:'building',label:'Building ('+c.building+')'},{key:'idea',label:'Ideas ('+c.idea+')'},{key:'parked',label:'Parked ('+c.parked+')'}];
+    fb.innerHTML = tabs.map(function(t){return '<button class="proj-filter-btn'+(projFilter===t.key?' active':'')+'" onclick="setProjFilter(\''+t.key.replace(/'/g,"\\'")+'\')">' +t.label+'</button>';}).join('');
+  }
+  var qc=document.getElementById('projQuickCapture'); if(qc) qc.style.display=projClientView?'none':'block';
+  var ab=document.getElementById('projAddBtn'); if(ab) ab.style.display=projClientView?'none':'inline-block';
+  var mb=document.getElementById('projMyViewBtn'); var cb=document.getElementById('projClientViewBtn');
+  if(mb){mb.style.background=projClientView?'transparent':'var(--purple)';mb.style.color=projClientView?'var(--grey)':'#fff';}
+  if(cb){cb.style.background=projClientView?'var(--purple)':'transparent';cb.style.color=projClientView?'#fff':'var(--grey)';}
+  var banner=document.getElementById('projClientBanner');
+  if(banner){var vis=projVisible();if(projClientView){banner.style.display='flex';document.getElementById('projClientBannerText').textContent='Client view active - '+vis.length+' client-facing project'+(vis.length!==1?'s':'');}else{banner.style.display='none';}}
+  var sub=document.getElementById('projViewSub'); if(sub) sub.textContent=projClientView?'Client-facing tools and deliverables':'Everything in motion';
+  var grid=document.getElementById('projGrid'); if(!grid) return;
+  var visible=projVisible();
+  if(visible.length===0){grid.innerHTML='<div style="text-align:center;padding:64px"><div style="font-size:15px;font-weight:500;color:var(--grey);margin-bottom:8px">Nothing here</div><div style="font-size:13px;color:#aaa">Try a different filter or add a new project.</div></div>';return;}
+  grid.innerHTML='<div class="proj-tracker-grid">'+visible.map(projCardHTML).join('')+'</div>';
+}
+function projCardHTML(p) {
+  var tags=Array.isArray(p.tags)?p.tags:(p.tags||'').split(',').map(function(t){return t.trim();}).filter(Boolean);
+  var goal=projClientView&&p.cd?p.cd:(p.goal||'');
+  var sc=PROJ_STATUS_CFG[p.status]||PROJ_STATUS_CFG.idea;
+  var bc=p.priority===1?'#9439bf':p.priority===2?'#bfb1c4':'#e8e5e1';
+  var fc=p.status==='live'?'#27ae60':p.status==='building'?'#9439bf':'#ccc';
+  var ca=projClientView?'':' onclick="projOpenForm(\''+p.id+'\')"';
+  var cc=projClientView?' client-card-view':'';
+  var tagsH=(!projClientView&&tags.length>0)?'<div style="display:flex;flex-wrap:wrap;gap:4px">'+tags.map(function(t){return '<span style="padding:2px 7px;border-radius:4px;background:#f0efed;color:var(--grey);font-size:10px;font-weight:500">'+escHtml(t)+'</span>';}).join('')+'</div>':'';
+  var progH=!projClientView?'<div><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:11px;color:var(--grey);font-weight:500">Progress</span><span style="font-size:11px;font-weight:500;color:#555">'+p.progress+'%</span></div><div class="proj-progress-bar"><div class="proj-progress-fill" style="width:'+p.progress+'%;background:'+fc+'"></div></div></div>':'';
+  var prioH=!projClientView?'<span style="font-size:10px;font-weight:500;color:'+(p.priority===1?'#9439bf':'var(--grey)')+'">P'+p.priority+'</span>':'';
+  var parkBtn=(p.status!=='parked')?'<button onclick="event.stopPropagation();projPark(\''+p.id+'\')" style="padding:4px 10px;font-size:11px;font-weight:500;border-radius:6px;border:0.5px solid var(--border);background:transparent;color:var(--grey);cursor:pointer;font-family:var(--font)">Park</button>':'<button onclick="event.stopPropagation();projOpenForm(\''+p.id+'\')" style="padding:4px 10px;font-size:11px;font-weight:500;border-radius:6px;border:0.5px solid #9439bf;background:transparent;color:#9439bf;cursor:pointer;font-family:var(--font)">Activate</button>';
+  var actH=!projClientView?parkBtn:'';
+  var urlH=p.url?'<a href="'+escHtml(p.url)+'" target="_blank" onclick="event.stopPropagation()" style="padding:4px 10px;font-size:11px;font-weight:500;border-radius:6px;background:#9439bf;color:#fff;text-decoration:none">Open</a>':'';
+  return '<div class="proj-tracker-card'+cc+'"'+ca+' style="border-left:3px solid '+bc+'">'+
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">'+
+      '<div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:500;color:#1a1a1a;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(p.name)+'</div>'+(p.subtitle?'<div style="font-size:10px;color:var(--grey);font-weight:500;text-transform:uppercase;letter-spacing:0.5px">'+escHtml(p.subtitle)+'</div>':'')+'</div>'+
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0"><span class="proj-status-badge" style="background:'+sc.bg+';color:'+sc.color+'"><span style="width:5px;height:5px;border-radius:50%;background:'+sc.color+';display:inline-block;flex-shrink:0"></span>'+sc.label+'</span>'+prioH+'</div>'+
+    '</div>'+
+    '<p style="font-size:13px;color:var(--grey);line-height:1.6;margin:0">'+escHtml(goal)+'</p>'+
+    progH+tagsH+
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:0.5px solid var(--border)" onclick="event.stopPropagation()">'+
+      '<span style="font-size:11px;color:var(--grey);font-weight:500">'+escHtml(p.category)+'</span>'+
+      '<div style="display:flex;gap:6px">'+actH+urlH+'</div>'+
+    '</div>'+
+  '</div>';
+}
+function setProjFilter(k){projFilter=k;projRender();}
+function setProjView(v){projClientView=v;if(projEditing){projEditing=null;document.getElementById('projForm').style.display='none';}projRender();}
+function projQuickAdd(e){if(e.key!=='Enter')return;var v=document.getElementById('projQuickInput').value.trim();if(!v)return;projProjects.unshift({id:'p'+Date.now(),name:v,subtitle:'',category:'Sales',status:'parked',priority:3,progress:0,goal:'',url:null,tags:[],cv:false,cd:null});projPersist();document.getElementById('projQuickInput').value='';projRender();}
+function projOpenForm(x){projEditing=x==='new'?'new':(projProjects.find(function(p){return p.id===x;})||null);if(!projEditing&&x!=='new')return;projRenderForm();document.getElementById('projForm').style.display='block';document.querySelector('.main').scrollTo({top:0,behavior:'smooth'});}
+function projCloseForm(){projEditing=null;document.getElementById('projForm').style.display='none';}
+function projToggleCd(){document.getElementById('pf-cd-wrap').style.display=document.getElementById('pf-cv').checked?'block':'none';}
+function projRenderForm(){
+  var isN=projEditing==='new';
+  var f=isN?{id:'',name:'',subtitle:'',category:'Sales',status:'idea',priority:2,progress:0,goal:'',url:'',tags:'',cv:false,cd:''}:Object.assign({},projEditing,{tags:Array.isArray(projEditing.tags)?projEditing.tags.join(', '):(projEditing.tags||'')});
+  var inp='width:100%;padding:8px 10px;background:#fafafa;border:0.5px solid var(--border);border-radius:8px;font-size:13px;color:#1a1a1a;font-family:var(--font);box-sizing:border-box;outline:none';
+  var lbl='font-size:11px;font-weight:500;color:var(--grey);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;display:block';
+  var cOpts=PROJ_CATS.map(function(c){return '<option value="'+c+'"'+(f.category===c?' selected':'')+'>'+c+'</option>';}).join('');
+  var sOpts=Object.keys(PROJ_STATUS_CFG).map(function(k){return '<option value="'+k+'"'+(f.status===k?' selected':'')+'>'+PROJ_STATUS_CFG[k].label+'</option>';}).join('');
+  var pOpts=[[1,'P1 - Critical'],[2,'P2 - Important'],[3,'P3 - Nice to have']].map(function(a){return '<option value="'+a[0]+'"'+(f.priority===a[0]?' selected':'')+'>'+a[1]+'</option>';}).join('');
+  document.getElementById('projForm').innerHTML=
+    '<div style="background:#fff;border:1px solid #9439bf;border-radius:var(--radius);padding:24px;margin-bottom:20px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:15px;font-weight:500">'+(isN?'Add project':'Edit - '+escHtml(f.name))+'</span><button onclick="projCloseForm()" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--grey)">x</button></div>'+
+    '<div class="proj-form-grid">'+
+    '<div style="grid-column:1/-1"><label style="'+lbl+'">Name *</label><input id="pf-name" style="'+inp+'" value="'+escHtml(f.name)+'" placeholder="What are you building?"></div>'+
+    '<div style="grid-column:1/-1"><label style="'+lbl+'">Subtitle</label><input id="pf-subtitle" style="'+inp+'" value="'+escHtml(f.subtitle||'')+'" placeholder="Optional tagline"></div>'+
+    '<div><label style="'+lbl+'">Category</label><select id="pf-cat" style="'+inp+'">'+cOpts+'</select></div>'+
+    '<div><label style="'+lbl+'">Status</label><select id="pf-status" style="'+inp+'">'+sOpts+'</select></div>'+
+    '<div><label style="'+lbl+'">Priority</label><select id="pf-priority" style="'+inp+'">'+pOpts+'</select></div>'+
+    '<div><label id="pf-prog-lbl" style="'+lbl+'">Progress - '+f.progress+'%</label><input type="range" id="pf-progress" min="0" max="100" step="5" value="'+f.progress+'" oninput="document.getElementById(\'pf-prog-lbl\').textContent=\'Progress - \'+this.value+\'%\'" style="width:100%;margin-top:8px;accent-color:#9439bf"></div>'+
+    '<div style="grid-column:1/-1"><label style="'+lbl+'">Objective</label><textarea id="pf-goal" style="'+inp+';min-height:72px;resize:vertical" placeholder="What is this trying to accomplish?">'+escHtml(f.goal||'')+'</textarea></div>'+
+    '<div><label style="'+lbl+'">URL (if live)</label><input id="pf-url" style="'+inp+'" value="'+escHtml(f.url||'')+'" placeholder="https://..."></div>'+
+    '<div><label style="'+lbl+'">Tags (comma-separated)</label><input id="pf-tags" style="'+inp+'" value="'+escHtml(f.tags||'')+'" placeholder="sales, AI, internal"></div>'+
+    '<div style="grid-column:1/-1"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="pf-cv"'+(f.cv?' checked':'')+' onchange="projToggleCd()" style="accent-color:#9439bf;width:15px;height:15px"><span style="'+lbl+';margin:0">Visible in client view</span></label></div>'+
+    '<div id="pf-cd-wrap" style="grid-column:1/-1;'+(f.cv?'':'display:none')+'"><label style="'+lbl+'">Client-facing description</label><textarea id="pf-cd" style="'+inp+';min-height:60px;resize:vertical" placeholder="How would you describe this to a client?">'+escHtml(f.cd||'')+'</textarea></div>'+
+    '</div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;border-top:0.5px solid var(--border);padding-top:16px;margin-top:16px">'+
+    '<div>'+(!isN?'<button onclick="projConfirmDelete(\''+f.id+'\')" style="padding:8px 14px;border-radius:8px;border:0.5px solid #e74c3c;background:transparent;color:#e74c3c;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font)">Remove project</button>':'')+'</div>'+
+    '<div style="display:flex;gap:8px"><button onclick="projCloseForm()" style="padding:8px 16px;border-radius:8px;border:0.5px solid var(--border);background:transparent;color:var(--grey);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font)">Cancel</button>'+
+    '<button onclick="projSaveForm(\''+escHtml(isN?'new':f.id)+'\')" style="padding:8px 20px;border-radius:8px;border:none;background:#9439bf;color:#fff;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font)">'+(isN?'Add project':'Save changes')+'</button></div>'+
+    '</div></div>';
+}
+function projSaveForm(x){
+  var name=document.getElementById('pf-name').value.trim();if(!name){alert('Project name is required.');return;}
+  var tags=document.getElementById('pf-tags').value.split(',').map(function(t){return t.trim();}).filter(Boolean);
+  var cv=document.getElementById('pf-cv').checked;
+  var p={id:x==='new'?'p'+Date.now():x,name:name,subtitle:document.getElementById('pf-subtitle').value.trim(),category:document.getElementById('pf-cat').value,status:document.getElementById('pf-status').value,priority:Number(document.getElementById('pf-priority').value),progress:Number(document.getElementById('pf-progress').value),goal:document.getElementById('pf-goal').value.trim(),url:document.getElementById('pf-url').value.trim()||null,tags:tags,cv:cv,cd:cv?document.getElementById('pf-cd').value.trim():null};
+  if(x==='new'){projProjects.unshift(p);}else{projProjects=projProjects.map(function(q){return q.id===p.id?p:q;});}
+  projPersist();projCloseForm();projRender();
+}
+function projConfirmDelete(id){var p=projProjects.find(function(x){return x.id===id;});if(p&&window.confirm('Remove "'+p.name+'"?')){projProjects=projProjects.filter(function(x){return x.id!==id;});projPersist();projCloseForm();projRender();}}
+function projPark(id){projProjects=projProjects.map(function(p){return p.id===id?Object.assign({},p,{status:'parked'}):p;});projPersist();projRender();}
+projInit();
+
+
+// ===== PROPOSAL BUILDER =====
+var PB_SYSTEM_PROMPT = 'You are the Go To 11 Proposal Builder — an expert system that transforms client meeting transcripts into structured, CFO-defensible proposals for Kenny Solway\'s executive communication coaching services.\n\nKENNY\'S POSITIONING:\n- Company: Go To 11\n- Name: Kenny Solway, Communication Strategist & Executive Coach\n- One-liner: Communication training that turns presentations into conversions\n- Methodology: Three Pillars — People (audience psychology), Process (repeatable frameworks), Delivery (presence through voice, pacing, posture, composure)\n- Core Framework — The Trust Multiplier: Preparation → Clarity → Confidence → Trust → Faster Approval. This is the throughline for every proposal.\n- AI component: AI-powered rehearsal platform with unlimited practice, timestamped feedback, progress tracking (SOC 2 Type II certified)\n- Contact: kennysolway@goto11.ca | (416) 433-9521 | goto11.ca\n\nVOICE AND TONE:\n- Warm and direct. Not corporate or salesy.\n- Confident without arrogance.\n- Client-centric — their challenge is the main character, not Kenny.\n- Mirror the client\'s own language from the transcript.\n- Outcome-focused — always tie back to business results.\n- Never use em dashes. Use commas, periods, or restructure.\n- No emojis. No exclamation marks.';
+
+function savePbApiKey() {
+  var val = document.getElementById('pbApiKey').value.trim();
+  if (val && val.indexOf('sk-') === 0) {
+    localStorage.setItem('anthropic_api_key', val);
+    document.getElementById('pbApiKeyPrompt').style.display = 'none';
+  }
+}
+
+(function() {
+  if (!localStorage.getItem('anthropic_api_key')) {
+    var prompt = document.getElementById('pbApiKeyPrompt');
+    if (prompt) prompt.style.display = 'block';
+  }
+})();
+
+function pbGoStep(n) {
+  document.querySelectorAll('.pb-step').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('pb-step' + n).classList.add('active');
+  document.querySelector('.main').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function pbExtract() {
+  var transcript = document.getElementById('pbTranscript').value.trim();
+  if (!transcript) { alert('Paste a transcript or meeting notes first.'); return; }
+
+  var key = localStorage.getItem('anthropic_api_key');
+  if (!key) { document.getElementById('pbApiKeyPrompt').style.display = 'block'; return; }
+
+  var btn = document.getElementById('pbExtractBtn');
+  btn.textContent = 'Analysing...';
+  btn.disabled = true;
+  document.getElementById('pbError1').style.display = 'none';
+
+  var company = document.getElementById('pbCompany').value.trim();
+  var contact = document.getElementById('pbContact').value.trim();
+
+  var userMsg = 'Analyse this meeting transcript and extract all relevant details for a Go To 11 proposal.\n\n';
+  if (company) userMsg += 'Client company: ' + company + '\n';
+  if (contact) userMsg += 'Primary contact: ' + contact + '\n';
+  userMsg += '\nTRANSCRIPT:\n' + transcript;
+  userMsg += '\n\nRespond in TWO clearly labelled sections:\n\nEXTRACTION:\nA structured summary of everything you found: client info, problem/context, scope signals, budget/logistics, success criteria. Note whether each item was explicitly stated, inferred, or missing.\n\nGAPS:\nA numbered list of the critical missing pieces that must be answered before building the proposal. If you have everything needed, write "No critical gaps — ready to build."';
+
+  callClaude(PB_SYSTEM_PROMPT, userMsg).then(function(result) {
+    btn.textContent = 'Extract & Analyse';
+    btn.disabled = false;
+    if (!result) {
+      document.getElementById('pbError1').textContent = 'Something went wrong. Try again.';
+      document.getElementById('pbError1').style.display = 'block';
+      return;
+    }
+    var extractionMatch = result.match(/EXTRACTION:\s*\n([\s\S]*?)(?=\nGAPS:)/i);
+    var gapsMatch = result.match(/GAPS:\s*\n([\s\S]*)/i);
+    var extraction = extractionMatch ? extractionMatch[1].trim() : result;
+    var gaps = gapsMatch ? gapsMatch[1].trim() : '';
+
+    document.getElementById('pbExtraction').textContent = extraction;
+    var gapsWrap = document.getElementById('pbGapsWrap');
+    if (gaps && gaps.toLowerCase().indexOf('no critical gaps') === -1) {
+      document.getElementById('pbGaps').textContent = gaps;
+      gapsWrap.style.display = 'block';
+    } else {
+      gapsWrap.style.display = 'none';
+    }
+    pbGoStep(2);
+  });
+}
+
+function pbBuild() {
+  var btn = document.getElementById('pbBuildBtn');
+  btn.textContent = 'Building proposal...';
+  btn.disabled = true;
+  document.getElementById('pbError2').style.display = 'none';
+
+  var extraction = document.getElementById('pbExtraction').textContent;
+  var gapAnswers = document.getElementById('pbGapAnswers').value.trim();
+  var company = document.getElementById('pbCompany').value.trim() || 'the client';
+  var contact = document.getElementById('pbContact').value.trim() || 'the contact';
+  var transcript = document.getElementById('pbTranscript').value.trim();
+
+  var userMsg = 'Build a full Go To 11 proposal using the following information.\n\nCLIENT: ' + company + '\nCONTACT: ' + contact + '\n\nEXTRACTED DETAILS:\n' + extraction;
+  if (gapAnswers) userMsg += '\n\nADDITIONAL DETAILS PROVIDED:\n' + gapAnswers;
+  userMsg += '\n\nORIGINAL TRANSCRIPT (for language mirroring):\n' + transcript.substring(0, 2000);
+
+  userMsg += '\n\nBuild a complete Gamma-ready proposal prompt with these 12 sections:\n1. Cover — client name, engagement title, date, Kenny\'s contact\n2. Executive Summary — 3-4 sentences capturing the core problem and Go To 11\'s solution\n3. Understanding of the Situation — mirror their language, name the business impact, include cost-of-inaction framing\n4. Objectives — 4-6 measurable outcomes tied to The Trust Multiplier chain\n5. Program Design — sessions, format, timeline, what each session covers\n6. The Trust Multiplier — explain the 5-stage chain and how this engagement moves them through it\n7. AI Rehearsal Platform — describe the platform and its role in the engagement\n8. What Success Looks Like — measurement approach, leading and lagging indicators\n9. About Go To 11 — Kenny\'s background, methodology, relevant client experience\n10. Testimonials — select 2-3 relevant testimonials from the library\n11. Investment — present pricing clearly with payment terms and what is included\n12. Next Steps — 2-3 clear, specific actions to move forward\n\nWrite in full prose. Warm, direct, client-centric. Mirror their language. No em dashes. No exclamation marks. Output the complete proposal text ready to paste into Gamma.';
+
+  callClaude(PB_SYSTEM_PROMPT, userMsg).then(function(result) {
+    btn.textContent = 'Build Proposal';
+    btn.disabled = false;
+    if (!result) {
+      document.getElementById('pbError2').textContent = 'Something went wrong. Try again.';
+      document.getElementById('pbError2').style.display = 'block';
+      return;
+    }
+    document.getElementById('pbProposalOut').textContent = result;
+    pbGoStep(3);
+  });
+}
+
+function pbCopy() {
+  var text = document.getElementById('pbProposalOut').textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    var btns = document.querySelectorAll('#pb-step3 .btn-primary');
+    var btn = btns[0];
+    btn.textContent = 'Copied!';
+    setTimeout(function() { btn.textContent = 'Copy proposal'; }, 2000);
+  });
+}
+
 </script>
 </body>
 </html>
