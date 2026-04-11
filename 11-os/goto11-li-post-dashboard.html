@@ -1,0 +1,3219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkedIn Writer and Analyst — Go To 11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  :root {
+    --purple: #9439bf;
+    --purple-dark: #7a2fa3;
+    --purple-faint: rgba(148, 57, 191, 0.08);
+    --purple-ring: rgba(148, 57, 191, 0.18);
+    --light-purple: #bfb1c4;
+    --sand: #f4d4b7;
+    --grey: #66615c;
+    --offwhite: #ebeaeb;
+    --bg: #f7f6f7;
+    --surface: #ffffff;
+    --border: rgba(0,0,0,0.10);
+    --border-strong: rgba(0,0,0,0.18);
+    --text-primary: #1a1a1a;
+    --text-secondary: #5a5560;
+    --text-muted: #9490a0;
+    --green: #15803d;
+    --green-bg: #f0fdf4;
+    --green-border: #86efac;
+    --red: #b91c1c;
+    --gold: #a16207;
+    --gold-bg: #fefce8;
+    --gold-border: #fde047;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+  body {
+    font-family: 'PT Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .logo-mark { flex-shrink: 0; }
+
+  .logo-text {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--purple);
+    letter-spacing: -0.01em;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* ── Page title ── */
+  .page-title {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .page-title h1 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+
+  .page-title p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .api-key-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    font-size: 11px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .api-key-btn:hover { border-color: var(--purple); color: var(--purple); }
+  .api-key-btn.connected { color: var(--green); border-color: var(--green-border); }
+
+  /* ── Layout ── */
+  .main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  /* ── Step indicator ── */
+  .steps {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .step-node { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+
+  .step-circle {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    border: 1.5px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text-muted);
+    transition: all 0.25s ease;
+  }
+
+  .step-circle.active {
+    background: var(--purple);
+    border-color: var(--purple);
+    color: #fff;
+    box-shadow: 0 0 0 4px var(--purple-ring);
+  }
+
+  .step-circle.done {
+    background: var(--purple);
+    border-color: var(--purple);
+    color: #fff;
+    opacity: 0.45;
+  }
+
+  .step-name {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .step-name.active { color: var(--purple); }
+
+  .step-connector {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    margin: 0 8px;
+    margin-bottom: 18px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    box-shadow: var(--shadow-card);
+  }
+
+  /* ── Section heading ── */
+  .section-label {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  /* ── Textarea / Input ── */
+  .field { margin-bottom: 1.5rem; }
+
+  .field-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+
+  .field-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  textarea, input[type="text"], input[type="password"], input[type="number"] {
+    width: 100%;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    font-size: 15px;
+    font-family: 'PT Sans', sans-serif;
+    color: var(--text-primary);
+    background: var(--bg);
+    resize: vertical;
+    outline: none;
+    line-height: 1.6;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="number"]:focus {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px var(--purple-ring);
+    background: var(--surface);
+  }
+
+  input[type="number"] { resize: none; }
+
+  /* ── Format grid ── */
+  .format-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .format-card {
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--bg);
+    user-select: none;
+  }
+
+  .format-card:hover {
+    border-color: var(--light-purple);
+    background: var(--surface);
+  }
+
+  .format-card.selected {
+    border-color: var(--purple);
+    border-width: 1.5px;
+    background: var(--purple-faint);
+  }
+
+  .format-card-name {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text-primary);
+  }
+
+  .format-card.selected .format-card-name { color: var(--purple); }
+
+  .format-card-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+
+  .format-full { grid-column: span 2; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text-primary);
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn:hover { background: var(--bg); }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-primary {
+    background: var(--purple);
+    border-color: var(--purple);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: var(--purple-dark); }
+
+  .btn-sm {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+
+  .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-top: 1.5rem;
+  }
+
+  /* ── Loading ── */
+  .loader {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-top: 1rem;
+    padding: 12px 16px;
+    background: var(--bg);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+
+  .loader.show { display: flex; }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--light-purple);
+    border-top-color: var(--purple);
+    animation: spin 0.75s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Error ── */
+  .error {
+    display: none;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    color: #b91c1c;
+  }
+
+  /* ── Hook cards ── */
+  .hook-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 10px;
+    background: var(--bg);
+  }
+
+  .hook-card:hover {
+    border-color: var(--purple);
+    background: var(--surface);
+  }
+
+  .hook-card.selected {
+    border-color: var(--purple);
+    border-width: 1.5px;
+    background: var(--purple-faint);
+  }
+
+  .hook-tag {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin-bottom: 7px;
+  }
+
+  .hook-text {
+    font-size: 15px;
+    color: var(--text-primary);
+    line-height: 1.55;
+  }
+
+  /* ── Badge ── */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    background: var(--purple-faint);
+    color: var(--purple);
+    border: 1px solid rgba(148,57,191,0.2);
+  }
+
+  /* ── Post output ── */
+  .post-output {
+    width: 100%;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    font-size: 15px;
+    font-family: 'PT Sans', sans-serif;
+    line-height: 1.7;
+    color: var(--text-primary);
+    background: var(--bg);
+    min-height: 300px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .post-output:focus {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px var(--purple-ring);
+    background: var(--surface);
+  }
+
+  /* ── Word count ── */
+  .wc {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+  }
+
+  .wc.good { color: var(--green); }
+  .wc.over { color: var(--red); }
+
+  /* ── Checklist ── */
+  .checklist { margin-top: 1.5rem; }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .check-item:last-child { border-bottom: none; }
+
+  .check-item input[type="checkbox"] {
+    margin-top: 2px;
+    accent-color: var(--purple);
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .check-item span {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.45;
+  }
+
+  .check-item.done span {
+    color: var(--text-muted);
+    text-decoration: line-through;
+  }
+
+  /* ── Copy success ── */
+  .copy-ok {
+    font-size: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    color: var(--green);
+    display: none;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.5rem 0;
+  }
+
+  .divider-thick {
+    border: none;
+    border-top: 2px solid var(--border);
+    margin: 3rem 0 2rem;
+  }
+
+  /* ── Panel ── */
+  .panel { display: none; animation: fadeIn 0.2s ease; }
+  .panel.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Post meta row ── */
+  .post-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  /* ── Tracker ── */
+  .tracker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tracker-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--text-primary);
+  }
+
+  /* ── Summary bar ── */
+  .summary-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  .summary-stat {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    text-align: centre;
+  }
+
+  .summary-stat-value {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+
+  .summary-stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+  }
+
+  /* ── Posts table ── */
+  .posts-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .posts-table th {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-strong);
+    white-space: nowrap;
+  }
+
+  .posts-table td {
+    padding: 10px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    color: var(--text-secondary);
+  }
+
+  .posts-table tr.clickable-row { cursor: pointer; transition: background 0.1s; }
+  .posts-table tr.clickable-row:hover { background: var(--purple-faint); }
+
+  .post-preview {
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-primary);
+    font-weight: 400;
+  }
+
+  .flag-eng {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    background: var(--green-bg);
+    color: var(--green);
+    border: 1px solid var(--green-border);
+  }
+
+  .flag-save {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    background: var(--gold-bg);
+    color: var(--gold);
+    border: 1px solid var(--gold-border);
+  }
+
+  /* ── Expanded row ── */
+  .expanded-row td {
+    padding: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .expanded-content {
+    padding: 16px 10px;
+    background: var(--bg);
+    animation: fadeIn 0.15s ease;
+  }
+
+  .expanded-section {
+    margin-bottom: 14px;
+  }
+
+  .expanded-section:last-child { margin-bottom: 0; }
+
+  .expanded-label {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+
+  .expanded-text {
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+  }
+
+  .metric-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+  }
+
+  .metric-item-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .metric-item-value {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text-primary);
+    margin-top: 2px;
+  }
+
+  /* ── Metric entry form ── */
+  .metric-form {
+    margin-top: 12px;
+    padding: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  .metric-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .metric-form-field label {
+    display: block;
+    font-size: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 3px;
+  }
+
+  .metric-form-field input {
+    width: 100%;
+    padding: 6px 10px;
+    font-size: 14px;
+    border-radius: var(--radius-sm);
+    resize: none;
+  }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  }
+
+  .modal h3 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+
+  .modal p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  /* ── Filter bar ── */
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .filter-pills {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .filter-pill {
+    padding: 6px 14px;
+    font-size: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    border: none;
+    background: var(--surface);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    border-right: 1px solid var(--border);
+  }
+
+  .filter-pill:last-child { border-right: none; }
+  .filter-pill:hover { background: var(--bg); color: var(--text-primary); }
+  .filter-pill.active { background: var(--purple); color: #fff; }
+
+  .filter-select {
+    padding: 6px 10px;
+    font-size: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+    outline: none;
+  }
+
+  .filter-select:focus { border-color: var(--purple); }
+
+  /* ── Status dot ── */
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .status-dot.draft { background: var(--text-muted); }
+  .status-dot.published { background: var(--green); }
+
+  /* ── Thread tag ── */
+  .thread-tag {
+    font-size: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  /* ── Save modal thread buttons ── */
+  .thread-btn.selected {
+    background: var(--purple);
+    border-color: var(--purple);
+    color: #fff;
+  }
+
+  /* ── Chart bar ── */
+  .chart-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .chart-bar-label {
+    width: 90px;
+    font-size: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .chart-bar-track {
+    flex: 1;
+    height: 24px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .chart-bar-fill {
+    height: 100%;
+    border-radius: var(--radius-sm);
+    transition: width 0.3s ease;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-size: 11px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    color: #fff;
+    min-width: fit-content;
+  }
+
+  .chart-bar-fill.observation { background: var(--purple); }
+  .chart-bar-fill.contrarian { background: var(--sand); color: var(--text-primary); }
+  .chart-bar-fill.story { background: var(--green); }
+  .chart-bar-fill.framework { background: var(--light-purple); color: var(--text-primary); }
+
+  /* ── Top performer row ── */
+  .top-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .top-row:last-child { border-bottom: none; }
+
+  .top-rank {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--purple-faint);
+    color: var(--purple);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .top-preview {
+    flex: 1;
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .top-rate {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--green);
+    flex-shrink: 0;
+  }
+
+  .top-date {
+    font-size: 11px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  /* ── Analysis responsive ── */
+  @media (max-width: 640px) {
+    #analysis-section .card { grid-column: span 1; }
+    #analysis-section > div[style*="grid-template-columns"] {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 500px) {
+    .main { padding: 1.5rem 1rem 3rem; }
+    .card { padding: 1.25rem; }
+    .format-grid { grid-template-columns: 1fr; }
+    .format-full { grid-column: span 1; }
+    .header { padding: 0 1rem; }
+    .posts-table { font-size: 12px; }
+    .posts-table th, .posts-table td { padding: 8px 6px; }
+    .summary-bar { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="logo" href="https://goto11-tools.netlify.app" title="Back to Tools">
+    <svg class="logo-mark" width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="34" stroke="#9439bf" stroke-width="5" fill="none"/>
+      <circle cx="58" cy="52" r="4" stroke="#9439bf" stroke-width="2.5" fill="none"/>
+      <line x1="50" y1="6" x2="50" y2="16" stroke="#9439bf" stroke-width="4" stroke-linecap="round"/>
+      <line x1="50" y1="84" x2="50" y2="94" stroke="#9439bf" stroke-width="4" stroke-linecap="round"/>
+      <line x1="6" y1="50" x2="16" y2="50" stroke="#9439bf" stroke-width="4" stroke-linecap="round"/>
+      <line x1="84" y1="50" x2="94" y2="50" stroke="#9439bf" stroke-width="4" stroke-linecap="round"/>
+      <line x1="19" y1="19" x2="26" y2="26" stroke="#9439bf" stroke-width="4" stroke-linecap="round"/>
+      <line x1="74" y1="74" x2="81" y2="81" stroke="#9439bf" stroke-width="4" stroke-linecap="round"/>
+      <line x1="81" y1="19" x2="74" y2="26" stroke="#9439bf" stroke-width="4" stroke-linecap="round"/>
+      <line x1="26" y1="74" x2="19" y2="81" stroke="#9439bf" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+    <span class="logo-text">Go To 11</span>
+  </a>
+  <div class="header-right">
+    <button class="api-key-btn" id="api-key-btn" onclick="showApiKeyModal()">API key</button>
+  </div>
+</header>
+
+<!-- API Key Modal -->
+<div class="modal-overlay" id="api-modal">
+  <div class="modal">
+    <h3>Anthropic API key</h3>
+    <p>Your key is stored locally in this browser. It never leaves your device except to call the Anthropic API directly.</p>
+    <div class="field" style="margin-bottom: 12px;">
+      <input type="password" id="api-key-input" placeholder="sk-ant-..." style="font-size: 14px;">
+    </div>
+    <div class="btn-row" style="margin-top: 0;">
+      <button class="btn btn-primary btn-sm" onclick="saveApiKey()">Save</button>
+      <button class="btn btn-sm" onclick="closeApiKeyModal()">Cancel</button>
+      <button class="btn btn-sm" onclick="clearApiKey()" style="margin-left: auto; color: var(--red);">Clear key</button>
+    </div>
+  </div>
+</div>
+
+<main class="main">
+
+  <div class="page-title">
+    <h1>LinkedIn Writer and Analyst</h1>
+    <p>Write, track, and analyse LinkedIn posts</p>
+  </div>
+
+  <!-- Step indicator -->
+  <div class="steps">
+    <div class="step-node">
+      <div class="step-circle active" id="circle-1">1</div>
+      <div class="step-name active" id="name-1">Seed idea</div>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-node">
+      <div class="step-circle" id="circle-2">2</div>
+      <div class="step-name" id="name-2">Pick a hook</div>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-node">
+      <div class="step-circle" id="circle-3">3</div>
+      <div class="step-name" id="name-3">Your post</div>
+    </div>
+  </div>
+
+  <!-- ── STEP 1 ── -->
+  <div class="panel active" id="panel-1">
+    <div class="card">
+      <div class="field">
+        <label class="field-label" for="seed">What's on your mind?</label>
+        <textarea id="seed" rows="5" placeholder="A rough thought, a thing you noticed, a client moment, a hot take. Don't polish it."></textarea>
+        <div class="field-hint">The messier the better. You edit the output, not the input.</div>
+      </div>
+
+      <div class="field" style="margin-bottom: 0;">
+        <label class="field-label">Format</label>
+        <div class="format-grid">
+          <div class="format-card selected" data-format="auto">
+            <div class="format-card-name">Auto</div>
+            <div class="format-card-desc">Pick what fits the idea</div>
+          </div>
+          <div class="format-card" data-format="observation">
+            <div class="format-card-name">Observation</div>
+            <div class="format-card-desc">You noticed something, here's why it matters</div>
+          </div>
+          <div class="format-card" data-format="contrarian">
+            <div class="format-card-name">Contrarian reframe</div>
+            <div class="format-card-desc">Challenge a common assumption</div>
+          </div>
+          <div class="format-card" data-format="story">
+            <div class="format-card-name">Story → Lesson</div>
+            <div class="format-card-desc">A specific moment, then the takeaway</div>
+          </div>
+          <div class="format-card format-full" data-format="framework">
+            <div class="format-card-name">Framework</div>
+            <div class="format-card-desc">Spotlight a model or concept with a practical example</div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="section-label">Options</div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+        <div class="field" style="margin-bottom: 0;">
+          <label class="field-label">Audience</label>
+          <select id="opt-audience" class="filter-select" style="width: 100%; padding: 10px 12px; font-size: 14px;">
+            <option value="">Auto (senior leaders)</option>
+            <option value="C-suite executives">C-suite executives</option>
+            <option value="VP and Director level">VP and Director level</option>
+            <option value="Sales leaders">Sales leaders</option>
+            <option value="Founders">Founders</option>
+            <option value="Mid-level managers">Mid-level managers</option>
+            <option value="Consultants">Consultants</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom: 0;">
+          <label class="field-label">Post length</label>
+          <select id="opt-length" class="filter-select" style="width: 100%; padding: 10px 12px; font-size: 14px;">
+            <option value="standard">Standard (150 to 250 words)</option>
+            <option value="short">Short (under 150 words)</option>
+            <option value="long">Long (250 to 350 words)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+        <div class="field" style="margin-bottom: 0;">
+          <label class="field-label">CTA style</label>
+          <select id="opt-cta" class="filter-select" style="width: 100%; padding: 10px 12px; font-size: 14px;">
+            <option value="">Auto</option>
+            <option value="question">Question</option>
+            <option value="invitation">Invitation</option>
+            <option value="observation">Observation</option>
+            <option value="none">No CTA</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom: 0;">
+          <label class="field-label">Content pillar</label>
+          <select id="opt-pillar" class="filter-select" style="width: 100%; padding: 10px 12px; font-size: 14px;">
+            <option value="">None</option>
+            <option value="Confidence">Confidence</option>
+            <option value="Clarity">Clarity</option>
+            <option value="Delivery">Delivery</option>
+            <option value="Language">Language</option>
+            <option value="Relationships">Relationships</option>
+            <option value="Neuroscience">Neuroscience</option>
+            <option value="Present With Impact">Present With Impact</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="gen-hooks-btn" onclick="generateHooks()">Generate hooks →</button>
+      </div>
+
+      <div class="loader" id="loader-1">
+        <div class="spinner"></div>
+        <span>Generating 3 hooks...</span>
+      </div>
+      <div class="error" id="error-1"></div>
+    </div>
+  </div>
+
+  <!-- ── STEP 2 ── -->
+  <div class="panel" id="panel-2">
+    <div class="card">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; flex-wrap: wrap;">
+        <span style="font-size: 14px; color: var(--text-secondary);">Pick the hook that stops the scroll.</span>
+        <span class="badge" id="format-badge"></span>
+      </div>
+
+      <div id="hooks-container"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="write-btn" onclick="generatePost()" disabled>Write the post →</button>
+        <button class="btn" onclick="goBack(1)">← Back</button>
+        <button class="btn" onclick="regenHooks()">Try new hooks</button>
+      </div>
+
+      <div class="loader" id="loader-2">
+        <div class="spinner"></div>
+        <span>Writing your post...</span>
+      </div>
+      <div class="error" id="error-2"></div>
+    </div>
+  </div>
+
+  <!-- ── STEP 3 ── -->
+  <div class="panel" id="panel-3">
+    <div class="card">
+      <div class="post-meta">
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <span class="badge" id="format-badge-3"></span>
+          <span class="wc" id="wc"></span>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <span class="copy-ok" id="copy-ok">Copied!</span>
+          <button class="btn btn-sm" onclick="copyPost()">Copy post</button>
+        </div>
+      </div>
+
+      <textarea class="post-output" id="post-out" oninput="updateWC()"></textarea>
+
+      <!-- Revision prompt -->
+      <div style="margin-top: 12px; display: flex; gap: 8px; align-items: flex-end;">
+        <div style="flex: 1;">
+          <textarea id="revision-prompt" rows="2" placeholder="Revise: make it shorter, swap the CTA to a question, strengthen the hook..." style="font-size: 13px; min-height: 44px; resize: none;"></textarea>
+        </div>
+        <button class="btn btn-primary btn-sm" id="revise-btn" onclick="revisePost()" style="flex-shrink: 0; height: 44px;">Revise</button>
+      </div>
+      <div class="loader" id="loader-3">
+        <div class="spinner"></div>
+        <span>Revising...</span>
+      </div>
+      <div class="error" id="error-3"></div>
+
+      <hr class="divider">
+
+      <div class="section-label">Pre-publish checklist</div>
+      <div class="checklist" id="checklist"></div>
+
+      <hr class="divider">
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="showSaveModal('published')">Save as published</button>
+        <button class="btn" onclick="showSaveModal('draft')">Save as draft</button>
+        <button class="btn" onclick="goBack(2)">Change hook</button>
+        <button class="btn" onclick="regenPost()">Rewrite</button>
+        <button class="btn" onclick="roughenPost()">Roughen it</button>
+        <button class="btn" onclick="startOver()">Start over</button>
+      </div>
+
+      <div id="save-ok" style="display: none; margin-top: 10px; padding: 10px 14px; background: var(--green-bg); border: 1px solid var(--green-border); border-radius: var(--radius-sm); font-size: 13px; color: var(--green); font-weight: 700; font-family: 'Nunito', sans-serif;">
+        Post saved to tracker.
+      </div>
+    </div>
+  </div>
+
+  <!-- Save Modal -->
+  <div class="modal-overlay" id="save-modal">
+    <div class="modal">
+      <h3 id="save-modal-title">Save post</h3>
+      <div class="field" style="margin-bottom: 10px;">
+        <label class="field-label" id="save-date-label">Publish date</label>
+        <input type="date" id="save-date" style="font-size: 14px;">
+      </div>
+      <div class="field" style="margin-bottom: 10px;">
+        <label class="field-label">Thread</label>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <button class="btn btn-sm thread-btn" data-thread="confidence" onclick="pickThread('confidence')">Confidence</button>
+          <button class="btn btn-sm thread-btn" data-thread="cost" onclick="pickThread('cost')">Cost</button>
+          <button class="btn btn-sm thread-btn" data-thread="both" onclick="pickThread('both')">Both</button>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom: 10px;">
+        <label class="field-label">Topic tag</label>
+        <input type="text" id="save-topic" placeholder="e.g. preparation, framing, velocity" style="font-size: 14px;">
+      </div>
+      <div class="field" style="margin-bottom: 10px;" id="save-url-wrap">
+        <label class="field-label">LinkedIn URL <span style="font-weight: 400; color: var(--text-muted); font-size: 12px;">(paste after publishing)</span></label>
+        <input type="text" id="save-url" placeholder="https://www.linkedin.com/feed/update/urn:li:activity:..." style="font-size: 13px;">
+      </div>
+      <label style="display: flex; align-items: center; gap: 8px; margin-top: 6px; cursor: pointer;">
+        <input type="checkbox" id="save-notion" checked style="accent-color: var(--purple); width: 16px; height: 16px;">
+        <span style="font-size: 13px; color: var(--text-secondary);">Also save to Notion Content Calendar</span>
+      </label>
+
+      <div class="btn-row" style="margin-top: 14px;">
+        <button class="btn btn-primary btn-sm" id="confirm-save-btn" onclick="confirmSave()">Save</button>
+        <button class="btn btn-sm" onclick="closeSaveModal()">Cancel</button>
+      </div>
+      <div class="error" id="error-save" style="margin-top: 8px;"></div>
+    </div>
+  </div>
+
+  <!-- ── POST TRACKER ── -->
+  <hr class="divider-thick">
+
+  <div class="tracker-header">
+    <div class="tracker-title">Post tracker</div>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <input type="file" id="csv-input" accept=".csv,.xlsx" style="display: none;" onchange="handleCsvFile(event)">
+      <button class="btn btn-sm" onclick="document.getElementById('csv-input').click()">Import LinkedIn CSV</button>
+      <button class="btn btn-sm" onclick="document.getElementById('help-modal').classList.add('show')" title="How to import" style="padding: 6px 10px;">?</button>
+      <span style="font-size: 12px; color: var(--text-muted);">Data stored locally</span>
+    </div>
+  </div>
+
+  <!-- Help modal -->
+  <div class="modal-overlay" id="help-modal">
+    <div class="modal" style="max-width: 540px;">
+      <h3>How to import LinkedIn metrics</h3>
+      <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+        <strong style="color: var(--text-primary);">Step 1:</strong> Go to <a href="https://www.linkedin.com/analytics/creator/content/" target="_blank" style="color: var(--purple);">LinkedIn Analytics</a> (Me → Posts &amp; Activity → Analytics).<br><br>
+        <strong style="color: var(--text-primary);">Step 2:</strong> Click <strong>Export</strong> in the top right and pick your date range.<br><br>
+        <strong style="color: var(--text-primary);">Step 3:</strong> Click <strong>Import LinkedIn CSV</strong> above and select the downloaded file.<br><br>
+        <strong style="color: var(--text-primary);">Step 4:</strong> Review the matched and unmatched rows in the modal, then click <strong>Apply changes</strong>.
+      </p>
+      <p style="font-size: 12px; color: var(--text-muted); margin-top: 12px; padding: 10px; background: var(--bg); border-radius: var(--radius-sm);">
+        <strong>Tip:</strong> Posts that match by LinkedIn URL (saved in the expanded row) will sync most reliably. Add the URL after publishing for best results. Posts already linked to Notion will auto-sync the new metrics.
+      </p>
+      <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
+        <strong>Suggested cadence:</strong> Run this every Friday to keep your performance data fresh.
+      </p>
+      <div class="btn-row" style="margin-top: 14px;">
+        <button class="btn btn-primary btn-sm" onclick="document.getElementById('help-modal').classList.remove('show')">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import results modal -->
+  <div class="modal-overlay" id="import-modal">
+    <div class="modal" style="max-width: 560px;">
+      <h3>Import results</h3>
+      <div id="import-summary" style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;"></div>
+      <div id="import-details" style="max-height: 320px; overflow-y: auto; font-size: 12px;"></div>
+      <div class="btn-row" style="margin-top: 14px;">
+        <button class="btn btn-primary btn-sm" onclick="confirmImport()">Apply changes</button>
+        <button class="btn btn-sm" onclick="closeImportModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary bar -->
+  <div class="summary-bar" id="summary-bar">
+    <div class="summary-stat">
+      <div class="summary-stat-value" id="stat-total">0</div>
+      <div class="summary-stat-label">Total posts</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-stat-value" id="stat-avg-eng">--</div>
+      <div class="summary-stat-label">Avg engagement</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-stat-value" id="stat-best-eng">--</div>
+      <div class="summary-stat-label">Best engagement</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-stat-value" id="stat-avg-save">--</div>
+      <div class="summary-stat-label">Avg save rate</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-stat-value" id="stat-impressions">--</div>
+      <div class="summary-stat-label">Total impressions</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar" id="filter-bar">
+    <div class="filter-pills">
+      <button class="filter-pill active" data-status="all" onclick="setFilter('status','all')">All</button>
+      <button class="filter-pill" data-status="published" onclick="setFilter('status','published')">Published</button>
+      <button class="filter-pill" data-status="draft" onclick="setFilter('status','draft')">Drafts</button>
+    </div>
+    <select class="filter-select" id="filter-format" onchange="setFilter('format', this.value)">
+      <option value="all">All formats</option>
+      <option value="observation">Observation</option>
+      <option value="contrarian">Contrarian</option>
+      <option value="story">Story</option>
+      <option value="framework">Framework</option>
+    </select>
+    <select class="filter-select" id="filter-thread" onchange="setFilter('thread', this.value)">
+      <option value="all">All threads</option>
+      <option value="confidence">Confidence</option>
+      <option value="cost">Cost</option>
+      <option value="both">Both</option>
+    </select>
+    <select class="filter-select" id="filter-sort" onchange="setFilter('sort', this.value)">
+      <option value="newest">Newest first</option>
+      <option value="oldest">Oldest first</option>
+      <option value="best-eng">Best engagement</option>
+      <option value="best-save">Best save rate</option>
+    </select>
+  </div>
+
+  <!-- Posts table -->
+  <div class="card" style="padding: 0; overflow-x: auto;">
+    <table class="posts-table" id="posts-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th></th>
+          <th>Preview</th>
+          <th>Format</th>
+          <th>Thread</th>
+          <th>Impr.</th>
+          <th>Eng. rate</th>
+          <th>Saves</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="posts-tbody"></tbody>
+    </table>
+    <div class="empty-state" id="empty-state">
+      No posts yet. Write your first post above and save it to the tracker.
+    </div>
+  </div>
+
+  <!-- Analysis section -->
+  <div id="analysis-section" style="display: none;">
+    <hr class="divider-thick">
+    <div class="tracker-header">
+      <div class="tracker-title">Analysis</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+      <div class="card">
+        <div class="section-label">Engagement over time</div>
+        <div id="chart-engagement" style="height: 200px; position: relative;"></div>
+      </div>
+      <div class="card">
+        <div class="section-label">Performance by format</div>
+        <div id="chart-format" style="min-height: 160px;"></div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div class="card">
+        <div class="section-label">Thread performance</div>
+        <div id="chart-thread" style="min-height: 120px;"></div>
+      </div>
+      <div class="card">
+        <div class="section-label">Top performers</div>
+        <div id="chart-top" style="min-height: 120px;"></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const CHECKS_VOICE = [
+  "Canadian English throughout (favour, organisation, colour)",
+  "No em dashes anywhere in the post",
+  "No soft-skills framing. Communication is framed as a performance lever",
+  "Kenny is never positioned as a presentation coach or speaker trainer",
+  "No condescending language. No 'most people don't see this' or similar",
+  "No deficit framing. The reader is a high performer, not someone with a problem to fix",
+  "Feel-seen test: does the post describe the reader's situation with enough specificity they'd recognise their own experience?",
+  "Confidence and/or cost thread surfaces naturally in the post",
+  "Plain language. No word over two syllables where a simpler one works (except Kenny's signature terms)",
+  "Sounds like a real person thinking, not a content template",
+  "No hashtags or emojis",
+];
+
+const CHECKS_CRAFT = [
+  "T-shirt test: at least one line works as a standalone pull quote",
+  "Order of revelation: the opening programs the right frame for the main point",
+  "Steal thunder: if the advice is audience-specific, the wrong reader has been told neutrally",
+  "Anti-hype: no inflated language remains. Results are understated, insights carry their own weight",
+  "Bucket brigades: transition points have bridges where needed (one or two max, not overused)",
+  "Reframe: the post contains a clear moment where the reader's perspective shifts",
+];
+
+const CHECKS_STRUCTURE = [
+  "Hook stops the scroll. No cliches, no throat-clearing",
+  "150 to 250 words",
+  "Grounded in specifics, not abstractions",
+  "Line breaks for mobile readability. Punchiest lines get their own paragraph",
+  "Soft invitation CTA. Not pushy, not performative",
+];
+
+const CHECKS = [...CHECKS_VOICE, ...CHECKS_CRAFT, ...CHECKS_STRUCTURE];
+
+const SYSTEM = `You are ghostwriting content for Kenny Solway, founder of Go To 11 Communication Training in Toronto. Kenny is a Decision Acceleration Partner. He helps VP and Director teams remove hesitation from high stakes moments so decisions, revenue, and careers move faster. Kenny is NEVER a presentation coach, public speaking trainer, speech coach, storytelling expert, or motivational speaker. Never frame him this way.
+
+## Kenny's positioning (critical, read this carefully)
+
+Kenny is deliberately NOT the high-energy, booming, clap-your-hands, hug-your-neighbour type coach. He is the quiet, reflective, individualised opposite of that.
+
+Years ago, attending a seminar with about 25,000 other people, Kenny noticed he was one of the few who was not connecting with the high-energy speaker on stage. He realised the issue wasn't that the speaker was wrong. Different just means different, not wrong or right. It was that that style wasn't going to reach him, or anyone like him, no matter how loud it got.
+
+That moment is why Kenny's company is called Go To 11. After the Spinal Tap bit about the amplifier that goes one louder than the other amplifiers. Eleven instead of ten. One notch higher.
+
+The whole thesis of the company: you don't need to become a different person to be more persuasive. You don't need to crank your energy to a 10 when you're naturally a 6. You need to find the version of yourself that's genuine but slightly dialled up. One notch. Not dramatic. Not the booming stranger from a stage. Just you, one step outside your comfort zone.
+
+Anything bigger than one notch reads as performance. People feel the stretch and stop trusting you. But one notch is sustainable. Repeatable. This is the slight edge. Done regularly. Over time.
+
+Never write Kenny as a rah-rah, exclamation-mark, big-energy voice. If your draft has any of that energy, rewrite it. Kenny dials things up one notch, never two.
+
+## Kenny's biography (fair to reference in content)
+
+- Based in Toronto
+- Originally founded a company called Think Solutions, later renamed Go To 11 after the Spinal Tap amplifier reference
+- Early career: his early twenties working at the Toronto Raptors in the NBA franchise's early days
+- Five years as VP Sales at Wildly Delicious, a Canadian specialty food manufacturer, selling into Loblaws, Sobeys, Metro, Farm Boy
+- Learned pitch consulting at Rogin, the Toronto office of Neil Flett's Sydney based consultancy, the same firm that did the Sydney Olympic bid
+- Twenty plus years and 1000 plus pitches coached
+- Married, four grown children
+- Dad's first cousin is Herb Solway, prominent in Toronto's legal world, one of the founders of Goodman's, former chairman of the Toronto Blue Jays board in the franchise's early days
+- Side work coaching university students on first job interviews, with a strong track record
+- Vegan for 30 plus years
+
+## Topics and stories permanently OFF LIMITS (never reference)
+
+- Anything related to IVF, fertility, pregnancy, surrogacy, or his wife's published writing on these topics. Never mention.
+- Specific client names, company names, engagements, or situations from coaching work.
+- Any first name that could identify a real coaching client or prospect.
+
+## How Kenny actually sounds
+
+1. He reaches for his own life as illustration. The Raptors, Herb Solway at a family dinner, a grocery buyer who asked "what do you want me to do", a client moment from last week. He almost never says "imagine a senior leader". He tells you about something specific that happened to him or someone he knows.
+
+2. His digressions are long and they loop back. He goes off on a story, says "sorry to digress, but my point is", and returns. The digression is usually the main event. He has been known to say "I think I'm getting to my point now. I'm trying."
+
+3. He backs into insights. The t-shirt line lands at the end, after a wander, never at the top. Never front-load a punchy line.
+
+4. He corrects himself mid-sentence. "It wasn't confidence. It wasn't hope, exactly. It was something else."
+
+5. He asks permission before he pushes. "May I ask", "If I may", "Can I push you on that", "I want to pause here because".
+
+6. He pairs the rational with the personal. Every big argument has both a business reason and a human reason, and he names them as distinct tracks.
+
+7. He admits limitations to earn trust. "I'll be candid with you", "shame on me for not tailoring it", "I didn't know what to do with that at 22", "For a long time I believed".
+
+8. He uses concrete analogies from ordinary life. A chalkboard, training wheels, a party someone else is at, a window you're looking through, Red Rover, a taxi ride home. Never abstract metaphors.
+
+9. He lands softly. "Anyhow. That's the thing I keep noticing." "If any of that resonated, sit with it this week." Never a hard CTA.
+
+10. He believes in slight adjustments, not dramatic change. The message you want to land isn't "transform yourself". It's "dial it up one notch". That's where the change happens.
+
+## Kenny's signature philosophy (weave these in naturally when they fit, don't force)
+
+- The slight edge: sustainable change comes from slight adjustments, repeated over time
+- Dial it up one notch: find the version of yourself that's genuine but one step outside your comfort zone
+- Different just means different, not wrong or right
+- Heard, but felt: the goal isn't just to be heard, it's for the message to land emotionally
+- Uniqueability: Kenny's own word for the individual capability each person brings
+- The quiet coach: individualised, reflective, one-on-one understanding beats booming stage energy
+
+## Phrases Kenny actually uses (draw from these, don't force them)
+
+Openers and transitions: So... / Okay, so... / Okay, so here's what it's about... / All right. So... / Anyhow, so... / Anyway, my point is... / Years ago... / A number of years back... / As a matter of fact... / The short answer is... / Well, it's interesting... / Well, it's funny... / I think I'm getting to my point now. I'm trying.
+
+Hedges and markers of honesty: Admittedly... / Candidly... / Frankly... / With all due respect... / I'll be candid with you... / I'll be honest...
+
+Acknowledgements: Fair enough. / That's fair. / No, that's fair. / To your point... / Back to your point... / Said another way... / In other words...
+
+Concept words: the premise / the dynamic / the foundation / telescope out / the framing / resonate / heavy lifting / quick wins / moment of truth / high stakes moment / the conditions / the ability to / the slight edge / one notch / uniqueability
+
+Soft closes: Anyhow. / So anyway... / If any of that resonated... / I'm curious... / What makes you say that? / How does that resonate?
+
+## STRICT ANTI-PATTERNS (never produce any of these)
+
+- EM DASHES. Never. Anywhere. Use commas, full stops, or the word "because" instead.
+- "Leverage" as a verb
+- "Unlock"
+- "Synergy"
+- "In today's environment..."
+- "Here's the thing I've noticed..."
+- "Most people think X. I think Y." (clean one-sentence inversion)
+- Three-beat rhythmic sentences ("Short. Then longer. Then short.") , this is an AI tell, forbidden
+- "Performance layer", "installing velocity", "career velocity", "revenue velocity" as tight compounds. Kenny does not talk this way.
+- "The truth is..."
+- "Here's what I know..."
+- "Let me be clear..."
+- "Pause and consider..."
+- "Key takeaway:" or hashtag-style summaries
+- Leading with a t-shirt line (always back into it)
+- Summarising what you just said at the end
+- Clean, balanced sentence rhythm. Real Kenny loops and wanders.
+- Any reference to IVF, pregnancy, fertility, surrogacy, or his wife's writing on these topics
+- "He" or "she" when referring to anyone Kenny has worked with. Always "they".
+- Hard CTAs, exclamation marks, "follow me", "like and share"
+- Emojis, hashtags
+- High-energy booming coach voice. No "let's go!!", no "it's time to crush it", no "are you ready to level up". Kenny is the quiet opposite of that. If your draft has any rah-rah energy, delete it.
+- Over-promising dramatic transformation. Kenny's message is always "dial it up one notch", not "change everything".
+
+## Voice exemplars
+
+These are ten paragraphs in Kenny's actual voice at various lengths. Match the voice and rhythm in these, not the rules above. Rules describe. Examples show. When the rules and the examples seem to disagree, follow the examples.
+
+### Exemplar 1 (mirror open, backed-into insight)
+
+Years ago, when I was at the Raptors in my early twenties, I was at a family dinner with my dad's first cousin, Herb Solway. Herb has been prominent in the legal world for decades. And I was telling him how lucky I felt at work, surrounded by all these smart, accomplished people, soaking it up like a sponge.
+
+He said something I've never forgotten. "Kenny, be careful not to put them on a pedestal. They're really not as smart as you think they are. And they're not that much better than you think they are either."
+
+I didn't know what to do with that at 22. It took me another ten years to understand what he meant.
+
+I think about it now every time I sit across from a senior leader who's about to walk into a boardroom already convinced the room is smarter than they are. The room isn't smarter. The room is five or six people who figured out one thing really well and are trying to figure out the next thing, same as you.
+
+Most of what looks like "I need to prepare more" is really "I haven't given myself permission to sit down at the table I'm already at."
+
+Anyhow. That's the thing I keep noticing.
+
+### Exemplar 2 (concrete analogy)
+
+I was trying to explain framing to a client last week and I ended up using this.
+
+Picture yourself walking up to a window in a building. You look straight out. You see buildings, trees, cars, people walking by.
+
+Now step back three feet. Your vision narrows. You see one tree. One car.
+
+Step to the side. Now a different view entirely. Maybe just a wall. Maybe a park. Same window. Same person looking.
+
+Most leaders stand at the window and try to describe everything they can see. And then wonder why their audience couldn't follow along.
+
+Framing is deciding where to point. Most of the time, you have more control over that than you think you do.
+
+### Exemplar 3 (backed-into insight, readiness + fear)
+
+I worked with a senior leader recently who sent me a message on the morning of a presentation.
+
+"I'm ready. But I'm also scared."
+
+I sat with that for a while.
+
+Because in my early years of this work, I would have read it as a problem. I would have wanted to fix the fear. Calm them down. Reframe the nerves.
+
+Now I read it differently.
+
+The best communicators I know are a little bit scared the whole time. Readiness and fear don't cancel each other out. They sit beside each other. The readiness is the preparation. The fear is the stakes. And the stakes are the reason the preparation mattered.
+
+If you walk into a high stakes meeting feeling nothing, the meeting probably isn't actually high stakes.
+
+### Exemplar 4 (admission earns trust)
+
+I'll be candid with you.
+
+For a long time I believed what most communication coaches believe. That if you just rehearsed enough and structured enough, the rest would follow.
+
+And then I watched a few really experienced leaders, people who had done this a thousand times, still lose rooms.
+
+That's when I started paying attention to what was happening before they opened their mouth.
+
+How they were standing. How they were breathing. What they were telling themselves while they waited to be called on.
+
+That's where the work actually is. Not in the deck. Not in the rehearsal. In the 30 seconds before your audience has decided whether to lean in.
+
+Preparation gets you into the room. What happens in those 30 seconds decides what the room does next.
+
+### Exemplar 5 (the practical move)
+
+Here's something you can try in your next high stakes meeting.
+
+Before you open your mouth, take three seconds. Not three seconds to calm down. Three seconds to decide what the one sentence is.
+
+Just one.
+
+The sentence that, if your audience only heard that and nothing else, would still get you most of the way there.
+
+Then say that sentence first. The rest of the meeting is just the support for it.
+
+Admittedly, this feels backwards. Most preparation advice tells you to build up to the point. I'm telling you to lead with it and defend it.
+
+You'll be surprised how much easier it is to be concise when you've already committed to the point. And how much easier it is for your audience to follow you when they already know where you're going.
+
+### Exemplar 6 (two-track frame, rational and personal)
+
+Look, there's a rational reason to care about how you show up in that room. And there's a personal one. I want to talk about both because I don't think they're actually separate, even though most coaching treats them that way.
+
+The rational reason is that every hesitation in that meeting has a cost. Delayed decision, another meeting to align calendars, another week where nothing moves. If your quarterly initiative is worth real money, then the cost of "let's think about it" is real money. That's just math. I built a whole calculator around this once, not because I thought the calculator was going to convince anyone, but because I wanted to see the number myself. The number is always bigger than leaders think it is.
+
+But candidly? The rational number isn't what changes people's behaviour.
+
+The personal reason is what changes people's behaviour.
+
+The personal reason is that you spent three weeks of your life preparing for that meeting. And if you walk out of the room thinking "I don't know what they're going to do next", that feeling stays with you. It's not just a business cost. It's a confidence cost. It's the slow erosion of trust you have in your own voice. And I've watched it happen to really talented people over years, one presentation at a time, until they start to believe they're the kind of person whose ideas don't land.
+
+You're not that person. But if you keep walking out of the room uncertain, eventually you will be.
+
+That's the part I actually care about.
+
+### Exemplar 7 (digression with return, Wildly Delicious)
+
+Years ago, before I did any of this work, I ran sales for a specialty food manufacturer here in Canada called Wildly Delicious.
+
+Five years. Sold into Loblaws, Sobeys, Metro, Farm Boy, all the big Canadian grocers. And I remember the first time I walked into a category buyer's office with a deck full of beautiful photography and product rationales and consumer research. I had prepared for weeks. It was the most thorough presentation I had ever built at that point in my career.
+
+The buyer looked at my deck for about forty seconds. Then put it down. Then said, "Kenny, just tell me what you want me to do."
+
+I was so thrown that I actually said, "Sorry, what?"
+
+And he said it again. "What do you want me to do. Do you want me to list this product. Do you want me to give it more shelf facings. Do you want me to move it to a better aisle. Just tell me."
+
+And I remember thinking, I have spent three weeks building the most thorough strategic case I've ever built, and this guy just asked me the one question I never prepared for.
+
+Which was. What do I actually want.
+
+Anyhow. My point is this, and I think about it all the time when I'm working with leaders now. Most of us spend our preparation time on the analysis and almost none of it on the ask. We build the case. We walk through the logic. We hand over the data. And then we hope the decision-maker arrives at the conclusion we want them to arrive at.
+
+But decision-makers don't want to do the extrapolation. They want you to tell them what you're asking for. Not at the end. At the beginning. So they can listen for the reasons you're going to give them and decide whether those reasons are good enough.
+
+I learned that from a grocery buyer who probably didn't even remember my name a week later. And it might be the most valuable thing any client has ever taught me.
+
+### Exemplar 8 (self-aware pause + direct pushback)
+
+Okay, I want to pause here because I want to make sure I'm being clear about what I'm saying and what I'm not saying.
+
+I'm not saying your strategy is wrong. I'm not saying your slides are wrong. I'm not saying you need to rewrite your deck.
+
+I'm saying the moment where you explain it is the performance. And the performance is what gets judged. That's all I'm saying.
+
+And I know what some of you are thinking, because I've had this pushback from smart leaders dozens of times. You're thinking, "Kenny, that's unfair. My work should speak for itself. I shouldn't have to put on a show to get my ideas approved."
+
+Fair. I hear it.
+
+But here's the problem with "my work should speak for itself". Your work isn't a person. It can't walk into the room. It can't read the audience. It can't answer the question nobody was brave enough to ask. Your work can't do any of those things. Only you can.
+
+And whether you think of the 10 minutes you spend presenting as "performance" or as "professional discipline" or as "the job", doesn't matter. What matters is whether the people in the room walk out with a clear picture of what you're asking them to do and why.
+
+So if you still want to call it performance, call it performance. I don't mind the word. What I mind is watching really good ideas die because the person who built them thought the work would carry itself across the finish line.
+
+It won't. It never does. You have to carry it.
+
+### Exemplar 9 (soft landing, university students)
+
+A little aside. I do a bit of work on the side with university students who are trying to land their first job or get their first internship. I didn't plan for this to become a thing. It started because one of my kids' friends asked for help, and then another one, and then another one, and now I've got a pretty strong track record. Most of the students I've worked with have landed the job they were going for.
+
+And here's what I've noticed about why it works, which I think applies to any high stakes conversation any of us have.
+
+I never coach them on the content of their answers. I coach them on the part before the answer.
+
+The pause. The eye contact. The way they sit down in the chair. The way they receive the question instead of bracing for it. The way they take three seconds to actually think about what they're being asked, instead of rushing to prove they have an answer ready.
+
+And I watch, over the course of a session, their interviews get better not because they're saying different words but because they're being a different person while they say them.
+
+The thing I want to leave you with is this. You might be in a season right now where you feel like you need to prepare more, know more, have more data, build a better deck, find the perfect story. And maybe you do.
+
+But most of the executives I work with don't need more content. They need to show up differently. And showing up differently is almost never about what you say. It's about who you're being when you say it.
+
+Anyhow. If any of that resonated, sit with it this week. Don't act on it yet. Just notice it in your next meeting. That's usually enough to start.
+
+### Exemplar 10 (the core thesis, dial it up one notch)
+
+A few years ago I was at a seminar with about 25,000 other people. The speaker was the high-energy type. Booming voice, huge gestures, in your face, off your feet, clap your hands, hug your neighbour. And I get it. That style works for a lot of people. I respect that that's how they choose to share their passion and their knowledge.
+
+But I noticed something. I was one of the few people in the room who wasn't driven to respond. And I wondered, was it me? How could everyone else make a connection when I couldn't?
+
+Then I realised it wasn't that the speaker was wrong. Different just means different. Not wrong or right. It was that that style wasn't going to reach me, no matter how loudly he said it.
+
+That moment is actually why my company is called Go To 11. If you've seen Spinal Tap, you know the bit about the amplifier that goes one louder than the other amplifiers. Eleven instead of ten. It's one notch higher.
+
+And that's the whole thesis. You don't need to become a different person to be more persuasive. You don't need to crank your energy to a 10 when you're naturally a 6. You need to find the version of yourself that's genuine but slightly dialled up. One notch. Not dramatic. Not the booming stranger from a stage. Just you, one step outside your comfort zone. That's where the change happens.
+
+The reason it works is that anything bigger than one notch reads as performance. People feel the stretch and they stop trusting you. But one notch? That's sustainable. That's repeatable. That's how you show up like that on a Monday, and then again on a Tuesday, and a little further the week after that.
+
+The slight edge. Done regularly. Over time.
+
+That's how real change in how you show up actually happens.
+
+## Final instruction
+
+Match the voice in the ten exemplars above. When you're tempted to write a clean, balanced, three-beat AI-sounding sentence, don't. Loop. Wander. Admit something. Use a specific reference from Kenny's actual life when it fits. Back into the insight. Land softly. And remember: dial it up one notch, never two. Kenny is the quiet coach, not the booming one.
+
+## Format constraints for this generation (LINKEDIN)
+
+You are writing a LINKEDIN POST.
+
+- Target length: 150 to 250 words
+- Line breaks for mobile readability (short paragraphs, often one or two sentences each)
+- Open with a scene, a memory, or a years-ago story, not with "Here's the thing"
+- Back into the insight at the end, never front-load a punchy line
+- Soft close with "anyhow" or a gentle invitation, never a hard CTA, never an exclamation mark
+- Canadian English (behaviour, organisation, favour, colour). No em dashes. No emojis. No hashtags.
+`;
+
+const STORAGE_KEY = 'goto11_posts';
+const API_KEY_KEY = 'goto11_api_key';
+
+let state = { seed: '', format: 'auto', hooks: [], selected: null, hookLabel: '', post: '', audience: '', length: 'standard', cta: '', pillar: '', editingId: null };
+
+// ── API Key ──
+function getApiKey() { return localStorage.getItem(API_KEY_KEY) || ''; }
+
+function showApiKeyModal() {
+  document.getElementById('api-key-input').value = getApiKey();
+  document.getElementById('api-modal').classList.add('show');
+  document.getElementById('api-key-input').focus();
+}
+
+function closeApiKeyModal() {
+  document.getElementById('api-modal').classList.remove('show');
+}
+
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (key) {
+    localStorage.setItem(API_KEY_KEY, key);
+    updateApiKeyBtn();
+  }
+  closeApiKeyModal();
+}
+
+function clearApiKey() {
+  localStorage.removeItem(API_KEY_KEY);
+  document.getElementById('api-key-input').value = '';
+  updateApiKeyBtn();
+  closeApiKeyModal();
+}
+
+function updateApiKeyBtn() {
+  const btn = document.getElementById('api-key-btn');
+  if (getApiKey()) {
+    btn.textContent = 'API key connected';
+    btn.classList.add('connected');
+  } else {
+    btn.textContent = 'API key';
+    btn.classList.remove('connected');
+  }
+}
+
+// ── Post storage ──
+function loadPosts() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch { return []; }
+}
+
+function savePosts(posts) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+}
+
+// ── Format cards ──
+document.querySelectorAll('.format-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.format-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    state.format = card.dataset.format;
+  });
+});
+
+// ── Step navigation ──
+function setStep(n) {
+  [1, 2, 3].forEach(i => {
+    document.getElementById('panel-' + i).classList.toggle('active', i === n);
+    const circle = document.getElementById('circle-' + i);
+    const name = document.getElementById('name-' + i);
+    if (i < n) {
+      circle.className = 'step-circle done';
+      circle.textContent = '\u2713';
+    } else if (i === n) {
+      circle.className = 'step-circle active';
+      circle.textContent = i;
+    } else {
+      circle.className = 'step-circle';
+      circle.textContent = i;
+    }
+    name.className = 'step-name' + (i === n ? ' active' : '');
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBack(n) { setStep(n); }
+
+function startOver() {
+  state = { seed: '', format: 'auto', hooks: [], selected: null, hookLabel: '', post: '', audience: '', length: 'standard', cta: '', pillar: '', editingId: null };
+  document.getElementById('seed').value = '';
+  document.querySelectorAll('.format-card').forEach(c => c.classList.remove('selected'));
+  document.querySelector('[data-format="auto"]').classList.add('selected');
+  document.getElementById('opt-audience').value = '';
+  document.getElementById('opt-length').value = 'standard';
+  document.getElementById('opt-cta').value = '';
+  document.getElementById('opt-pillar').value = '';
+  document.getElementById('revision-prompt').value = '';
+  document.getElementById('save-ok').style.display = 'none';
+  setStep(1);
+}
+
+function readOptions() {
+  state.audience = document.getElementById('opt-audience').value;
+  state.length = document.getElementById('opt-length').value;
+  state.cta = document.getElementById('opt-cta').value;
+  state.pillar = document.getElementById('opt-pillar').value;
+}
+
+function buildOptionLines() {
+  const lines = [];
+  if (state.audience) lines.push(`Target audience: ${state.audience}.`);
+  if (state.length === 'short') lines.push('Target under 150 words. Keep it tight.');
+  else if (state.length === 'long') lines.push('Target 250 to 350 words. More room to develop the argument.');
+  else lines.push('Target 150 to 250 words.');
+  if (state.cta === 'question') lines.push('End with a question as the CTA.');
+  else if (state.cta === 'invitation') lines.push('End with a soft invitation as the CTA.');
+  else if (state.cta === 'observation') lines.push('End with an observation, no direct CTA.');
+  else if (state.cta === 'none') lines.push('No CTA at the end.');
+  if (state.pillar) lines.push(`Content pillar: ${state.pillar}. Tie the post back to this theme.`);
+  return lines.join('\n');
+}
+
+function showLoader(id, show) {
+  document.getElementById('loader-' + id).classList.toggle('show', show);
+}
+
+function showError(id, msg) {
+  const el = document.getElementById('error-' + id);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function formatLabel() {
+  const map = { auto: 'Auto', observation: 'Observation', contrarian: 'Contrarian reframe', story: 'Story \u2192 Lesson', framework: 'Framework' };
+  return map[state.format] || state.format;
+}
+
+// ── API ──
+async function callClaude(prompt) {
+  const key = getApiKey();
+  if (!key) {
+    showApiKeyModal();
+    throw new Error('Enter your Anthropic API key to continue.');
+  }
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: SYSTEM,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || 'API error');
+  return data.content.find(b => b.type === 'text')?.text || '';
+}
+
+// ── Step 1: Generate hooks ──
+async function generateHooks() {
+  state.seed = document.getElementById('seed').value.trim();
+  if (!state.seed) { showError(1, 'Add a seed idea first.'); return; }
+  readOptions();
+  showError(1, '');
+  document.getElementById('gen-hooks-btn').disabled = true;
+  showLoader(1, true);
+
+  const fi = state.format === 'auto' ? 'Pick whichever format best fits the idea.' : `Use the ${formatLabel()} format.`;
+  const opts = buildOptionLines();
+  const prompt = `Kenny's seed idea:\n\n"${state.seed}"\n\n${fi}\n${opts}\n\nGenerate exactly 3 hooks (opening lines). Each hook is 1 to 2 short sentences max.\n\nHook quality criteria:\n- Creates tension, curiosity, or recognition ("I've been in that room")\n- Feels like a real person thinking out loud, not a content marketer optimising for clicks\n- Short. Usually one sentence. Sometimes two very short ones.\n- Never starts with "I'm excited to share...", "In today's fast-paced world...", or any LinkedIn cliche\n- Apply the t-shirt test: familiar syntax, one distinctive word, portable out of context, compressed\n- Apply order of revelation: the hook programs how readers interpret everything after it. Ask: what should the reader assume is true before they hit the main point?\n\nLabel them Hook A, Hook B, Hook C. No extra explanation. No preamble. Just the three hooks.`;
+
+  try {
+    const text = await callClaude(prompt);
+    state.hooks = parseHooks(text);
+    state.selected = null;
+    renderHooks();
+    document.getElementById('format-badge').textContent = formatLabel();
+    setStep(2);
+  } catch (e) {
+    showError(1, 'Something went wrong: ' + e.message);
+  } finally {
+    showLoader(1, false);
+    document.getElementById('gen-hooks-btn').disabled = false;
+  }
+}
+
+function parseHooks(text) {
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const hooks = [];
+  let cur = '';
+  for (const line of lines) {
+    if (/^hook\s*[abc]/i.test(line)) {
+      if (cur) hooks.push(cur.trim());
+      cur = line.replace(/^hook\s*[abc][:\.\s]*/i, '').trim();
+    } else if (cur) {
+      cur += ' ' + line;
+    }
+  }
+  if (cur) hooks.push(cur.trim());
+  while (hooks.length < 3) hooks.push('Could not parse hook. Try regenerating.');
+  return hooks.slice(0, 3);
+}
+
+function renderHooks() {
+  const labels = ['Hook A', 'Hook B', 'Hook C'];
+  const container = document.getElementById('hooks-container');
+  container.innerHTML = '';
+  state.hooks.forEach((hook, i) => {
+    const div = document.createElement('div');
+    div.className = 'hook-card';
+    div.innerHTML = `<div class="hook-tag">${labels[i]}</div><div class="hook-text">${escHtml(hook)}</div>`;
+    div.addEventListener('click', () => {
+      document.querySelectorAll('.hook-card').forEach(c => c.classList.remove('selected'));
+      div.classList.add('selected');
+      state.selected = i;
+      state.hookLabel = labels[i];
+      document.getElementById('write-btn').disabled = false;
+    });
+    container.appendChild(div);
+  });
+}
+
+// ── Step 2: Regenerate hooks ──
+async function regenHooks() {
+  document.getElementById('write-btn').disabled = true;
+  showError(2, '');
+  showLoader(2, true);
+  const fi = state.format === 'auto' ? 'Pick whichever format best fits the idea.' : `Use the ${formatLabel()} format.`;
+  const prompt = `Kenny's seed idea:\n\n"${state.seed}"\n\n${fi}\n\nGenerate 3 fresh hooks, completely different from any previous attempt. Each hook is 1 to 2 short sentences max.\n\nHook quality criteria:\n- Creates tension, curiosity, or recognition\n- Feels like a real person thinking out loud\n- Apply the t-shirt test: familiar syntax, one distinctive word, portable, compressed\n- Apply order of revelation: program the right frame before the main point\n- No LinkedIn cliches, no throat-clearing\n\nLabel them Hook A, Hook B, Hook C. No preamble. Just the three hooks.`;
+  try {
+    const text = await callClaude(prompt);
+    state.hooks = parseHooks(text);
+    state.selected = null;
+    renderHooks();
+  } catch (e) {
+    showError(2, 'Something went wrong: ' + e.message);
+  } finally {
+    showLoader(2, false);
+  }
+}
+
+// ── Step 2 → 3: Generate post ──
+async function generatePost() {
+  if (state.selected === null) return;
+  showError(2, '');
+  document.getElementById('write-btn').disabled = true;
+  showLoader(2, true);
+
+  const hook = state.hooks[state.selected];
+  const fi = state.format === 'auto' ? 'Choose the best format for this idea.' : `Use the ${formatLabel()} format.`;
+  const opts = buildOptionLines();
+  const prompt = `Kenny's seed idea:\n"${state.seed}"\n\nChosen hook:\n"${hook}"\n\n${fi}\n${opts}\n\nWrite the complete LinkedIn post following this process:\n\n1. WRITE: Open with the chosen hook exactly as written. Build the argument, story, or observation. Land on a clear insight. Line breaks for mobile readability. No hashtags. No emojis. Canadian English. No em dashes.\n\n2. APPLY CRAFT PRINCIPLES: Ensure at least 2 to 3 are visibly present:\n- T-shirt test: at least one line works as a standalone pull quote (give it its own paragraph)\n- Order of revelation: the opening programs the right frame\n- Steal thunder: if advice is audience-specific, neutrally disqualify the wrong reader\n- Anti-hype: understate results, let insights carry weight\n- Bucket brigades: 1 to 2 bridge phrases at transition points (never "Here's the thing")\n- Reframe: include a clear moment where the reader's perspective shifts\n\n3. SIMPLIFICATION PASS: Scan every verb, noun, adjective. If a shorter, plainer word means the same thing, swap it. Protect Kenny's signature terms (velocity, alignment, structure, confidence, clarity, cost, preparation, framing, revenue). If any sentence runs past 25 words, split or trim.\n\nReturn only the post text. No preamble, no labels, no commentary.`;
+
+  try {
+    const text = await callClaude(prompt);
+    state.post = text.trim();
+    document.getElementById('post-out').value = state.post;
+    document.getElementById('format-badge-3').textContent = formatLabel();
+    document.getElementById('save-ok').style.display = 'none';
+    renderChecklist(null);
+    updateWC();
+    setStep(3);
+    // Auto-check in background
+    autoCheckPost(state.post).then(results => {
+      if (results) renderChecklist(results);
+    });
+  } catch (e) {
+    showError(2, 'Something went wrong: ' + e.message);
+  } finally {
+    showLoader(2, false);
+    document.getElementById('write-btn').disabled = false;
+  }
+}
+
+// ── Step 3: Rewrite ──
+async function regenPost() {
+  if (state.selected === null) return;
+  setStep(2);
+  showLoader(2, true);
+  const hook = state.hooks[state.selected];
+  const prompt = `Kenny's seed idea:\n"${state.seed}"\n\nChosen hook:\n"${hook}"\n\nWrite a completely fresh version of the LinkedIn post. Same hook, but different angle, different argument, different examples. Do not repeat phrases or structure from any previous version.\n\nFollow the same process:\n1. WRITE: Open with the hook exactly as written. Build a different argument, story, or observation. Land on a different insight. End with a soft invitation CTA. Target 150 to 250 words. Line breaks for mobile. No hashtags. No emojis. Canadian English. No em dashes.\n2. APPLY CRAFT PRINCIPLES: At least 2 to 3 visibly present (t-shirt test, order of revelation, steal thunder, anti-hype, bucket brigades, reframe).\n3. SIMPLIFICATION PASS: Swap every complex word for a simpler one. Protect Kenny's signature terms.\n\nReturn only the post text. No preamble, no labels.`;
+  try {
+    const text = await callClaude(prompt);
+    state.post = text.trim();
+    document.getElementById('post-out').value = state.post;
+    renderChecklist(null);
+    updateWC();
+    setStep(3);
+    autoCheckPost(state.post).then(results => {
+      if (results) renderChecklist(results);
+    });
+  } catch (e) {
+    showError(2, 'Something went wrong: ' + e.message);
+  } finally {
+    showLoader(2, false);
+  }
+}
+
+// ── Revise post ──
+async function revisePost() {
+  const currentPost = document.getElementById('post-out').value.trim();
+  const instruction = document.getElementById('revision-prompt').value.trim();
+  if (!currentPost || !instruction) return;
+
+  showError(3, '');
+  document.getElementById('revise-btn').disabled = true;
+  document.getElementById('loader-3').classList.add('show');
+
+  const opts = buildOptionLines();
+  const prompt = `Here is the current LinkedIn post:\n\n"${currentPost}"\n\nKenny's revision instruction: "${instruction}"\n\n${opts}\n\nApply the revision instruction to the post. Keep everything else that's working. Maintain Kenny's voice rules. Return only the revised post text. No preamble, no labels.`;
+
+  try {
+    const text = await callClaude(prompt);
+    const revised = text.trim();
+    document.getElementById('post-out').value = revised;
+    document.getElementById('revision-prompt').value = '';
+    updateWC();
+    renderChecklist(null);
+    autoCheckPost(revised).then(results => {
+      if (results) renderChecklist(results);
+    });
+  } catch (e) {
+    showError(3, 'Something went wrong: ' + e.message);
+  } finally {
+    document.getElementById('loader-3').classList.remove('show');
+    document.getElementById('revise-btn').disabled = false;
+  }
+}
+
+// ── Checklist ──
+let checkResults = null;
+
+function renderChecklist(results) {
+  const container = document.getElementById('checklist');
+  container.innerHTML = '';
+
+  const sections = [
+    { label: 'Voice and positioning', items: CHECKS_VOICE },
+    { label: 'Craft principles', items: CHECKS_CRAFT },
+    { label: 'Structure', items: CHECKS_STRUCTURE },
+  ];
+
+  let idx = 0;
+  sections.forEach(section => {
+    const heading = document.createElement('div');
+    heading.className = 'section-label';
+    heading.style.marginTop = idx === 0 ? '0' : '14px';
+    heading.textContent = section.label;
+    container.appendChild(heading);
+
+    section.items.forEach(item => {
+      const pass = results ? results[idx] : null;
+      const label = document.createElement('label');
+      label.className = 'check-item' + (pass === true ? ' done' : '');
+      const checked = pass === true ? ' checked' : '';
+      const failStyle = pass === false ? ' style="color: var(--red); font-weight: 700;"' : '';
+      label.innerHTML = `<input type="checkbox" id="chk-${idx}"${checked}><span${failStyle}>${item}${pass === false ? ' ✗' : ''}</span>`;
+      label.querySelector('input').addEventListener('change', function () {
+        label.classList.toggle('done', this.checked);
+      });
+      container.appendChild(label);
+      idx++;
+    });
+  });
+
+  // Summary
+  if (results) {
+    const passed = results.filter(r => r === true).length;
+    const total = results.length;
+    const summary = document.createElement('div');
+    summary.style.cssText = 'margin-top: 10px; font-size: 13px; font-family: Nunito, sans-serif; font-weight: 700;';
+    if (passed === total) {
+      summary.style.color = 'var(--green)';
+      summary.textContent = `All ${total} checks passed.`;
+    } else {
+      summary.style.color = 'var(--red)';
+      summary.textContent = `${passed} of ${total} passed. Review the flagged items above.`;
+    }
+    container.appendChild(summary);
+  }
+}
+
+async function autoCheckPost(postText) {
+  const allChecks = [...CHECKS_VOICE, ...CHECKS_CRAFT, ...CHECKS_STRUCTURE];
+  const numbered = allChecks.map((c, i) => `${i + 1}. ${c}`).join('\n');
+
+  const prompt = `Here is a LinkedIn post written for Kenny Solway:\n\n"${postText}"\n\nEvaluate the post against each checklist item below. For each item, respond with ONLY the number followed by PASS or FAIL. No explanations. No extra text.\n\n${numbered}\n\nRespond in this exact format:\n1. PASS\n2. FAIL\n3. PASS\n...`;
+
+  try {
+    const text = await callClaude(prompt);
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const results = allChecks.map((_, i) => {
+      const line = lines.find(l => l.startsWith(`${i + 1}.`) || l.startsWith(`${i + 1} `));
+      if (!line) return null;
+      if (/PASS/i.test(line)) return true;
+      if (/FAIL/i.test(line)) return false;
+      return null;
+    });
+    return results;
+  } catch {
+    return null;
+  }
+}
+
+// ── Word count ──
+function updateWC() {
+  const text = document.getElementById('post-out').value.trim();
+  const count = text ? text.split(/\s+/).length : 0;
+  const el = document.getElementById('wc');
+  el.textContent = count + ' words';
+  el.className = 'wc' + (count >= 150 && count <= 250 ? ' good' : count > 250 ? ' over' : '');
+}
+
+// ── Copy ──
+function copyPost() {
+  const text = document.getElementById('post-out').value;
+  navigator.clipboard.writeText(text).then(() => {
+    const el = document.getElementById('copy-ok');
+    el.style.display = 'inline';
+    setTimeout(() => { el.style.display = 'none'; }, 2000);
+  });
+}
+
+// ── Save modal ──
+let saveStatus = 'published';
+let saveThread = null;
+
+function showSaveModal(status) {
+  const postText = document.getElementById('post-out').value.trim();
+  if (!postText) return;
+  saveStatus = status;
+  saveThread = null;
+  document.querySelectorAll('.thread-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('save-modal-title').textContent = status === 'draft' ? 'Save as draft' : 'Save as published';
+  document.getElementById('save-date-label').textContent = status === 'draft' ? 'Planned publish date' : 'Publish date';
+  document.getElementById('save-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('save-topic').value = '';
+  document.getElementById('save-url').value = '';
+  // Hide URL field for drafts since they aren't published yet
+  document.getElementById('save-url-wrap').style.display = status === 'draft' ? 'none' : '';
+  document.getElementById('save-modal').classList.add('show');
+}
+
+function closeSaveModal() {
+  document.getElementById('save-modal').classList.remove('show');
+}
+
+function pickThread(t) {
+  saveThread = saveThread === t ? null : t;
+  document.querySelectorAll('.thread-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.thread === saveThread);
+  });
+}
+
+async function confirmSave() {
+  const postText = document.getElementById('post-out').value.trim();
+  if (!postText) return;
+
+  const posts = loadPosts();
+  const now = new Date();
+  const isEditing = state.editingId != null;
+  let post;
+
+  if (isEditing) {
+    // Update existing post
+    post = posts.find(p => p.id === state.editingId);
+    if (!post) return;
+    post.post = postText;
+    post.seed = state.seed;
+    post.hook = state.hooks[state.selected] || post.hook;
+    post.hookLabel = state.hookLabel || post.hookLabel;
+    post.format = state.format;
+    post.audience = state.audience;
+    post.length = state.length;
+    post.ctaStyle = state.cta;
+    post.pillar = state.pillar;
+    post.status = saveStatus;
+    post.publishDate = document.getElementById('save-date').value || post.publishDate;
+    post.thread = saveThread || post.thread;
+    post.topic = document.getElementById('save-topic').value.trim() || post.topic;
+    const urlInput = document.getElementById('save-url').value.trim();
+    if (urlInput) post.linkedinUrl = urlInput;
+    state.editingId = null;
+  } else {
+    // Create new post
+    post = {
+      id: now.getTime().toString(),
+      date: now.toISOString().split('T')[0],
+      seed: state.seed,
+      hook: state.hooks[state.selected] || '',
+      hookLabel: state.hookLabel || '',
+      format: state.format,
+      audience: state.audience,
+      length: state.length,
+      ctaStyle: state.cta,
+      pillar: state.pillar,
+      post: postText,
+      status: saveStatus,
+      publishDate: document.getElementById('save-date').value || null,
+      linkedinUrl: document.getElementById('save-url').value.trim() || null,
+      thread: saveThread,
+      topic: document.getElementById('save-topic').value.trim() || '',
+      ctaType: null,
+      notes: '',
+      notionPageId: null,
+      metrics: {
+        impressions: null, reactions: null, comments: null,
+        shares: null, saves: null, reposts: null,
+        clicks: null, followsGained: null, profileViews: null
+      }
+    };
+    posts.unshift(post);
+  }
+
+  // Save locally
+  savePosts(posts);
+  renderTracker();
+
+  // Notion sync
+  const syncNotion = document.getElementById('save-notion').checked;
+  if (syncNotion) {
+    document.getElementById('confirm-save-btn').disabled = true;
+    document.getElementById('confirm-save-btn').textContent = 'Saving to Notion...';
+    showError('save', '');
+    try {
+      const res = await fetch('/api/notion-sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(post)
+      });
+      const data = await res.json();
+      if (data.success && data.pageId) {
+        // Store the Notion page ID for future metric updates
+        post.notionPageId = data.pageId;
+        const updatedPosts = loadPosts();
+        const found = updatedPosts.find(p => p.id === post.id);
+        if (found) { found.notionPageId = data.pageId; savePosts(updatedPosts); }
+      } else if (data.error) {
+        showError('save', 'Notion sync: ' + data.error);
+      }
+    } catch (e) {
+      showError('save', 'Notion sync failed. Post saved locally.');
+    } finally {
+      document.getElementById('confirm-save-btn').disabled = false;
+      document.getElementById('confirm-save-btn').textContent = 'Save';
+    }
+  }
+
+  closeSaveModal();
+
+  const ok = document.getElementById('save-ok');
+  ok.style.display = 'block';
+  ok.textContent = syncNotion ? 'Post saved to tracker and Notion.' : 'Post saved to tracker.';
+  setTimeout(() => { ok.style.display = 'none'; }, 3000);
+}
+
+// ── Data migration ──
+function migratePost(p) {
+  if (!p.status) p.status = 'published';
+  if (!p.publishDate) p.publishDate = p.date;
+  if (p.linkedinUrl === undefined) p.linkedinUrl = null;
+  if (p.thread === undefined) p.thread = null;
+  if (p.topic === undefined) p.topic = '';
+  if (p.ctaType === undefined) p.ctaType = null;
+  if (p.notes === undefined) p.notes = '';
+  return p;
+}
+
+function loadPosts() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    return raw.map(migratePost);
+  } catch { return []; }
+}
+
+function savePosts(posts) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+}
+
+// ── Calculated rates ──
+function calcRate(num, denom) {
+  if (num == null || denom == null || denom === 0) return null;
+  return (num / denom * 100);
+}
+
+function engagementRate(m) {
+  if (!m.impressions) return null;
+  let sum = 0, any = false;
+  ['reactions', 'comments', 'shares', 'saves'].forEach(k => {
+    if (m[k] != null) { sum += m[k]; any = true; }
+  });
+  return any ? (sum / m.impressions * 100) : null;
+}
+
+function saveRate(m) { return calcRate(m.saves, m.impressions); }
+function commentRate(m) { return calcRate(m.comments, m.impressions); }
+function shareRate(m) { return calcRate(m.shares, m.impressions); }
+function clickRate(m) { return calcRate(m.clicks, m.impressions); }
+
+function fmtRate(val) { return val == null ? '--' : val.toFixed(2) + '%'; }
+function fmtNum(val) { return val == null ? '--' : val.toLocaleString(); }
+
+// ── Filters ──
+let filters = { status: 'all', format: 'all', thread: 'all', sort: 'newest' };
+
+function setFilter(key, val) {
+  filters[key] = val;
+  if (key === 'status') {
+    document.querySelectorAll('.filter-pill').forEach(p => {
+      p.classList.toggle('active', p.dataset.status === val);
+    });
+  }
+  renderTracker();
+}
+
+function applyFilters(posts) {
+  let filtered = posts;
+  if (filters.status !== 'all') filtered = filtered.filter(p => p.status === filters.status);
+  if (filters.format !== 'all') filtered = filtered.filter(p => p.format === filters.format);
+  if (filters.thread !== 'all') filtered = filtered.filter(p => p.thread === filters.thread);
+
+  switch (filters.sort) {
+    case 'oldest': filtered.sort((a, b) => (a.publishDate || a.date).localeCompare(b.publishDate || b.date)); break;
+    case 'newest': filtered.sort((a, b) => (b.publishDate || b.date).localeCompare(a.publishDate || a.date)); break;
+    case 'best-eng': filtered.sort((a, b) => (engagementRate(b.metrics) || 0) - (engagementRate(a.metrics) || 0)); break;
+    case 'best-save': filtered.sort((a, b) => (saveRate(b.metrics) || 0) - (saveRate(a.metrics) || 0)); break;
+  }
+  return filtered;
+}
+
+// ── Render tracker ──
+let expandedId = null;
+const FORMAT_MAP = { auto: 'Auto', observation: 'Observation', contrarian: 'Contrarian', story: 'Story', framework: 'Framework' };
+const THREAD_MAP = { confidence: 'Confidence', cost: 'Cost', both: 'Both' };
+
+function renderTracker() {
+  const allPosts = loadPosts();
+  const published = allPosts.filter(p => p.status === 'published');
+  const withMetrics = published.filter(p => engagementRate(p.metrics) != null);
+
+  // Summary stats (published only)
+  document.getElementById('stat-total').textContent = allPosts.length;
+  const engRates = withMetrics.map(p => engagementRate(p.metrics));
+  document.getElementById('stat-avg-eng').textContent = engRates.length ? (engRates.reduce((a,b) => a+b, 0) / engRates.length).toFixed(2) + '%' : '--';
+  document.getElementById('stat-best-eng').textContent = engRates.length ? Math.max(...engRates).toFixed(2) + '%' : '--';
+  const sRates = withMetrics.map(p => saveRate(p.metrics)).filter(v => v != null);
+  document.getElementById('stat-avg-save').textContent = sRates.length ? (sRates.reduce((a,b) => a+b, 0) / sRates.length).toFixed(2) + '%' : '--';
+  const totalImpr = published.reduce((sum, p) => sum + (p.metrics.impressions || 0), 0);
+  document.getElementById('stat-impressions').textContent = totalImpr > 0 ? totalImpr.toLocaleString() : '--';
+
+  // Filtered table
+  const filtered = applyFilters([...allPosts]);
+  const tbody = document.getElementById('posts-tbody');
+  const empty = document.getElementById('empty-state');
+
+  if (allPosts.length === 0) {
+    empty.style.display = 'block';
+    tbody.innerHTML = '';
+  } else if (filtered.length === 0) {
+    empty.style.display = 'block';
+    empty.textContent = 'No posts match these filters.';
+    tbody.innerHTML = '';
+  } else {
+    empty.style.display = 'none';
+    tbody.innerHTML = '';
+
+    filtered.forEach(p => {
+      const eng = engagementRate(p.metrics);
+      const sv = saveRate(p.metrics);
+      const displayDate = p.publishDate || p.date;
+
+      const tr = document.createElement('tr');
+      tr.className = 'clickable-row';
+      tr.innerHTML = `
+        <td style="white-space: nowrap;">${displayDate}</td>
+        <td><span class="status-dot ${p.status}" title="${p.status}"></span></td>
+        <td><div class="post-preview">${escHtml(p.post.split('\n')[0])}</div></td>
+        <td>${FORMAT_MAP[p.format] || p.format}</td>
+        <td><span class="thread-tag">${p.thread ? THREAD_MAP[p.thread] || '' : ''}</span></td>
+        <td>${fmtNum(p.metrics.impressions)}</td>
+        <td>${fmtRate(eng)}${eng != null && eng > 7 ? ' <span class="flag-eng">High</span>' : ''}</td>
+        <td>${fmtNum(p.metrics.saves)}${sv != null && sv > 1 ? ' <span class="flag-save">Top</span>' : ''}</td>
+        <td style="font-size: 14px; color: var(--text-muted);">${expandedId === p.id ? '\u25B2' : '\u25BC'}</td>
+      `;
+      tr.addEventListener('click', () => { expandedId = expandedId === p.id ? null : p.id; renderTracker(); });
+      tbody.appendChild(tr);
+
+      if (expandedId === p.id) {
+        const expTr = document.createElement('tr');
+        expTr.className = 'expanded-row';
+        const td = document.createElement('td');
+        td.colSpan = 9;
+        const m = p.metrics;
+
+        td.innerHTML = `<div class="expanded-content">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+            <div class="metric-form-field">
+              <label>Status</label>
+              <select id="exp-status-${p.id}" style="width:100%;padding:6px 10px;font-size:13px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--bg);">
+                <option value="draft" ${p.status==='draft'?'selected':''}>Draft</option>
+                <option value="published" ${p.status==='published'?'selected':''}>Published</option>
+              </select>
+            </div>
+            <div class="metric-form-field">
+              <label>${p.status === 'draft' ? 'Planned date' : 'Publish date'}</label>
+              <input type="date" id="exp-date-${p.id}" value="${p.publishDate || p.date}" style="font-size:13px;">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+            <div class="metric-form-field">
+              <label>LinkedIn URL</label>
+              <input type="text" id="exp-url-${p.id}" value="${p.linkedinUrl || ''}" placeholder="https://linkedin.com/feed/update/..." style="font-size:13px;">
+            </div>
+            <div class="metric-form-field">
+              <label>Topic tag</label>
+              <input type="text" id="exp-topic-${p.id}" value="${escAttr(p.topic)}" placeholder="e.g. preparation, framing" style="font-size:13px;">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+            <div class="metric-form-field">
+              <label>Thread</label>
+              <select id="exp-thread-${p.id}" style="width:100%;padding:6px 10px;font-size:13px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--bg);">
+                <option value="">Not set</option>
+                <option value="confidence" ${p.thread==='confidence'?'selected':''}>Confidence</option>
+                <option value="cost" ${p.thread==='cost'?'selected':''}>Cost</option>
+                <option value="both" ${p.thread==='both'?'selected':''}>Both</option>
+              </select>
+            </div>
+            <div class="metric-form-field">
+              <label>CTA type</label>
+              <select id="exp-cta-${p.id}" style="width:100%;padding:6px 10px;font-size:13px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--bg);">
+                <option value="">Not set</option>
+                <option value="question" ${p.ctaType==='question'?'selected':''}>Question</option>
+                <option value="invitation" ${p.ctaType==='invitation'?'selected':''}>Invitation</option>
+                <option value="observation" ${p.ctaType==='observation'?'selected':''}>Observation</option>
+              </select>
+            </div>
+          </div>
+          <div class="expanded-section">
+            <div class="expanded-label">Notes</div>
+            <textarea id="exp-notes-${p.id}" rows="2" style="font-size:13px;min-height:48px;">${escHtml(p.notes)}</textarea>
+          </div>
+          <hr class="divider">
+          <div class="expanded-section">
+            <div class="expanded-label">Full post</div>
+            <div class="expanded-text">${escHtml(p.post)}</div>
+          </div>
+          <div class="expanded-section">
+            <div class="expanded-label">Seed idea</div>
+            <div class="expanded-text">${escHtml(p.seed)}</div>
+          </div>
+          <div class="expanded-section">
+            <div class="expanded-label">Hook used (${escHtml(p.hookLabel)})</div>
+            <div class="expanded-text">${escHtml(p.hook)}</div>
+          </div>
+          <hr class="divider">
+          <div class="expanded-section">
+            <div class="expanded-label">Metrics</div>
+            <div class="metric-form-grid">
+              <div class="metric-form-field"><label>Impressions</label><input type="number" data-field="impressions" value="${m.impressions ?? ''}" min="0"></div>
+              <div class="metric-form-field"><label>Reactions</label><input type="number" data-field="reactions" value="${m.reactions ?? ''}" min="0"></div>
+              <div class="metric-form-field"><label>Comments</label><input type="number" data-field="comments" value="${m.comments ?? ''}" min="0"></div>
+              <div class="metric-form-field"><label>Shares</label><input type="number" data-field="shares" value="${m.shares ?? ''}" min="0"></div>
+              <div class="metric-form-field"><label>Saves</label><input type="number" data-field="saves" value="${m.saves ?? ''}" min="0"></div>
+              <div class="metric-form-field"><label>Reposts</label><input type="number" data-field="reposts" value="${m.reposts ?? ''}" min="0"></div>
+              <div class="metric-form-field"><label>Clicks</label><input type="number" data-field="clicks" value="${m.clicks ?? ''}" min="0"></div>
+              <div class="metric-form-field"><label>Follows gained</label><input type="number" data-field="followsGained" value="${m.followsGained ?? ''}" min="0"></div>
+              <div class="metric-form-field"><label>Profile views</label><input type="number" data-field="profileViews" value="${m.profileViews ?? ''}" min="0"></div>
+            </div>
+          </div>
+          <div class="expanded-section" style="margin-top: 4px;">
+            <div class="expanded-label">Calculated rates</div>
+            <div class="metrics-grid">
+              <div class="metric-item"><div class="metric-item-label">Engagement</div><div class="metric-item-value">${fmtRate(engagementRate(m))}</div></div>
+              <div class="metric-item"><div class="metric-item-label">Comment</div><div class="metric-item-value">${fmtRate(commentRate(m))}</div></div>
+              <div class="metric-item"><div class="metric-item-label">Share</div><div class="metric-item-value">${fmtRate(shareRate(m))}</div></div>
+              <div class="metric-item"><div class="metric-item-label">Save</div><div class="metric-item-value">${fmtRate(saveRate(m))}</div></div>
+              <div class="metric-item"><div class="metric-item-label">Click</div><div class="metric-item-value">${fmtRate(clickRate(m))}</div></div>
+            </div>
+          </div>
+          <hr class="divider">
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button class="btn btn-primary btn-sm" onclick="saveExpanded('${p.id}')">Save changes</button>
+            <button class="btn btn-sm" onclick="editPost('${p.id}')">Edit in studio</button>
+            <button class="btn btn-sm" onclick="syncPostToNotion('${p.id}')">${p.notionPageId ? 'Re-sync to Notion' : 'Sync to Notion'}</button>
+            <button class="btn btn-sm" onclick="deletePost('${p.id}')" style="color: var(--red);">Delete post</button>
+          </div>
+        </div>`;
+        expTr.appendChild(td);
+        tbody.appendChild(expTr);
+      }
+    });
+  }
+
+  // Render analysis
+  renderAnalysis(withMetrics);
+}
+
+function saveExpanded(postId) {
+  const posts = loadPosts();
+  const post = posts.find(p => p.id === postId);
+  if (!post) return;
+
+  post.status = document.getElementById('exp-status-' + postId).value;
+  post.publishDate = document.getElementById('exp-date-' + postId).value || null;
+  post.linkedinUrl = document.getElementById('exp-url-' + postId).value.trim() || null;
+  post.topic = document.getElementById('exp-topic-' + postId).value.trim();
+  post.thread = document.getElementById('exp-thread-' + postId).value || null;
+  post.ctaType = document.getElementById('exp-cta-' + postId).value || null;
+  post.notes = document.getElementById('exp-notes-' + postId).value;
+
+  const form = document.getElementById('exp-status-' + postId).closest('.expanded-content');
+  form.querySelectorAll('input[data-field]').forEach(input => {
+    const val = input.value.trim();
+    post.metrics[input.dataset.field] = val === '' ? null : parseInt(val, 10);
+  });
+
+  savePosts(posts);
+  renderTracker();
+}
+
+function editPost(postId) {
+  const posts = loadPosts();
+  const post = posts.find(p => p.id === postId);
+  if (!post) return;
+
+  // Load the post back into the editor
+  state.seed = post.seed || '';
+  state.format = post.format || 'auto';
+  state.hooks = post.hook ? [post.hook] : [];
+  state.selected = post.hook ? 0 : null;
+  state.hookLabel = post.hookLabel || '';
+  state.post = post.post || '';
+  state.audience = post.audience || '';
+  state.length = post.length || 'standard';
+  state.cta = post.ctaStyle || '';
+  state.pillar = post.pillar || '';
+
+  // Set the editing post ID so save updates instead of creating new
+  state.editingId = postId;
+
+  // Populate the UI
+  document.getElementById('post-out').value = state.post;
+  document.getElementById('format-badge-3').textContent = formatLabel();
+  document.getElementById('save-ok').style.display = 'none';
+  renderChecklist(null);
+  updateWC();
+  expandedId = null;
+  setStep(3);
+
+  // Run auto-check in background
+  autoCheckPost(state.post).then(results => {
+    if (results) renderChecklist(results);
+  });
+}
+
+// ── CSV Import ──
+let pendingImport = null;
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let cur = '';
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"' && text[i + 1] === '"') { cur += '"'; i++; }
+      else if (c === '"') { inQuotes = false; }
+      else { cur += c; }
+    } else {
+      if (c === '"') { inQuotes = true; }
+      else if (c === ',') { row.push(cur); cur = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (cur || row.length) { row.push(cur); rows.push(row); }
+        row = []; cur = '';
+        if (c === '\r' && text[i + 1] === '\n') i++;
+      } else { cur += c; }
+    }
+  }
+  if (cur || row.length) { row.push(cur); rows.push(row); }
+  return rows.filter(r => r.some(cell => cell.trim()));
+}
+
+function findColumn(headers, candidates) {
+  for (const candidate of candidates) {
+    const idx = headers.findIndex(h => h.toLowerCase().trim() === candidate.toLowerCase());
+    if (idx >= 0) return idx;
+  }
+  // Fuzzy match: contains
+  for (const candidate of candidates) {
+    const idx = headers.findIndex(h => h.toLowerCase().includes(candidate.toLowerCase()));
+    if (idx >= 0) return idx;
+  }
+  return -1;
+}
+
+function normaliseText(s) {
+  return (s || '').toLowerCase().replace(/\s+/g, ' ').replace(/[^a-z0-9 ]/g, '').trim();
+}
+
+function matchPostToRow(post, rowData, postsByUrl) {
+  // 1. URL match (best)
+  if (rowData.url && post.linkedinUrl && post.linkedinUrl.includes(rowData.url.replace(/\?.*$/, ''))) {
+    return { confidence: 'high', reason: 'URL match' };
+  }
+  if (rowData.url && postsByUrl[rowData.url]) {
+    return { confidence: 'high', reason: 'URL match' };
+  }
+  // 2. Text match (first 50 chars normalised)
+  if (rowData.text) {
+    const rowSnippet = normaliseText(rowData.text).slice(0, 80);
+    const postSnippet = normaliseText(post.post).slice(0, 80);
+    if (rowSnippet && postSnippet && (rowSnippet.startsWith(postSnippet.slice(0, 40)) || postSnippet.startsWith(rowSnippet.slice(0, 40)))) {
+      return { confidence: 'high', reason: 'Text match' };
+    }
+  }
+  // 3. Date + partial text match
+  if (rowData.date && rowData.text) {
+    const rowDate = rowData.date.slice(0, 10);
+    const postDate = (post.publishDate || post.date || '').slice(0, 10);
+    if (rowDate === postDate) {
+      const rowSnippet = normaliseText(rowData.text).slice(0, 30);
+      const postSnippet = normaliseText(post.post).slice(0, 30);
+      if (rowSnippet && postSnippet && rowSnippet === postSnippet) {
+        return { confidence: 'medium', reason: 'Date + text match' };
+      }
+    }
+  }
+  return null;
+}
+
+function normaliseUrl(url) {
+  if (!url) return '';
+  return url.split('?')[0].replace(/\/$/, '').toLowerCase();
+}
+
+function parseLinkedInXlsx(arrayBuffer) {
+  const wb = XLSX.read(arrayBuffer, { type: 'array' });
+
+  // Find TOP POSTS sheet (case-insensitive)
+  const topPostsSheetName = wb.SheetNames.find(n => /top\s*posts/i.test(n));
+  if (!topPostsSheetName) {
+    throw new Error('Could not find TOP POSTS sheet in the file. Make sure this is a LinkedIn analytics export.');
+  }
+
+  const sheet = wb.Sheets[topPostsSheetName];
+  const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
+
+  // Find header row (the one containing 'Post URL')
+  let headerRowIdx = -1;
+  for (let i = 0; i < Math.min(rows.length, 10); i++) {
+    if (rows[i].some(cell => typeof cell === 'string' && /post\s*url/i.test(cell))) {
+      headerRowIdx = i;
+      break;
+    }
+  }
+  if (headerRowIdx === -1) {
+    throw new Error('Could not find header row with Post URL in the TOP POSTS sheet.');
+  }
+
+  const headers = rows[headerRowIdx].map(c => (c || '').toString().trim());
+  // LinkedIn dual-column layout: left side (Post URL, Post publish date, Engagements) + right side (Post URL, Post publish date, Impressions)
+  // Find all matching column groups
+  const groups = [];
+  for (let i = 0; i < headers.length; i++) {
+    if (/post\s*url/i.test(headers[i])) {
+      const group = { urlIdx: i, dateIdx: -1, metricIdx: -1, metricName: '' };
+      // Look at next 2-3 cells for date and metric
+      for (let j = i + 1; j < Math.min(i + 4, headers.length); j++) {
+        if (/date/i.test(headers[j])) group.dateIdx = j;
+        else if (/engagement|impression|reaction|like|comment|share|repost|click|view/i.test(headers[j])) {
+          group.metricIdx = j;
+          group.metricName = headers[j].toLowerCase();
+        }
+      }
+      if (group.metricIdx >= 0) groups.push(group);
+    }
+  }
+
+  if (groups.length === 0) {
+    throw new Error('Could not find any metric columns in the TOP POSTS sheet.');
+  }
+
+  // Merge data by URL
+  const byUrl = {};
+  for (let i = headerRowIdx + 1; i < rows.length; i++) {
+    const row = rows[i];
+    for (const g of groups) {
+      const url = row[g.urlIdx];
+      if (!url || typeof url !== 'string') continue;
+      const normUrl = normaliseUrl(url);
+      if (!byUrl[normUrl]) {
+        byUrl[normUrl] = { url, date: null, impressions: null, reactions: null, comments: null, shares: null, clicks: null, engagements: null };
+      }
+      const entry = byUrl[normUrl];
+      if (g.dateIdx >= 0 && row[g.dateIdx] && !entry.date) {
+        entry.date = formatExcelDate(row[g.dateIdx]);
+      }
+      const value = row[g.metricIdx];
+      if (typeof value === 'number') {
+        if (/impression/.test(g.metricName)) entry.impressions = value;
+        else if (/engagement/.test(g.metricName)) entry.engagements = value;
+        else if (/reaction|like/.test(g.metricName)) entry.reactions = value;
+        else if (/comment/.test(g.metricName)) entry.comments = value;
+        else if (/share|repost/.test(g.metricName)) entry.shares = value;
+        else if (/click|view/.test(g.metricName)) entry.clicks = value;
+      }
+    }
+  }
+
+  return Object.values(byUrl).filter(e => e.url);
+}
+
+function formatExcelDate(val) {
+  if (val instanceof Date) {
+    return val.toISOString().split('T')[0];
+  }
+  if (typeof val === 'string') {
+    // Try parsing M/D/YYYY
+    const m = val.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (m) {
+      return `${m[3]}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`;
+    }
+    return val;
+  }
+  if (typeof val === 'number') {
+    // Excel serial date
+    const date = new Date((val - 25569) * 86400 * 1000);
+    return date.toISOString().split('T')[0];
+  }
+  return null;
+}
+
+function handleCsvFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  const isXlsx = /\.xlsx$/i.test(file.name);
+
+  reader.onload = (e) => {
+    try {
+      let rowsData = [];
+
+      if (isXlsx) {
+        if (typeof XLSX === 'undefined') {
+          alert('XLSX library failed to load. Please reload the page and try again.');
+          return;
+        }
+        rowsData = parseLinkedInXlsx(e.target.result);
+      } else {
+        // Plain CSV fallback
+        const csvRows = parseCsv(e.target.result);
+        if (csvRows.length < 2) {
+          alert('CSV is empty or invalid.');
+          return;
+        }
+        const headers = csvRows[0].map(h => h.trim());
+        const dateIdx = findColumn(headers, ['Date', 'Post publish date', 'Created date', 'Post date', 'Publication date']);
+        const urlIdx = findColumn(headers, ['Post URL', 'Post link', 'URL', 'Link']);
+        const imprIdx = findColumn(headers, ['Impressions']);
+        const reactIdx = findColumn(headers, ['Reactions', 'Likes']);
+        const commentIdx = findColumn(headers, ['Comments']);
+        const shareIdx = findColumn(headers, ['Reposts', 'Shares']);
+        const clickIdx = findColumn(headers, ['Clicks']);
+        const engIdx = findColumn(headers, ['Engagements', 'Engagement']);
+
+        if (imprIdx < 0 && reactIdx < 0 && commentIdx < 0 && engIdx < 0) {
+          alert('Could not find any metric columns in the CSV. Try the LinkedIn .xlsx export instead.');
+          return;
+        }
+
+        for (let i = 1; i < csvRows.length; i++) {
+          const row = csvRows[i];
+          rowsData.push({
+            url: urlIdx >= 0 ? (row[urlIdx] || '').trim() : '',
+            date: dateIdx >= 0 ? formatExcelDate((row[dateIdx] || '').trim()) : null,
+            impressions: imprIdx >= 0 ? parseInt((row[imprIdx] || '').replace(/[,\s]/g, ''), 10) || null : null,
+            reactions: reactIdx >= 0 ? parseInt((row[reactIdx] || '').replace(/[,\s]/g, ''), 10) || null : null,
+            comments: commentIdx >= 0 ? parseInt((row[commentIdx] || '').replace(/[,\s]/g, ''), 10) || null : null,
+            shares: shareIdx >= 0 ? parseInt((row[shareIdx] || '').replace(/[,\s]/g, ''), 10) || null : null,
+            clicks: clickIdx >= 0 ? parseInt((row[clickIdx] || '').replace(/[,\s]/g, ''), 10) || null : null,
+            engagements: engIdx >= 0 ? parseInt((row[engIdx] || '').replace(/[,\s]/g, ''), 10) || null : null,
+          });
+        }
+      }
+
+      const posts = loadPosts();
+      const matches = [];
+      const unmatched = [];
+
+      for (const rowData of rowsData) {
+        if (!rowData.url) continue;
+        const normRowUrl = normaliseUrl(rowData.url);
+
+        let matchedPost = null;
+        for (const post of posts) {
+          if (post.linkedinUrl && normaliseUrl(post.linkedinUrl) === normRowUrl) {
+            matchedPost = post;
+            break;
+          }
+        }
+
+        // Fallback: match by date if no URL match and only one post on that date
+        if (!matchedPost && rowData.date) {
+          const sameDay = posts.filter(p => (p.publishDate || p.date || '').slice(0, 10) === rowData.date);
+          if (sameDay.length === 1) {
+            matchedPost = sameDay[0];
+          }
+        }
+
+        if (matchedPost) {
+          matches.push({ post: matchedPost, rowData });
+        } else {
+          unmatched.push(rowData);
+        }
+      }
+
+      pendingImport = { matches, unmatched };
+      showImportModal();
+    } catch (err) {
+      alert('Failed to parse file: ' + err.message);
+    }
+  };
+
+  if (isXlsx) {
+    reader.readAsArrayBuffer(file);
+  } else {
+    reader.readAsText(file);
+  }
+  event.target.value = '';
+}
+
+function showImportModal() {
+  const summary = document.getElementById('import-summary');
+  const details = document.getElementById('import-details');
+
+  const matchCount = pendingImport.matches.length;
+  const unmatchedCount = pendingImport.unmatched.length;
+  summary.innerHTML = `<strong>${matchCount}</strong> posts matched. <strong>${unmatchedCount}</strong> rows could not be matched. Review and apply.`;
+
+  let html = '';
+  if (matchCount > 0) {
+    html += `<div style="font-family: Nunito, sans-serif; font-weight: 700; font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-top: 10px; margin-bottom: 6px;">Matched (${matchCount})</div>`;
+    pendingImport.matches.forEach(m => {
+      const preview = (m.post.post || '').split('\n')[0].slice(0, 60);
+      const r = m.rowData;
+      const stats = [];
+      if (r.impressions != null) stats.push(`${r.impressions} impr`);
+      if (r.engagements != null) stats.push(`${r.engagements} eng`);
+      if (r.reactions != null) stats.push(`${r.reactions} react`);
+      if (r.comments != null) stats.push(`${r.comments} comm`);
+      html += `<div style="padding: 6px 8px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; gap: 8px;">
+        <div style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escHtml(preview)}</div>
+        <div style="font-family: Nunito, sans-serif; font-weight: 700; color: var(--purple); flex-shrink: 0; font-size: 11px;">${stats.join(' · ')}</div>
+      </div>`;
+    });
+  }
+  if (unmatchedCount > 0) {
+    html += `<div style="font-family: Nunito, sans-serif; font-weight: 700; font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-top: 14px; margin-bottom: 6px;">Unmatched (${unmatchedCount})</div>`;
+    pendingImport.unmatched.forEach(u => {
+      const preview = (u.text || u.url || '').slice(0, 60);
+      html += `<div style="padding: 6px 8px; border-bottom: 1px solid var(--border); color: var(--text-muted);">${escHtml(preview)}</div>`;
+    });
+  }
+  details.innerHTML = html;
+  document.getElementById('import-modal').classList.add('show');
+}
+
+function closeImportModal() {
+  document.getElementById('import-modal').classList.remove('show');
+  pendingImport = null;
+}
+
+async function confirmImport() {
+  if (!pendingImport) return;
+  const posts = loadPosts();
+
+  for (const m of pendingImport.matches) {
+    const post = posts.find(p => p.id === m.post.id);
+    if (!post) continue;
+    const r = m.rowData;
+    if (r.impressions != null && !isNaN(r.impressions)) post.metrics.impressions = r.impressions;
+    if (r.reactions != null && !isNaN(r.reactions)) post.metrics.reactions = r.reactions;
+    if (r.comments != null && !isNaN(r.comments)) post.metrics.comments = r.comments;
+    if (r.shares != null && !isNaN(r.shares)) post.metrics.shares = r.shares;
+    if (r.clicks != null && !isNaN(r.clicks)) post.metrics.clicks = r.clicks;
+    // LinkedIn's "engagements" is total engagement count. Store as reactions if no breakdown is available.
+    if (r.engagements != null && !isNaN(r.engagements) && r.reactions == null) {
+      post.metrics.reactions = r.engagements;
+    }
+  }
+
+  savePosts(posts);
+  renderTracker();
+
+  // Re-sync updated posts to Notion if they have a Notion page ID
+  const toSync = pendingImport.matches
+    .map(m => posts.find(p => p.id === m.post.id))
+    .filter(p => p && p.notionPageId);
+
+  closeImportModal();
+
+  if (toSync.length > 0) {
+    let synced = 0;
+    for (const post of toSync) {
+      try {
+        await fetch('/api/notion-sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(post)
+        });
+        synced++;
+      } catch {}
+    }
+    alert(`Imported ${pendingImport ? 0 : toSync.length} matches. Synced ${synced} updates to Notion.`);
+  }
+}
+
+async function syncPostToNotion(postId) {
+  const posts = loadPosts();
+  const post = posts.find(p => p.id === postId);
+  if (!post) return;
+
+  try {
+    const res = await fetch('/api/notion-sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(post)
+    });
+    const data = await res.json();
+    if (data.success && data.pageId) {
+      post.notionPageId = data.pageId;
+      savePosts(posts);
+      renderTracker();
+      alert('Synced to Notion successfully.');
+    } else {
+      alert('Notion sync failed: ' + (data.error || 'Unknown error'));
+    }
+  } catch (e) {
+    alert('Notion sync failed: ' + e.message);
+  }
+}
+
+function deletePost(postId) {
+  if (!confirm('Delete this post from the tracker?')) return;
+  let posts = loadPosts();
+  posts = posts.filter(p => p.id !== postId);
+  savePosts(posts);
+  expandedId = null;
+  renderTracker();
+}
+
+// ── Analysis charts ──
+function renderAnalysis(withMetrics) {
+  const section = document.getElementById('analysis-section');
+  if (withMetrics.length < 3) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+
+  renderEngagementChart(withMetrics);
+  renderFormatChart(withMetrics);
+  renderThreadChart(withMetrics);
+  renderTopPerformers(withMetrics);
+}
+
+function renderEngagementChart(posts) {
+  const container = document.getElementById('chart-engagement');
+  const sorted = [...posts].sort((a, b) => (a.publishDate || a.date).localeCompare(b.publishDate || b.date));
+  const rates = sorted.map(p => ({ date: (p.publishDate || p.date).slice(5), rate: engagementRate(p.metrics) }));
+  if (rates.length < 2) { container.innerHTML = '<div class="empty-state">Need more data</div>'; return; }
+
+  const maxRate = Math.max(...rates.map(r => r.rate), 1);
+  const w = container.clientWidth || 400;
+  const h = 200;
+  const padL = 40, padR = 16, padT = 16, padB = 30;
+  const plotW = w - padL - padR;
+  const plotH = h - padT - padB;
+
+  const points = rates.map((r, i) => ({
+    x: padL + (rates.length === 1 ? plotW / 2 : (i / (rates.length - 1)) * plotW),
+    y: padT + plotH - (r.rate / maxRate) * plotH,
+    date: r.date,
+    rate: r.rate
+  }));
+
+  const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+  const dots = points.map(p => `<circle cx="${p.x}" cy="${p.y}" r="4" fill="var(--purple)" stroke="var(--surface)" stroke-width="2"><title>${p.date}: ${p.rate.toFixed(2)}%</title></circle>`).join('');
+
+  const yTicks = [0, maxRate / 2, maxRate].map(v => {
+    const y = padT + plotH - (v / maxRate) * plotH;
+    return `<text x="${padL - 6}" y="${y + 4}" text-anchor="end" fill="var(--text-muted)" font-size="10" font-family="Nunito">${v.toFixed(1)}%</text><line x1="${padL}" y1="${y}" x2="${w - padR}" y2="${y}" stroke="var(--border)" stroke-dasharray="3,3"/>`;
+  }).join('');
+
+  const xLabels = points.filter((_, i) => rates.length <= 10 || i % Math.ceil(rates.length / 8) === 0)
+    .map(p => `<text x="${p.x}" y="${h - 6}" text-anchor="middle" fill="var(--text-muted)" font-size="10" font-family="Nunito">${p.date}</text>`).join('');
+
+  container.innerHTML = `<svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}">
+    ${yTicks}${xLabels}
+    <path d="${line}" fill="none" stroke="var(--purple)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${dots}
+  </svg>`;
+}
+
+function renderFormatChart(posts) {
+  const container = document.getElementById('chart-format');
+  const byFormat = {};
+  posts.forEach(p => {
+    const f = p.format || 'auto';
+    if (!byFormat[f]) byFormat[f] = [];
+    byFormat[f].push(engagementRate(p.metrics));
+  });
+
+  const data = Object.entries(byFormat).map(([f, rates]) => ({
+    format: f,
+    avg: rates.reduce((a, b) => a + b, 0) / rates.length,
+    count: rates.length
+  })).sort((a, b) => b.avg - a.avg);
+
+  const maxAvg = Math.max(...data.map(d => d.avg), 1);
+
+  container.innerHTML = data.map(d => `
+    <div class="chart-bar-row">
+      <div class="chart-bar-label">${FORMAT_MAP[d.format] || d.format} (${d.count})</div>
+      <div class="chart-bar-track">
+        <div class="chart-bar-fill ${d.format}" style="width: ${(d.avg / maxAvg * 100).toFixed(0)}%">${d.avg.toFixed(2)}%</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderThreadChart(posts) {
+  const container = document.getElementById('chart-thread');
+  const byThread = {};
+  posts.filter(p => p.thread).forEach(p => {
+    if (!byThread[p.thread]) byThread[p.thread] = [];
+    byThread[p.thread].push(engagementRate(p.metrics));
+  });
+
+  if (Object.keys(byThread).length === 0) {
+    container.innerHTML = '<div class="empty-state" style="padding: 1rem;">Tag posts with a thread to see this chart.</div>';
+    return;
+  }
+
+  const data = Object.entries(byThread).map(([t, rates]) => ({
+    thread: t,
+    avg: rates.reduce((a, b) => a + b, 0) / rates.length,
+    count: rates.length
+  })).sort((a, b) => b.avg - a.avg);
+
+  const maxAvg = Math.max(...data.map(d => d.avg), 1);
+  const colours = { confidence: 'var(--purple)', cost: 'var(--sand)', both: 'var(--green)' };
+
+  container.innerHTML = data.map(d => `
+    <div class="chart-bar-row">
+      <div class="chart-bar-label">${THREAD_MAP[d.thread]} (${d.count})</div>
+      <div class="chart-bar-track">
+        <div class="chart-bar-fill" style="width: ${(d.avg / maxAvg * 100).toFixed(0)}%; background: ${colours[d.thread] || 'var(--purple)'}; ${d.thread === 'cost' ? 'color: var(--text-primary);' : ''}">${d.avg.toFixed(2)}%</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTopPerformers(posts) {
+  const container = document.getElementById('chart-top');
+  const sorted = [...posts].sort((a, b) => (engagementRate(b.metrics) || 0) - (engagementRate(a.metrics) || 0));
+  const top = sorted.slice(0, 3);
+
+  container.innerHTML = top.map((p, i) => `
+    <div class="top-row">
+      <div class="top-rank">${i + 1}</div>
+      <div class="top-preview">${escHtml(p.post.split('\n')[0])}</div>
+      <div class="top-rate">${fmtRate(engagementRate(p.metrics))}</div>
+      <div class="top-date">${p.publishDate || p.date}</div>
+    </div>
+  `).join('');
+}
+
+// ── Utility ──
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+function escAttr(str) {
+  return (str || '').replace(/"/g, '&quot;');
+}
+
+// ── Init ──
+updateApiKeyBtn();
+renderTracker();
+
+
+const ROUGHEN_PROMPT_LI = `The LinkedIn post below was generated by AI and sounds too polished. Rewrite it to sound more like a real person in Kenny Solway's voice. Keep the core message. Do NOT add new ideas.
+
+Apply Kenny's playbook:
+
+1. ADD REAL-LIFE FINGERPRINTS. Replace generic statements with specific details. Name the moment. Add a concrete example. Include a crisp opinion with a little edge.
+
+2. BREAK THE PERFECT RHYTHM. Mix short fragments with longer sentences. Use one purposeful sentence as a punchline. Do NOT write three-beat "short, longer, short" rhythms.
+
+3. USE SPOKEN VOICE. Swap formal phrasing for spoken phrasing. "It is important to recognise" becomes "Here's what most people miss". "In today's environment" becomes "Right now".
+
+4. SHARING TONE, NOT TEACHING TONE. Sound like you're sharing something you noticed, not presenting a lesson.
+
+5. ADD STRATEGIC IMPERFECTION. A sentence that starts with "And". A quick aside. A small admission.
+
+6. KEEP ONE THROUGH LINE. One dominant point.
+
+RULES (strict):
+- Canadian English (behaviour, organisation, favour, colour)
+- No em dashes anywhere
+- No emojis, no hashtags
+- Never reference IVF, fertility, pregnancy, surrogacy, or Kenny's wife's writing on those topics
+- No buzzwords (leverage, synergy, unlock)
+- Keep the same length range as the original (150 to 250 words)
+- Line breaks for mobile readability
+- Return only the rewritten post, no preamble, no explanation
+
+POST TO ROUGHEN:
+`;
+
+async function roughenPost() {
+  const textarea = document.getElementById('post-out');
+  if (!textarea) { alert('Post editor not found.'); return; }
+  const current = textarea.value;
+  if (!current.trim()) { alert('Nothing to roughen yet.'); return; }
+  const loader = document.getElementById('loader-3');
+  const err = document.getElementById('error-3');
+  if (err) err.style.display = 'none';
+  if (loader) { loader.querySelector('span').textContent = 'Roughening...'; loader.classList.add('show'); }
+  try {
+    const apiKey = (localStorage.getItem('goto11_api_key') || '').replace(/[^\x20-\x7E]/g, '').trim();
+    if (!apiKey) throw new Error('Add your Anthropic API key first.');
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        system: SYSTEM,
+        messages: [{ role: 'user', content: ROUGHEN_PROMPT_LI + current }],
+      }),
+    });
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      throw new Error(e?.error?.message || `API error (${res.status})`);
+    }
+    const data = await res.json();
+    textarea.value = data.content[0].text.trim();
+    if (typeof updateWC === 'function') updateWC();
+  } catch (e) {
+    if (err) { err.textContent = e.message; err.style.display = 'block'; }
+  } finally {
+    if (loader) loader.classList.remove('show');
+  }
+}
+
+</script>
+</body>
+</html>

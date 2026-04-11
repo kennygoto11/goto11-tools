@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>11 OS — Go To 11</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%239439bf'/><text x='16' y='23' font-family='Arial Black,sans-serif' font-size='16' font-weight='900' fill='white' text-anchor='middle'>11</text></svg>">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#9439bf;--lpurple:#bfb1c4;--sand:#f4d4b7;--grey:#66615c;
+  --bg:#fafafa;--card:#fff;--border:#e8e5e1;--radius:12px;
+  --sidebar-w:232px;--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --red:#e74c3c;--amber:#f39c12;--green:#27ae60;--blue:#3498db;
+}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:#1a1a1a;font-size:14px;line-height:1.5}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:var(--font);cursor:pointer;border:none;background:none;font-size:14px}
+input,textarea,select{font-family:var(--font);font-size:14px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;outline:none;width:100%;background:#fff}
+input:focus,textarea:focus,select:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(148,57,191,.1)}
+textarea{resize:vertical}
+
+/* Layout */
+.shell{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow-y:auto;overflow-x:hidden}
+.main{flex:1;overflow-y:auto;padding:32px 40px}
+
+/* Sidebar */
+.sb-logo{padding:20px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.sb-logo-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#9439bf,#6a1b9a);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;flex-shrink:0}
+.sb-logo-text{display:flex;flex-direction:column;line-height:1.2}
+.sb-logo-text span:first-child{font-weight:600;font-size:14px;color:#1a1a1a}
+.sb-logo-text span:last-child{font-size:11px;color:var(--grey);letter-spacing:.5px}
+.sb-section{padding:16px 0 4px}
+.sb-label{font-size:10px;font-weight:600;letter-spacing:1.2px;color:var(--grey);text-transform:uppercase;padding:0 16px 6px;display:flex;align-items:center;gap:6px;cursor:default}
+.sb-label.collapsible{cursor:pointer;user-select:none}
+.sb-label .chevron{font-size:9px;transition:transform .2s}
+.sb-label.collapsed .chevron{transform:rotate(-90deg)}
+.sb-nav{list-style:none}
+.sb-nav li a{display:flex;align-items:center;justify-content:space-between;padding:7px 16px;color:var(--grey);font-size:13px;font-weight:500;border-radius:0;transition:all .15s}
+.sb-nav li a:hover{background:#f5f0fa;color:var(--purple);text-decoration:none}
+.sb-nav li a.active{background:#f0e6f6;color:var(--purple);font-weight:600}
+.sb-badge{background:var(--purple);color:#fff;font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px;min-width:18px;text-align:center}
+.sb-user{margin-top:auto;padding:16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#6a1b9a);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.sb-user-info{line-height:1.2}
+.sb-user-info div:first-child{font-weight:600;font-size:13px}
+.sb-user-info div:last-child{font-size:11px;color:var(--grey)}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.page-title{font-size:22px;font-weight:700;margin-bottom:4px}
+.page-sub{color:var(--grey);font-size:13px;margin-bottom:24px}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px}
+.stat-card .label{font-size:12px;color:var(--grey);margin-bottom:4px}
+.stat-card .value{font-size:28px;font-weight:700;color:var(--purple)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:900px){.two-col{grid-template-columns:1fr}}
+.section-title{font-size:15px;font-weight:600;margin-bottom:12px}
+.list-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.list-item:last-child{border-bottom:none}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:8px;flex-shrink:0}
+.dot-red{background:var(--red)}.dot-amber{background:var(--amber)}.dot-green{background:var(--green)}.dot-blue{background:var(--blue)}
+.badge{font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px;white-space:nowrap}
+.badge-purple{background:#f0e6f6;color:var(--purple)}
+.badge-green{background:#e8f8f0;color:var(--green)}
+.badge-amber{background:#fef5e7;color:#c67c00}
+.badge-red{background:#fde8e8;color:var(--red)}
+.badge-blue{background:#eaf2fb;color:var(--blue)}
+.badge-grey{background:#f0efed;color:var(--grey)}
+.badge-gold{background:linear-gradient(135deg,#f6d365,#fda085);color:#5a3e00;font-weight:700}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;font-weight:600;font-size:13px;transition:all .15s}
+.btn-primary{background:var(--purple);color:#fff}.btn-primary:hover{background:#7b2fa3}
+.btn-secondary{background:#f0e6f6;color:var(--purple)}.btn-secondary:hover{background:#e4d4f0}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-outline{border:1px solid var(--border);color:var(--grey)}.btn-outline:hover{border-color:var(--purple);color:var(--purple)}
+.progress-bar{height:6px;background:#eee;border-radius:3px;overflow:hidden;margin-top:6px}
+.progress-bar .fill{height:100%;border-radius:3px;background:var(--purple);transition:width .3s}
+.tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:#f0efed;color:var(--grey)}
+.attention-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.attn-red{background:var(--red)}.attn-amber{background:var(--amber)}
+
+/* Pages */
+.page{display:none}.page.active{display:block}
+.attention-list .attn-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.attention-list .attn-item:last-child{border-bottom:none}
+.attention-list .attn-text{font-size:13px}
+.attention-list .attn-time{font-size:11px;color:var(--grey);margin-top:2px}
+
+/* To Get To 11 */
+.streak-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.streak-badge{background:#fff3e0;color:#e65100;font-weight:700;padding:4px 14px;border-radius:20px;font-size:14px}
+.quick-links{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+.quick-links a{display:inline-flex;align-items:center;gap:4px;padding:6px 14px;background:#fff;border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:500;color:var(--grey);transition:all .15s}
+.quick-links a:hover{border-color:var(--purple);color:var(--purple);text-decoration:none}
+.accordion{margin-bottom:16px}
+.accordion-header{display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-weight:600;font-size:14px;user-select:none;transition:all .15s}
+.accordion-header:hover{border-color:var(--purple)}
+.accordion-header .step-time{margin-left:auto;font-size:12px;font-weight:400;color:var(--grey)}
+.accordion-header .acc-chev{transition:transform .2s;font-size:10px;color:var(--grey)}
+.accordion.open .acc-chev{transform:rotate(90deg)}
+.accordion-body{display:none;padding:16px;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);background:#fff}
+.accordion.open .accordion-body{display:block}
+.accordion.open .accordion-header{border-radius:var(--radius) var(--radius) 0 0}
+.contact-card{background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.contact-card .cc-row{display:flex;gap:12px;margin-bottom:8px;align-items:center}
+.contact-card label{font-size:12px;font-weight:600;color:var(--grey);display:block;margin-bottom:4px}
+.toggle{position:relative;width:40px;height:22px;display:inline-block}
+.toggle input{opacity:0;width:0;height:0}
+.toggle .slider{position:absolute;top:0;left:0;right:0;bottom:0;background:#ccc;border-radius:22px;transition:.2s;cursor:pointer}
+.toggle .slider::before{content:"";position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.toggle input:checked+.slider{background:var(--purple)}
+.toggle input:checked+.slider::before{transform:translateX(18px)}
+.sent-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.sent-row:last-child{border-bottom:none}
+.celebration{display:none;text-align:center;padding:24px;background:linear-gradient(135deg,#f0e6f6,#fff3e0);border-radius:var(--radius);margin-top:16px}
+.celebration.show{display:block}
+.celebration h3{font-size:18px;margin-bottom:4px}
+.celebration p{color:var(--grey);font-size:13px}
+
+/* LinkedIn Writer */
+.format-selector{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.format-opt{padding:6px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;color:var(--grey)}
+.format-opt.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+.hook-card{padding:14px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s;margin-bottom:8px;background:#fff}
+.hook-card:hover{border-color:var(--purple)}
+.hook-card.selected{border-color:var(--purple);background:#f9f4fc;box-shadow:0 0 0 2px rgba(148,57,191,.15)}
+.writer-step{display:none}.writer-step.active{display:block}
+.word-count{font-size:12px;color:var(--grey);text-align:right;margin-top:4px}
+.api-loading{display:none;align-items:center;gap:8px;padding:12px;color:var(--grey);font-size:13px}
+.api-loading.show{display:flex}
+.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--purple);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Projects */
+.project-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.proj-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.proj-card h3{font-size:15px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.proj-meta{font-size:12px;color:var(--grey);margin-top:8px}
+.proj-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+
+/* Pipeline */
+.pipe-table{width:100%;border-collapse:collapse}
+.pipe-table th{text-align:left;font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;padding:8px 12px;border-bottom:2px solid var(--border)}
+.pipe-table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px}
+.pipe-table tr:hover td{background:#fafafa}
+
+/* Clients */
+.client-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.client-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.client-card h3{display:flex;align-items:center;gap:8px;font-size:15px;margin-bottom:12px}
+.client-detail{font-size:13px;color:var(--grey);margin-bottom:4px}
+
+/* IP Vault */
+.vault-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.vault-item:last-child{border-bottom:none}
+.vault-icon{width:40px;height:40px;border-radius:10px;background:#f0e6f6;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.vault-info h4{font-size:14px;font-weight:600;margin-bottom:2px}
+.vault-info span{font-size:12px;color:var(--grey)}
+
+/* Tools */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.tool-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.tool-card h3{font-size:15px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tool-card p{font-size:13px;color:var(--grey)}
+
+/* Placeholder */
+.placeholder-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:var(--grey)}
+.placeholder-page .ph-icon{font-size:48px;margin-bottom:12px;opacity:.3}
+.placeholder-page h2{font-size:18px;margin-bottom:4px;color:#1a1a1a}
+.placeholder-page p{font-size:13px}
+
+/* Comment Helper */
+.ch-form{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;display:flex;flex-direction:column;gap:20px}
+.ch-label{font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:block}
+.ch-input{width:100%;padding:12px 14px;background:#fff;border:1px solid var(--border);border-radius:10px;font-size:14px;color:#1a1a1a;font-family:var(--font);box-sizing:border-box;outline:none;transition:border-color .15s}
+.ch-input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(148,57,191,.1)}
+.ch-two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.ch-two-col{grid-template-columns:1fr}}
+.ch-output{margin-top:24px;background:var(--card);border:1.5px solid rgba(148,57,191,.13);border-radius:var(--radius);padding:28px}
+.ch-output-text{font-size:15px;line-height:1.7;color:#1a1a1a;margin:0;padding:16px 18px;background:#fafafa;border-radius:10px;border-left:3px solid var(--purple)}
+
+/* Email Outreach */
+.eo-lead-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.eo-lead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s}
+.eo-lead:hover{border-color:var(--purple)}
+.eo-lead.selected{border-color:var(--purple);background:#f9f4fc;box-shadow:0 0 0 2px rgba(148,57,191,.15)}
+.eo-lead-name{font-weight:600;font-size:14px}
+.eo-lead-meta{font-size:12px;color:var(--grey);margin-top:2px}
+.eo-step{display:none}.eo-step.active{display:block}
+.eo-research-box{padding:16px;background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;line-height:1.6;color:#1a1a1a;white-space:pre-wrap;max-height:300px;overflow-y:auto;margin-bottom:16px}
+.eo-email-box{font-size:14px;line-height:1.7;color:#1a1a1a;padding:20px;background:#fafafa;border-radius:10px;border-left:3px solid var(--purple);white-space:pre-wrap;margin-bottom:16px}
+.eo-subject{font-size:14px;font-weight:600;color:var(--purple);margin-bottom:12px}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#d0ccc7;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#b0aca7}
+
+/* Projects Tracker */
+.proj-filter-bar{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;margin-bottom:16px}
+.proj-filter-btn{padding:5px 12px;border-radius:20px;white-space:nowrap;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:transparent;color:var(--grey);transition:all .15s;font-family:var(--font)}
+.proj-filter-btn.active{border-color:var(--purple);background:rgba(148,57,191,0.08);color:var(--purple)}
+.proj-tracker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.proj-tracker-card{background:var(--card);border:0.5px solid var(--border);border-radius:0 var(--radius) var(--radius) 0;padding:18px 20px;display:flex;flex-direction:column;gap:12px;cursor:pointer;transition:border-color .15s}
+.proj-tracker-card:hover{border-color:var(--purple)}
+.proj-tracker-card.client-card-view{cursor:default}
+.proj-tracker-card.client-card-view:hover{border-color:var(--border)}
+.proj-status-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.proj-progress-bar{height:4px;background:#eee;border-radius:4px;overflow:hidden}
+.proj-progress-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.proj-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* Proposal Builder */
+.pb-step{display:none}.pb-step.active{display:block}
+.pb-form{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;display:flex;flex-direction:column;gap:20px}
+.pb-label{font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:block}
+.pb-input{width:100%;padding:12px 14px;background:#fff;border:1px solid var(--border);border-radius:10px;font-size:14px;color:#1a1a1a;font-family:var(--font);box-sizing:border-box;outline:none;transition:border-color .15s}
+.pb-input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(148,57,191,.1)}
+.pb-two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.pb-two-col{grid-template-columns:1fr}}
+.pb-output-box{font-size:13px;line-height:1.7;color:#1a1a1a;padding:20px;background:#fafafa;border-radius:10px;border-left:3px solid var(--purple);white-space:pre-wrap;max-height:500px;overflow-y:auto;margin-bottom:16px}
+.pb-section-label{font-size:10px;font-weight:600;color:var(--purple);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.pb-gap-list{background:#fef5e7;border:1px solid #fde68a;border-radius:10px;padding:16px 20px;font-size:13px;line-height:1.7;color:#92400e;margin-bottom:16px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">11</div>
+    <div class="sb-logo-text"><span>Go To 11</span><span>11 OS</span></div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">OPERATE</div>
+    <ul class="sb-nav">
+      <li><a href="#" data-page="mission-control" class="active">Mission Control <span class="sb-badge">3</span></a></li>
+      <li><a href="#" data-page="to-get-to-11">To Get To 11</a></li>
+      <li><a href="#" data-page="comment-helper">Comment Helper</a></li>
+      <li><a href="#" data-page="email-outreach">Email Outreach</a></li>
+      <li><a href="#" data-page="proposal-builder">Proposal Builder</a></li>
+      <li><a href="#" data-page="projects">Projects &amp; Builds</a></li>
+      <li><a href="#" data-page="pipeline">Pipeline <span class="sb-badge">5</span></a></li>
+      <li><a href="#" data-page="clients">Clients</a></li>
+    </ul>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">BUILD</div>
+    <ul class="sb-nav">
+      <li><a href="#" data-page="linkedin-writer">LinkedIn Writer</a></li>
+      <li><a href="#" data-page="li-dashboard">LI Dashboard</a></li>
+      <li><a href="#" data-page="newsletter-studio">Newsletter Studio</a></li>
+      <li><a href="#" data-page="content-lab">Content Lab</a></li>
+      <li><a href="#" data-page="offers">Offers &amp; Products</a></li>
+      <li><a href="#" data-page="ip-vault">IP Vault</a></li>
+    </ul>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">DEPLOY</div>
+    <ul class="sb-nav">
+      <li><a href="#" data-page="tools">Tools &amp; Apps</a></li>
+      <li><a href="#" data-page="masterclass-hub">Masterclass Hub</a></li>
+      <li><a href="#" data-page="pitch-builder">Pitch Builder</a></li>
+      <li><a href="#" data-page="network">Network</a></li>
+    </ul>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label collapsible" id="systemLabel">SYSTEM <span class="chevron">&#9654;</span></div>
+    <ul class="sb-nav" id="systemNav">
+      <li><a href="#" data-page="playbooks">Playbooks</a></li>
+      <li><a href="#" data-page="finance">Finance</a></li>
+    </ul>
+  </div>
+
+  <div class="sb-user">
+    <div class="sb-avatar">KS</div>
+    <div class="sb-user-info">
+      <div>Kenny Solway</div>
+      <div>Founder</div>
+    </div>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="main">
+
+<!-- Mission Control -->
+<div class="page active" id="page-mission-control">
+  <h1 class="page-title">Mission Control</h1>
+  <p class="page-sub">What needs your attention right now</p>
+
+  <div class="card" style="margin-bottom:24px">
+    <div class="section-title">Attention Items</div>
+    <div class="attention-list">
+      <div class="attn-item"><div class="attention-dot attn-red"></div><div><div class="attn-text">TechNova proposal follow-up overdue — 3 days since last contact</div><div class="attn-time">Pipeline · Contacted stage</div></div></div>
+      <div class="attn-item"><div class="attention-dot attn-amber"></div><div><div class="attn-text">Marcus Rivera skill build — deliverable due this week</div><div class="attn-time">Clients · Active engagement</div></div></div>
+      <div class="attn-item"><div class="attention-dot attn-amber"></div><div><div class="attn-text">LinkedIn Analyzer v2 — license pricing not finalized</div><div class="attn-time">Projects · 70% complete</div></div></div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="label">Active Projects</div><div class="value">6</div></div>
+    <div class="stat-card"><div class="label">Pipeline</div><div class="value">5</div></div>
+    <div class="stat-card"><div class="label">Clients</div><div class="value">3</div></div>
+    <div class="stat-card"><div class="label">Tools Built</div><div class="value">4</div></div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="section-title">Active Clients</div>
+      <div class="list-item"><div style="display:flex;align-items:center"><span class="dot dot-green"></span>Apex Solutions — Strategy Sprint</div><span class="badge badge-green">On Track</span></div>
+      <div class="list-item"><div style="display:flex;align-items:center"><span class="dot dot-amber"></span>Marcus Rivera — Skill Build</div><span class="badge badge-amber">Deliverable Due</span></div>
+      <div class="list-item"><div style="display:flex;align-items:center"><span class="dot dot-green"></span>Northvale Group — Exec Coaching</div><span class="badge badge-green">On Track</span></div>
+    </div>
+    <div class="card">
+      <div class="section-title">Pipeline Movement</div>
+      <div class="list-item"><div>Dana Park — Meridian Health</div><span class="badge badge-purple">Booked</span></div>
+      <div class="list-item"><div>Jordan Wei — CloudScale</div><span class="badge badge-blue">Replied</span></div>
+      <div class="list-item"><div>Sam Torres — TechNova</div><span class="badge badge-amber">Contacted</span></div>
+      <div class="list-item"><div>Alex Chen — BrightPath</div><span class="badge badge-grey">Researched</span></div>
+      <div class="list-item"><div>Morgan Ellis — FinEdge</div><span class="badge badge-grey">Researched</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- To Get To 11 -->
+<div class="page" id="page-to-get-to-11">
+  <h1 class="page-title">To Get To 11</h1>
+  <p class="page-sub">Daily 15-minute outreach brief</p>
+
+  <div class="streak-header">
+    <span style="color:var(--grey);font-size:13px" id="todayDate"></span>
+    <span class="streak-badge">&#128293; 2 Day Streak</span>
+  </div>
+
+  <div class="quick-links">
+    <a href="https://www.linkedin.com/notifications/" target="_blank">&#128276; Notifications</a>
+    <a href="https://www.linkedin.com/search/results/people/" target="_blank">&#128269; Find a Contact</a>
+    <a href="https://www.linkedin.com/search/results/content/?origin=FACETED_SEARCH&amp;sortBy=%5B%22date_posted%22%5D&amp;datePosted=%5B%22past-24h%22%5D&amp;postedBy=%5B%22first%22%5D" target="_blank">&#128197; Today 24h</a>
+    <a href="https://www.linkedin.com/search/results/content/?origin=FACETED_SEARCH&amp;sortBy=%5B%22date_posted%22%5D&amp;datePosted=%5B%22past-week%22%5D&amp;postedBy=%5B%22first%22%5D" target="_blank">&#128337; Catch-up 7d</a>
+    <a href="https://www.notion.so/goto11ca/165674c26436818383ace0fee24735d4?v=165674c264368185831a000ce8f05a40&amp;source=copy_link" target="_blank">&#128203; Active Leads</a>
+    <a href="https://www.notion.so/goto11ca/165674c264368185874cfd0198b1d832?v=16c674c264368077af4f000c9971364c&amp;source=copy_link" target="_blank">&#9745; My Tasks</a>
+    <a href="#" onclick="event.preventDefault();document.querySelectorAll('.sb-nav a').forEach(function(a){a.classList.remove('active')});document.querySelector('[data-page=&quot;comment-helper&quot;]').classList.add('active');document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});document.getElementById('page-comment-helper').classList.add('active');document.querySelector('.main').scrollTop=0;">&#128172; Comment Helper</a>
+    <a href="https://www.linkedin.com/mynetwork/invitation-manager/sent/" target="_blank">&#128233; Pending Invites</a>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="accordion open">
+    <div class="accordion-header" onclick="toggleAccordion(this)">
+      <span class="acc-chev">&#9654;</span>
+      Step 1: Scan for triggers
+      <span class="step-time">3 min</span>
+    </div>
+    <div class="accordion-body">
+      <p style="font-size:13px;color:var(--grey);margin-bottom:12px">Open LinkedIn notifications and feed. Flag anyone who posted, got promoted, changed roles, or engaged with your content.</p>
+      <label style="font-size:12px;font-weight:600;color:var(--grey);margin-bottom:6px;display:block">Flag names below</label>
+      <textarea id="flagNames" rows="3" placeholder="e.g. Dana Park posted about AI adoption, Jordan Wei liked my post..."></textarea>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="accordion">
+    <div class="accordion-header" onclick="toggleAccordion(this)">
+      <span class="acc-chev">&#9654;</span>
+      Step 2: Pick your three
+      <span class="step-time">2 min</span>
+    </div>
+    <div class="accordion-body">
+      <p style="font-size:13px;color:var(--grey);margin-bottom:16px">Choose 3 contacts to reach out to today. Mix trigger-based and relationship-based outreach.</p>
+      <div id="contactCards"></div>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="accordion">
+    <div class="accordion-header" onclick="toggleAccordion(this)">
+      <span class="acc-chev">&#9654;</span>
+      Step 3: Write and send
+      <span class="step-time">10 min</span>
+    </div>
+    <div class="accordion-body">
+      <p style="font-size:13px;color:var(--grey);margin-bottom:12px">Draft and send your 3 messages. Mark each as sent when done.</p>
+      <div id="sentTracker"></div>
+      <div class="celebration" id="celebration">
+        <h3>All 3 sent! &#127881;</h3>
+        <p>Streak extended. Come back tomorrow to keep it going.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LinkedIn Writer -->
+<div class="page" id="page-linkedin-writer">
+  <h1 class="page-title">LinkedIn Writer &amp; Analyst</h1>
+  <p class="page-sub">3-step post writer powered by Claude</p>
+
+  <!-- Step 1 -->
+  <div class="writer-step active" id="lw-step1">
+    <div class="card">
+      <div class="section-title">Step 1: Seed Your Idea</div>
+      <textarea id="seedIdea" rows="4" placeholder="What's on your mind? A client win, an observation, a hot take, a lesson learned..."></textarea>
+      <div class="format-selector" id="formatSelector">
+        <div class="format-opt active" data-fmt="auto">Auto</div>
+        <div class="format-opt" data-fmt="observation">Observation</div>
+        <div class="format-opt" data-fmt="contrarian">Contrarian Reframe</div>
+        <div class="format-opt" data-fmt="story">Story &#8594; Lesson</div>
+        <div class="format-opt" data-fmt="framework">Framework</div>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:12px;align-items:center">
+        <button class="btn btn-primary" onclick="generateHooks()">Generate Hooks</button>
+        <div class="api-loading" id="hookLoading"><div class="spinner"></div>Generating hooks...</div>
+      </div>
+      <div id="apiKeyPrompt" style="display:none;margin-top:12px">
+        <label style="font-size:12px;font-weight:600;color:var(--grey);display:block;margin-bottom:4px">Anthropic API Key</label>
+        <input type="password" id="apiKey" placeholder="sk-ant-..." style="margin-bottom:8px">
+        <p style="font-size:11px;color:var(--grey)">Stored in your browser only. Never sent anywhere except Anthropic's API.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="writer-step" id="lw-step2">
+    <div class="card">
+      <div class="section-title">Step 2: Choose Your Hook</div>
+      <p style="font-size:13px;color:var(--grey);margin-bottom:16px">Select the hook that hits hardest.</p>
+      <div id="hookOptions"></div>
+      <div style="margin-top:16px;display:flex;gap:12px;align-items:center">
+        <button class="btn btn-secondary" onclick="showWriterStep(1)">&#8592; Back</button>
+        <button class="btn btn-primary" onclick="writePost()">Write Post</button>
+        <div class="api-loading" id="postLoading"><div class="spinner"></div>Writing post...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="writer-step" id="lw-step3">
+    <div class="card">
+      <div class="section-title">Step 3: Edit &amp; Publish</div>
+      <textarea id="postOutput" rows="14" placeholder="Your post will appear here..."></textarea>
+      <div class="word-count" id="postWordCount"></div>
+      <div style="margin-top:16px;display:flex;gap:12px">
+        <button class="btn btn-secondary" onclick="showWriterStep(2)">&#8592; Back</button>
+        <button class="btn btn-secondary" onclick="regeneratePost()">Regenerate</button>
+        <button class="btn btn-primary" onclick="copyPost()">Copy to Clipboard</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Projects & Builds -->
+<div class="page" id="page-projects">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+    <div>
+      <h1 class="page-title">Projects &amp; Builds</h1>
+      <p class="page-sub" id="projViewSub">Everything in motion</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div style="display:flex;border:0.5px solid var(--border);border-radius:8px;overflow:hidden">
+        <button id="projMyViewBtn" onclick="setProjView(false)" style="padding:7px 13px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:var(--purple);color:#fff;font-family:var(--font)">My view</button>
+        <button id="projClientViewBtn" onclick="setProjView(true)" style="padding:7px 13px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--grey);font-family:var(--font)">Client view</button>
+      </div>
+      <button id="projAddBtn" onclick="projOpenForm('new')" style="padding:8px 14px;background:var(--purple);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font)">+ Add project</button>
+    </div>
+  </div>
+  <div class="stat-grid" id="projStats" style="margin-bottom:20px"></div>
+  <div class="proj-filter-bar" id="projFilterBar"></div>
+  <div id="projQuickCapture" style="margin-bottom:16px">
+    <input id="projQuickInput" placeholder="Got a new idea? Type it and press Enter to park it"
+      style="width:100%;padding:9px 14px;background:#fafafa;border:0.5px solid var(--border);border-radius:var(--radius);font-size:13px;color:#1a1a1a;font-family:var(--font);outline:none;box-sizing:border-box"
+      onkeydown="projQuickAdd(event)">
+  </div>
+  <div id="projClientBanner" style="display:none;padding:8px 0;margin-bottom:12px;align-items:center;gap:8px">
+    <span style="width:8px;height:8px;border-radius:50%;background:#f4d4b7;display:inline-block;flex-shrink:0"></span>
+    <span id="projClientBannerText" style="font-size:12px;font-weight:500;color:var(--grey)"></span>
+  </div>
+  <div id="projForm" style="display:none"></div>
+  <div id="projGrid"></div>
+</div>
+
+<!-- Pipeline -->
+<div class="page" id="page-pipeline">
+  <h1 class="page-title">Pipeline</h1>
+  <p class="page-sub">Prospects and deal stages</p>
+  <div class="card">
+    <table class="pipe-table">
+      <thead><tr><th>Contact</th><th>Company</th><th>Stage</th><th>Days in Stage</th><th></th></tr></thead>
+      <tbody>
+        <tr><td><strong>Dana Park</strong></td><td>Meridian Health</td><td><span class="badge badge-purple">Booked</span></td><td>1</td><td><a href="https://notion.so" target="_blank" class="btn btn-outline btn-sm">Open in Notion</a></td></tr>
+        <tr><td><strong>Jordan Wei</strong></td><td>CloudScale</td><td><span class="badge badge-blue">Replied</span></td><td>4</td><td><a href="https://notion.so" target="_blank" class="btn btn-outline btn-sm">Open in Notion</a></td></tr>
+        <tr><td><strong>Sam Torres</strong></td><td>TechNova</td><td><span class="badge badge-amber">Contacted</span></td><td>7</td><td><a href="https://notion.so" target="_blank" class="btn btn-outline btn-sm">Open in Notion</a></td></tr>
+        <tr><td><strong>Alex Chen</strong></td><td>BrightPath</td><td><span class="badge badge-grey">Researched</span></td><td>3</td><td><a href="https://notion.so" target="_blank" class="btn btn-outline btn-sm">Open in Notion</a></td></tr>
+        <tr><td><strong>Morgan Ellis</strong></td><td>FinEdge</td><td><span class="badge badge-grey">Researched</span></td><td>2</td><td><a href="https://notion.so" target="_blank" class="btn btn-outline btn-sm">Open in Notion</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Clients -->
+<div class="page" id="page-clients">
+  <h1 class="page-title">Clients</h1>
+  <p class="page-sub">Active engagements</p>
+  <div class="client-grid">
+    <div class="client-card">
+      <h3><span class="dot dot-green"></span>Apex Solutions</h3>
+      <div class="client-detail"><strong>Service:</strong> Strategy Sprint</div>
+      <div class="client-detail"><strong>Phase:</strong> Week 2 of 4 — Positioning</div>
+      <div class="client-detail"><strong>Next Session:</strong> April 14, 2026</div>
+      <div style="margin-top:12px"><a href="https://notion.so" target="_blank" class="btn btn-outline btn-sm">Open in Notion</a></div>
+    </div>
+    <div class="client-card">
+      <h3><span class="dot dot-amber"></span>Marcus Rivera</h3>
+      <div class="client-detail"><strong>Service:</strong> Skill Build</div>
+      <div class="client-detail"><strong>Phase:</strong> Deliverable review</div>
+      <div class="client-detail"><strong>Next Session:</strong> April 11, 2026</div>
+      <div style="margin-top:12px"><a href="https://notion.so" target="_blank" class="btn btn-outline btn-sm">Open in Notion</a></div>
+    </div>
+    <div class="client-card">
+      <h3><span class="dot dot-green"></span>Northvale Group</h3>
+      <div class="client-detail"><strong>Service:</strong> Executive Coaching</div>
+      <div class="client-detail"><strong>Phase:</strong> Monthly check-in</div>
+      <div class="client-detail"><strong>Next Session:</strong> April 22, 2026</div>
+      <div style="margin-top:12px"><a href="https://notion.so" target="_blank" class="btn btn-outline btn-sm">Open in Notion</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- IP Vault -->
+<div class="page" id="page-ip-vault">
+  <h1 class="page-title">IP Vault</h1>
+  <p class="page-sub">Proprietary frameworks and methodologies</p>
+  <div class="card">
+    <div class="vault-item">
+      <div class="vault-icon">&#9878;</div>
+      <div class="vault-info"><h4>Decision Acceleration Framework</h4><span>Methodology · <span class="badge badge-green">Documented</span></span></div>
+    </div>
+    <div class="vault-item">
+      <div class="vault-icon">&#9881;</div>
+      <div class="vault-info"><h4>To Get To 11 System</h4><span>Process · <span class="badge badge-green">Documented</span></span></div>
+    </div>
+    <div class="vault-item">
+      <div class="vault-icon">&#128203;</div>
+      <div class="vault-info"><h4>Strategy Sprint Format</h4><span>Service Blueprint · <span class="badge badge-green">Documented</span></span></div>
+    </div>
+    <div class="vault-item">
+      <div class="vault-icon">&#127919;</div>
+      <div class="vault-info"><h4>Positioning Pitch Builder</h4><span>Tool · <span class="badge badge-green">Documented</span></span></div>
+    </div>
+    <div class="vault-item">
+      <div class="vault-icon">&#128172;</div>
+      <div class="vault-info"><h4>Skill Build Methodology</h4><span>Service Blueprint · <span class="badge badge-green">Documented</span></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Tools & Apps -->
+<div class="page" id="page-tools">
+  <h1 class="page-title">Tools &amp; Apps</h1>
+  <p class="page-sub">Live tools built and deployed</p>
+  <div class="tools-grid">
+    <div class="tool-card">
+      <h3>Positioning Pitch Builder <span class="dot dot-green" title="Live"></span></h3>
+      <p>Interactive tool to frame and present your positioning to senior leadership</p>
+      <div style="margin-top:8px"><span class="badge badge-gold">LICENSABLE</span></div>
+    </div>
+    <div class="tool-card">
+      <h3>Gate Cost Calculator <span class="dot dot-green" title="Live"></span></h3>
+      <p>Calculate the true cost of decision gates and approval bottlenecks</p>
+    </div>
+    <div class="tool-card">
+      <h3>Comment Helper <span class="dot dot-green" title="Live"></span></h3>
+      <p>AI-powered LinkedIn comment generator for daily engagement</p>
+    </div>
+    <div class="tool-card">
+      <h3>LinkedIn Analyzer v2 <span class="dot dot-amber" title="In Progress"></span></h3>
+      <p>Post performance analysis with AI-driven improvement suggestions</p>
+      <div style="margin-top:8px"><span class="badge badge-gold">LICENSABLE</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Embedded tool pages -->
+<div class="page" id="page-li-dashboard">
+  <iframe src="goto11-li-post-dashboard.html" style="width:100%;height:calc(100vh - 32px);border:none;border-radius:var(--radius)"></iframe>
+</div>
+<div class="page" id="page-newsletter-studio">
+  <iframe src="goto11-newsletter-studio.html" style="width:100%;height:calc(100vh - 32px);border:none;border-radius:var(--radius)"></iframe>
+</div>
+<div class="page" id="page-masterclass-hub">
+  <iframe src="masterclass-dashboard.html" style="width:100%;height:calc(100vh - 32px);border:none;border-radius:var(--radius)"></iframe>
+</div>
+<div class="page" id="page-pitch-builder">
+  <iframe src="pitch-builder.html" style="width:100%;height:calc(100vh - 32px);border:none;border-radius:var(--radius)"></iframe>
+</div>
+
+<!-- Placeholder pages -->
+<div class="page" id="page-content-lab"><div class="placeholder-page"><div class="ph-icon">&#128218;</div><h2>Content Lab</h2><p>Coming soon</p></div></div>
+<div class="page" id="page-offers"><div class="placeholder-page"><div class="ph-icon">&#127873;</div><h2>Offers &amp; Products</h2><p>Coming soon</p></div></div>
+<!-- Comment Helper -->
+<div class="page" id="page-comment-helper">
+  <div style="max-width:640px">
+    <div style="font-size:10px;font-weight:600;color:var(--purple);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px">Go To 11 — Comment Helper</div>
+    <h1 class="page-title">Drop a post. Get a comment.</h1>
+    <p class="page-sub">Paste a LinkedIn post and get a sharp, on-brand comment in your voice. No fluff, no "Great post!" — just something worth saying.</p>
+
+    <div id="chApiKeyPrompt" style="display:none;margin-bottom:20px;padding:16px 20px;background:#fef5e7;border:1px solid #fde68a;border-radius:10px">
+      <label class="ch-label" style="color:#92400e">API Key Required</label>
+      <p style="font-size:13px;color:#92400e;margin-bottom:10px">Enter your Anthropic API key to use the Comment Helper. It's stored locally in your browser — never sent anywhere except Anthropic's API.</p>
+      <input type="password" id="chApiKey" class="ch-input" placeholder="sk-ant-..." style="margin-bottom:8px">
+      <button class="btn btn-primary btn-sm" onclick="saveChApiKey()">Save key</button>
+    </div>
+
+    <div class="ch-form">
+      <div>
+        <label class="ch-label">Post text *</label>
+        <textarea id="chPostText" class="ch-input" rows="7" placeholder="Paste the full text of the LinkedIn post you want to comment on." style="resize:vertical;min-height:140px;line-height:1.6"></textarea>
+      </div>
+      <div class="ch-two-col">
+        <div>
+          <label class="ch-label">Poster name <span style="opacity:.5;font-weight:400">(optional)</span></label>
+          <input id="chPosterName" class="ch-input" placeholder="e.g. Sarah Chen">
+        </div>
+        <div>
+          <label class="ch-label">Your angle <span style="opacity:.5;font-weight:400">(optional)</span></label>
+          <input id="chAngle" class="ch-input" placeholder="A point you want to make">
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;padding-top:4px">
+        <button id="chGenerate" class="btn btn-primary" style="flex:1;padding:13px 20px;font-size:14px;border-radius:10px" onclick="generateComment()">Draft comment</button>
+        <button class="btn btn-outline" style="padding:13px 20px;font-size:14px;border-radius:10px" onclick="clearComment()">Clear</button>
+      </div>
+    </div>
+
+    <div id="chError" style="display:none;margin-top:16px;padding:12px 16px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;font-size:13px;color:#dc2626"></div>
+
+    <div id="chOutput" class="ch-output" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <span style="font-size:11px;font-weight:600;color:var(--purple);text-transform:uppercase;letter-spacing:.6px">Your comment</span>
+        <span id="chCharCount" style="font-size:11px;color:var(--grey)"></span>
+      </div>
+      <p id="chCommentText" class="ch-output-text"></p>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button id="chCopy" class="btn btn-primary" style="flex:1;padding:11px 16px;font-size:13px;border-radius:10px" onclick="copyComment()">Copy comment</button>
+        <button class="btn btn-outline" style="padding:11px 16px;font-size:13px;border-radius:10px;border-color:var(--purple);color:var(--purple)" onclick="generateComment()">Try again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Email Outreach -->
+<div class="page" id="page-email-outreach">
+  <div style="max-width:700px">
+    <div style="font-size:10px;font-weight:600;color:var(--purple);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px">Go To 11 — Email Outreach</div>
+    <h1 class="page-title">Research. Draft. Send.</h1>
+    <p class="page-sub">Pull a lead from Notion, research them, and draft a personalised email in your voice.</p>
+
+    <!-- Step 1: Pick a lead -->
+    <div class="eo-step active" id="eo-step1">
+      <div class="ch-form">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <label class="ch-label" style="margin-bottom:0">Your leads</label>
+          <button class="btn btn-secondary btn-sm" onclick="loadLeads()">Refresh from Notion</button>
+        </div>
+        <div id="eoLeadList" class="eo-lead-list">
+          <p style="font-size:13px;color:var(--grey)">Click "Refresh from Notion" to pull your leads.</p>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:4px">
+          <label class="ch-label">Or enter manually</label>
+          <div class="ch-two-col">
+            <div>
+              <label class="ch-label">Name *</label>
+              <input id="eoName" class="ch-input" placeholder="e.g. Sasha Zito">
+            </div>
+            <div>
+              <label class="ch-label">Title &amp; Company</label>
+              <input id="eoTitle" class="ch-input" placeholder="e.g. VP HR, TransUnion">
+            </div>
+          </div>
+          <div class="ch-two-col" style="margin-top:12px">
+            <div>
+              <label class="ch-label">Email</label>
+              <input id="eoEmail" class="ch-input" placeholder="name@company.com">
+            </div>
+            <div>
+              <label class="ch-label">Your connection <span style="opacity:.5;font-weight:400">(filter)</span></label>
+              <input id="eoFilter" class="ch-input" placeholder="e.g. Previous client, met at event">
+            </div>
+          </div>
+        </div>
+        <div>
+          <label class="ch-label">Additional context <span style="opacity:.5;font-weight:400">(optional)</span></label>
+          <textarea id="eoContext" class="ch-input" rows="3" placeholder="Anything else you know. A recent post, a trigger event, what you want to say." style="resize:vertical;line-height:1.6"></textarea>
+        </div>
+        <button id="eoResearchBtn" class="btn btn-primary" style="width:100%;padding:13px 20px;font-size:14px;border-radius:10px" onclick="researchAndDraft()">Research &amp; Draft Email</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Research + Draft output -->
+    <div class="eo-step" id="eo-step2">
+      <div class="ch-form">
+        <div>
+          <label class="ch-label">Research summary</label>
+          <div id="eoResearch" class="eo-research-box"></div>
+        </div>
+        <div>
+          <label class="ch-label">Subject line</label>
+          <div id="eoSubject" class="eo-subject"></div>
+        </div>
+        <div>
+          <label class="ch-label">Email draft</label>
+          <div id="eoEmailDraft" class="eo-email-box"></div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-primary" style="flex:1;padding:11px 16px;font-size:13px;border-radius:10px" onclick="copyOutreachEmail()">Copy email</button>
+          <button class="btn btn-outline" style="padding:11px 16px;font-size:13px;border-radius:10px;border-color:var(--purple);color:var(--purple)" onclick="researchAndDraft()">Regenerate</button>
+          <button class="btn btn-outline" style="padding:11px 16px;font-size:13px;border-radius:10px" onclick="showEoStep(1)">Back</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="eoError" style="display:none;margin-top:16px;padding:12px 16px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;font-size:13px;color:#dc2626"></div>
+  </div>
+</div>
+
+<div class="page" id="page-network"><div class="placeholder-page"><div class="ph-icon">&#127760;</div><h2>Network</h2><p>Coming soon</p></div></div>
+<div class="page" id="page-playbooks"><div class="placeholder-page"><div class="ph-icon">&#128214;</div><h2>Playbooks</h2><p>Coming soon</p></div></div>
+<div class="page" id="page-finance"><div class="placeholder-page"><div class="ph-icon">&#128176;</div><h2>Finance</h2><p>Coming soon</p></div></div>
+
+
+<!-- Proposal Builder -->
+<div class="page" id="page-proposal-builder">
+  <div style="max-width:760px">
+    <div style="font-size:10px;font-weight:600;color:var(--purple);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px">Go To 11 — Proposal Builder</div>
+    <h1 class="page-title">Transcript to Proposal.</h1>
+    <p class="page-sub">Paste a meeting transcript or notes. Get a structured, client-ready Go To 11 proposal.</p>
+
+    <!-- Step 1: Paste transcript -->
+    <div class="pb-step active" id="pb-step1">
+      <div class="pb-form">
+        <div>
+          <label class="pb-label">Meeting transcript or notes *</label>
+          <textarea id="pbTranscript" class="pb-input" rows="12" placeholder="Paste the full transcript or your meeting notes here. The more context the better — names, titles, challenges described, scope hints, budget signals, timelines." style="resize:vertical;min-height:200px;line-height:1.6"></textarea>
+        </div>
+        <div class="pb-two-col">
+          <div>
+            <label class="pb-label">Client company name</label>
+            <input id="pbCompany" class="pb-input" placeholder="e.g. CIBC, Northvale Group">
+          </div>
+          <div>
+            <label class="pb-label">Primary contact</label>
+            <input id="pbContact" class="pb-input" placeholder="e.g. Dana Park, VP HR">
+          </div>
+        </div>
+        <div id="pbApiKeyPrompt" style="display:none;padding:16px 20px;background:#fef5e7;border:1px solid #fde68a;border-radius:10px">
+          <label class="pb-label" style="color:#92400e">API Key Required</label>
+          <p style="font-size:13px;color:#92400e;margin-bottom:10px">Enter your Anthropic API key to use the Proposal Builder.</p>
+          <input type="password" id="pbApiKey" class="pb-input" placeholder="sk-ant-..." style="margin-bottom:8px">
+          <button class="btn btn-primary btn-sm" onclick="savePbApiKey()">Save key</button>
+        </div>
+        <div style="display:flex;gap:10px;padding-top:4px">
+          <button id="pbExtractBtn" class="btn btn-primary" style="flex:1;padding:13px 20px;font-size:14px;border-radius:10px" onclick="pbExtract()">Extract &amp; Analyse</button>
+        </div>
+      </div>
+      <div id="pbError1" style="display:none;margin-top:16px;padding:12px 16px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;font-size:13px;color:#dc2626"></div>
+    </div>
+
+    <!-- Step 2: Review extraction + fill gaps -->
+    <div class="pb-step" id="pb-step2">
+      <div class="pb-form">
+        <div>
+          <div class="pb-section-label">What I found in the transcript</div>
+          <div id="pbExtraction" class="pb-output-box"></div>
+        </div>
+        <div id="pbGapsWrap" style="display:none">
+          <div class="pb-section-label">Gaps — answer these before I build the proposal</div>
+          <div id="pbGaps" class="pb-gap-list"></div>
+          <div>
+            <label class="pb-label">Your answers to the gaps above</label>
+            <textarea id="pbGapAnswers" class="pb-input" rows="5" placeholder="Answer each gap point. e.g. '1. 12 participants — all senior directors. 2. Start date mid-May. 3. Budget around $25k.'" style="resize:vertical;line-height:1.6"></textarea>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary" onclick="pbGoStep(1)">&#8592; Back</button>
+          <button id="pbBuildBtn" class="btn btn-primary" style="flex:1;padding:13px 20px;font-size:14px;border-radius:10px" onclick="pbBuild()">Build Proposal</button>
+        </div>
+      </div>
+      <div id="pbError2" style="display:none;margin-top:16px;padding:12px 16px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;font-size:13px;color:#dc2626"></div>
+    </div>
+
+    <!-- Step 3: Proposal output -->
+    <div class="pb-step" id="pb-step3">
+      <div class="pb-form">
+        <div>
+          <div class="pb-section-label">Gamma-ready proposal prompt</div>
+          <div id="pbProposalOut" class="pb-output-box"></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-primary" style="flex:1;padding:11px 16px;font-size:13px;border-radius:10px" onclick="pbCopy()">Copy proposal</button>
+          <a href="https://gamma.app" target="_blank" class="btn btn-secondary" style="padding:11px 16px;font-size:13px;border-radius:10px;text-decoration:none">Open Gamma &#8599;</a>
+          <button class="btn btn-outline" style="padding:11px 16px;font-size:13px;border-radius:10px" onclick="pbGoStep(1)">Start over</button>
+        </div>
+        <p style="font-size:12px;color:var(--grey);margin-top:4px">Copy the proposal text above, then paste it into Gamma as a prompt to generate the designed document.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+// Navigation
+document.querySelectorAll('.sb-nav a[data-page]').forEach(function(link) {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    var page = this.dataset.page;
+    document.querySelectorAll('.sb-nav a').forEach(function(a) { a.classList.remove('active'); });
+    this.classList.add('active');
+    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+    document.getElementById('page-' + page).classList.add('active');
+    document.querySelector('.main').scrollTop = 0;
+  });
+});
+
+// System section collapse
+var systemLabel = document.getElementById('systemLabel');
+var systemNav = document.getElementById('systemNav');
+systemLabel.addEventListener('click', function() {
+  systemLabel.classList.toggle('collapsed');
+  systemNav.style.display = systemLabel.classList.contains('collapsed') ? 'none' : '';
+});
+
+// Accordion
+function toggleAccordion(header) {
+  header.parentElement.classList.toggle('open');
+}
+
+// Today's date
+document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-CA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+// Contact cards for To Get To 11
+(function() {
+  var container = document.getElementById('contactCards');
+  for (var i = 1; i <= 3; i++) {
+    var div = document.createElement('div');
+    div.className = 'contact-card';
+    div.id = 'cc-' + i;
+    div.innerHTML =
+      '<div class="cc-row">' +
+        '<div style="flex:1"><label>Name</label><input type="text" placeholder="Contact name" class="cc-name"></div>' +
+        '<div style="width:160px"><label>Reason</label><select class="cc-reason"><option>Trigger</option><option>Filter</option><option>Relationship</option></select></div>' +
+        '<div style="display:flex;align-items:flex-end;gap:8px;padding-bottom:2px"><label style="margin-bottom:0">Connected</label><label class="toggle"><input type="checkbox"><span class="slider"></span></label></div>' +
+      '</div>' +
+      '<label>Context</label>' +
+      '<textarea rows="2" placeholder="Why this person today? What\'s the hook?" class="cc-context"></textarea>' +
+      '<div style="margin-top:8px;text-align:right"><button class="btn btn-secondary btn-sm" onclick="draftMessage(' + i + ')">Draft</button></div>';
+    container.appendChild(div);
+  }
+})();
+
+function draftMessage(i) {
+  var card = document.getElementById('cc-' + i);
+  var name = card.querySelector('.cc-name').value || 'Contact ' + i;
+  // Navigate to LinkedIn Writer page
+  document.querySelectorAll('.sb-nav a').forEach(function(a) { a.classList.remove('active'); });
+  document.querySelector('[data-page="linkedin-writer"]').classList.add('active');
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('page-linkedin-writer').classList.add('active');
+  document.getElementById('seedIdea').value = 'Outreach message for ' + name;
+  document.getElementById('seedIdea').focus();
+}
+
+// Sent tracker
+(function() {
+  var container = document.getElementById('sentTracker');
+  var sentCount = 0;
+  for (var i = 1; i <= 3; i++) {
+    var row = document.createElement('div');
+    row.className = 'sent-row';
+    row.innerHTML = '<span style="font-size:13px">Message ' + i + '</span><button class="btn btn-secondary btn-sm sent-btn">Mark as Sent</button>';
+    container.appendChild(row);
+  }
+  container.addEventListener('click', function(e) {
+    if (e.target.classList.contains('sent-btn') && !e.target.disabled) {
+      e.target.textContent = 'Sent \u2713';
+      e.target.disabled = true;
+      e.target.style.opacity = '.5';
+      sentCount++;
+      if (sentCount >= 3) document.getElementById('celebration').classList.add('show');
+    }
+  });
+})();
+
+// LinkedIn Writer
+var selectedFormat = 'auto';
+var selectedHook = null;
+var hooks = [];
+
+document.getElementById('formatSelector').addEventListener('click', function(e) {
+  if (!e.target.classList.contains('format-opt')) return;
+  document.querySelectorAll('.format-opt').forEach(function(o) { o.classList.remove('active'); });
+  e.target.classList.add('active');
+  selectedFormat = e.target.dataset.fmt;
+});
+
+function showWriterStep(n) {
+  document.querySelectorAll('.writer-step').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('lw-step' + n).classList.add('active');
+}
+
+function getApiKey() {
+  var key = localStorage.getItem('anthropic_api_key');
+  if (key) return key;
+  var input = document.getElementById('apiKey');
+  if (input.value && input.value.indexOf('sk-') === 0) {
+    localStorage.setItem('anthropic_api_key', input.value);
+    document.getElementById('apiKeyPrompt').style.display = 'none';
+    return input.value;
+  }
+  document.getElementById('apiKeyPrompt').style.display = 'block';
+  input.focus();
+  return null;
+}
+
+function callClaude(systemPrompt, userPrompt) {
+  var key = getApiKey();
+  if (!key) return Promise.resolve(null);
+  return fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }]
+    })
+  }).then(function(res) {
+    if (!res.ok) return res.json().then(function(err) { alert('API Error: ' + (err.error && err.error.message || res.statusText)); return null; });
+    return res.json().then(function(data) { return data.content[0].text; });
+  }).catch(function(e) { alert('Request failed: ' + e.message); return null; });
+}
+
+var SYSTEM_PROMPT = 'You are Kenny Solway\'s LinkedIn ghostwriter. Kenny is a Decision Acceleration Partner who helps VPs and directors frame and present their ideas so senior leadership says yes the first time. He\'s based in Toronto, runs Go To 11. His voice is direct, concrete, slightly irreverent, never corporate-speak. No jargon like "leverage", "synergy", or "unlock". Write like a smart friend who happens to be an expert.\n\nNever use em-dashes. Use commas, periods, or restructure the sentence instead.';
+
+function generateHooks() {
+  var idea = document.getElementById('seedIdea').value.trim();
+  if (!idea) { alert('Enter a seed idea first.'); return; }
+  var loader = document.getElementById('hookLoading');
+  loader.classList.add('show');
+  var formatHint = selectedFormat === 'auto' ? 'Pick the best format.' : 'Use the "' + selectedFormat + '" format.';
+  var userPrompt = 'Generate exactly 5 LinkedIn post hook options based on this idea: "' + idea + '"\n\n' + formatHint + '\n\nReturn ONLY a JSON array of 5 strings, each being a compelling opening line (1-2 sentences max). No markdown, no explanation, just the JSON array.';
+  callClaude(SYSTEM_PROMPT, userPrompt).then(function(result) {
+    loader.classList.remove('show');
+    if (!result) return;
+    try {
+      var parsed = result.trim();
+      if (parsed.indexOf('```') !== -1) parsed = parsed.replace(/```json?\n?/g, '').replace(/```/g, '');
+      hooks = JSON.parse(parsed);
+      var container = document.getElementById('hookOptions');
+      container.innerHTML = '';
+      hooks.forEach(function(hook, i) {
+        var div = document.createElement('div');
+        div.className = 'hook-card';
+        div.textContent = hook;
+        div.addEventListener('click', function() {
+          document.querySelectorAll('.hook-card').forEach(function(c) { c.classList.remove('selected'); });
+          div.classList.add('selected');
+          selectedHook = i;
+        });
+        container.appendChild(div);
+      });
+      showWriterStep(2);
+    } catch(e) { alert('Failed to parse hooks. Try again.'); }
+  });
+}
+
+function writePost() {
+  if (selectedHook === null) { alert('Select a hook first.'); return; }
+  var loader = document.getElementById('postLoading');
+  loader.classList.add('show');
+  var idea = document.getElementById('seedIdea').value.trim();
+  var hook = hooks[selectedHook];
+  var userPrompt = 'Write a LinkedIn post using this hook: "' + hook + '"\n\nOriginal idea: "' + idea + '"\n\nFormat: ' + selectedFormat + '\n\nRules:\n- 150-250 words\n- Short paragraphs (1-3 sentences each)\n- Line breaks between paragraphs\n- No hashtags\n- End with a question or provocative closer\n- Sound like a human, not a brand\n\nReturn ONLY the post text, no meta-commentary.';
+  callClaude(SYSTEM_PROMPT, userPrompt).then(function(result) {
+    loader.classList.remove('show');
+    if (!result) return;
+    document.getElementById('postOutput').value = result;
+    updateWordCount();
+    showWriterStep(3);
+  });
+}
+
+function regeneratePost() { writePost(); }
+
+function updateWordCount() {
+  var text = document.getElementById('postOutput').value;
+  var words = text.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('postWordCount').textContent = words + ' words \u00B7 ' + text.length + ' characters';
+}
+
+document.getElementById('postOutput').addEventListener('input', updateWordCount);
+
+function copyPost() {
+  var textarea = document.getElementById('postOutput');
+  navigator.clipboard.writeText(textarea.value).then(function() {
+    var btns = document.querySelectorAll('.btn-primary');
+    var btn = btns[btns.length - 1];
+    var orig = btn.innerHTML;
+    btn.innerHTML = 'Copied!';
+    setTimeout(function() { btn.innerHTML = orig; }, 1500);
+  });
+}
+
+// API key save on change
+document.getElementById('apiKey').addEventListener('change', function() {
+  if (this.value && this.value.indexOf('sk-') === 0) {
+    localStorage.setItem('anthropic_api_key', this.value);
+    document.getElementById('apiKeyPrompt').style.display = 'none';
+  }
+});
+
+// Comment Helper
+var COMMENT_SYSTEM_PROMPT = 'You are Kenny Solway\'s LinkedIn comment ghostwriter. Kenny is the founder of Go To 11, a Decision Acceleration Partner who helps leaders with executive presence, promotion readiness, revenue conversion, and high-stakes communication.\n\nYour job: write a short, sharp public LinkedIn comment (2-4 sentences max) that:\n- Directly references a specific idea, phrase, or claim from the original post. Pull a concrete detail and build on it, challenge it, or reframe it. The reader should immediately see the connection between the post and the comment.\n- Adds genuine value or a fresh angle. Bring a real-world example, a contrarian take, or a "yes, and" that extends their point somewhere unexpected.\n- Sounds like a real human, not a bot. Conversational, confident, occasionally witty.\n- Never kisses up, never uses hollow praise ("Great post!", "Love this!", "So true!")\n- Never asks a question at the end just to seem engaged\n- Positions Kenny as a peer who thinks critically, not a fan\n- Uses first person naturally\n- Matches the tone of the original post. Match casual with casual, serious with serious.\n- Never uses emojis or hashtags\n- Never uses em-dashes. Use commas, periods, or restructure the sentence instead.\n\nIf a poster name is provided, you may reference them naturally (first name only) but don\'t force it.\nIf an angle is provided, lean into that perspective.\n\nRespond with ONLY the comment text. No preamble, no quotes, no explanation.';
+
+function saveChApiKey() {
+  var val = document.getElementById('chApiKey').value.trim();
+  if (val && val.indexOf('sk-') === 0) {
+    localStorage.setItem('anthropic_api_key', val);
+    document.getElementById('chApiKeyPrompt').style.display = 'none';
+  }
+}
+
+// Show API key prompt on Comment Helper if no key stored
+(function() {
+  if (!localStorage.getItem('anthropic_api_key')) {
+    document.getElementById('chApiKeyPrompt').style.display = 'block';
+  }
+})();
+
+function generateComment() {
+  var postText = document.getElementById('chPostText').value.trim();
+  if (!postText) return;
+
+  var key = localStorage.getItem('anthropic_api_key');
+  if (!key) {
+    document.getElementById('chApiKeyPrompt').style.display = 'block';
+    document.getElementById('chApiKey').focus();
+    return;
+  }
+
+  var btn = document.getElementById('chGenerate');
+  btn.textContent = 'Writing...';
+  btn.disabled = true;
+  document.getElementById('chError').style.display = 'none';
+  document.getElementById('chOutput').style.display = 'none';
+
+  var userMsg = 'Here is the LinkedIn post to comment on:\n\n---\n' + postText + '\n---';
+  var posterName = document.getElementById('chPosterName').value.trim();
+  var angle = document.getElementById('chAngle').value.trim();
+  if (posterName) userMsg += '\n\nPoster\'s name: ' + posterName;
+  if (angle) userMsg += '\n\nAngle I want to take: ' + angle;
+
+  callClaude(COMMENT_SYSTEM_PROMPT, userMsg).then(function(result) {
+    btn.textContent = 'Draft comment';
+    btn.disabled = false;
+    if (!result) {
+      document.getElementById('chError').textContent = 'Something went wrong generating the comment. Try again.';
+      document.getElementById('chError').style.display = 'block';
+      return;
+    }
+    document.getElementById('chCommentText').textContent = result;
+    document.getElementById('chCharCount').textContent = result.length + ' chars';
+    document.getElementById('chOutput').style.display = 'block';
+    document.getElementById('chCopy').textContent = 'Copy comment';
+    document.getElementById('chCopy').style.background = 'var(--purple)';
+    document.getElementById('chCopy').style.color = '#fff';
+    document.getElementById('chCopy').style.border = 'none';
+  });
+}
+
+function copyComment() {
+  var text = document.getElementById('chCommentText').textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    var btn = document.getElementById('chCopy');
+    btn.textContent = 'Copied — go paste it';
+    btn.style.background = '#f0fdf4';
+    btn.style.color = '#16a34a';
+    btn.style.border = '1px solid #bbf7d0';
+    setTimeout(function() {
+      btn.textContent = 'Copy comment';
+      btn.style.background = 'var(--purple)';
+      btn.style.color = '#fff';
+      btn.style.border = 'none';
+    }, 2500);
+  });
+}
+
+function clearComment() {
+  document.getElementById('chPostText').value = '';
+  document.getElementById('chPosterName').value = '';
+  document.getElementById('chAngle').value = '';
+  document.getElementById('chOutput').style.display = 'none';
+  document.getElementById('chError').style.display = 'none';
+}
+
+// ===== EMAIL OUTREACH =====
+var OUTREACH_SYSTEM_PROMPT = 'You are drafting a personalised sales outreach email on behalf of Kenny Solway.\n\nWHO KENNY IS\nKenny is the founder of Go To 11 Communication Training (goto11.ca), based in Toronto. He helps VPs and directors frame and present their ideas so senior leadership says yes the first time. Two decades and 1,000+ pitches behind him. Past clients include Microsoft, CIBC, Bell, Pfizer, Canada Post, Kia, Labatt, Publicis, Toronto Raptors.\n\nHe is NOT a presentation coach, public speaking trainer, or motivational speaker. Never use that language.\n\nKENNY\'S CORE BELIEF\nThe problem usually isn\'t the idea. It\'s the moment you have to explain it. Communication is the performance layer that determines whether ideas move, wait, or die.\n\nVOICE\nReflective and observational. Warm but direct. Confident without arrogance. Concise. Short declarative sentences for emphasis, then a longer sentence to elaborate, then short again. Anti-hype. Understated. Let the insight carry the weight, not adjectives. Canadian English (behaviour, organisation, colour, favour).\n\nABSOLUTE RULES\n- Never use em dashes anywhere. Use periods, commas, colons, or restructure.\n- No emojis. No exclamation marks. No hashtags.\n- No "I hope this email finds you well." No "I came across your profile." No "Just wanted to reach out." No LinkedIn cliches.\n- Never pitch Go To 11 directly. Never include a CTA for a meeting. The goal is to start a conversation, not close a deal.\n- The recipient should feel observed accurately, not flattered generically.\n- If context is thin, write shorter rather than padding with fluff.\n\nYour task has TWO parts. You MUST complete both.\n\nPART 1: RESEARCH\nUsing everything you know about the person, their company, their industry, and any context provided, write a brief research summary (3 to 5 bullet points). Include: who they are, what their company is doing lately, and what would make this outreach timely or relevant.\n\nPART 2: DRAFT EMAIL\nUsing the research, draft a personalised email. Structure:\n1. Open with the specific connection or reason for writing. If there is a previous relationship, acknowledge it warmly without guilt about time passing.\n2. One to two sentences showing you actually know what is happening in their world. Reference something specific from research.\n3. One sentence connecting their situation to Kenny\'s lens (how things land in the room, decision velocity, clarity under pressure) but only if it fits naturally. Do not shoehorn it.\n4. Close with a genuine question about their world. No pitch, no meeting ask.\n5. Sign off with "Kenny" on its own line.\n\nLength: 80 to 150 words. Short paragraphs. No markdown formatting. Plain text only.\n\nOUTPUT FORMAT (follow exactly):\nRESEARCH:\n[bullet points]\n\nSUBJECT: [subject line, under 50 chars]\n\nEMAIL:\n[email body]\n\nNo other commentary. No preamble. No explanation.';
+
+var eoSelectedLead = null;
+
+
+function showEoStep(n) {
+  document.querySelectorAll('.eo-step').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('eo-step' + n).classList.add('active');
+}
+
+function loadLeads() {
+  var list = document.getElementById('eoLeadList');
+  list.innerHTML = '<p style="font-size:13px;color:var(--grey)">Loading leads from Notion...</p>';
+
+  fetch('/.netlify/functions/leads').then(function(res) {
+    if (!res.ok) throw new Error('Server error: ' + res.status);
+    return res.json();
+  }).then(function(leads) {
+    if (!leads || leads.length === 0) {
+      list.innerHTML = '<p style="font-size:13px;color:var(--grey)">No leads found in Notion. Use the manual form below.</p>';
+      return;
+    }
+    list.innerHTML = '';
+    leads.forEach(function(lead) {
+      var div = document.createElement('div');
+      div.className = 'eo-lead';
+      div.innerHTML = '<div><div class="eo-lead-name">' + escHtml(lead.name || 'Unknown') + '</div><div class="eo-lead-meta">' + escHtml(lead.title || '') + (lead.filter ? ' \u00B7 ' + escHtml(lead.filter) : '') + '</div></div><div style="text-align:right"><div style="font-size:12px;color:var(--grey)">' + escHtml(lead.email || 'No email') + '</div></div>';
+      div.addEventListener('click', function() {
+        document.querySelectorAll('.eo-lead').forEach(function(l) { l.classList.remove('selected'); });
+        div.classList.add('selected');
+        eoSelectedLead = lead;
+        document.getElementById('eoName').value = lead.name || '';
+        document.getElementById('eoTitle').value = lead.title || '';
+        document.getElementById('eoEmail').value = lead.email || '';
+        document.getElementById('eoFilter').value = lead.filter || '';
+      });
+      list.appendChild(div);
+    });
+  }).catch(function(e) {
+    list.innerHTML = '<p style="font-size:13px;color:#dc2626">Could not load leads: ' + escHtml(e.message) + '. Use the manual form below.</p>';
+  });
+}
+
+function plainText(prop) {
+  if (!prop) return '';
+  var arr = prop.title || prop.rich_text || [];
+  return arr.map(function(t) { return t.plain_text || ''; }).join('').trim();
+}
+
+function escHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function researchAndDraft() {
+  var name = document.getElementById('eoName').value.trim();
+  if (!name) { alert('Enter a contact name.'); return; }
+
+  var key = localStorage.getItem('anthropic_api_key');
+  if (!key) {
+    document.getElementById('chApiKeyPrompt').style.display = 'block';
+    document.getElementById('chApiKey').focus();
+    return;
+  }
+
+  var title = document.getElementById('eoTitle').value.trim();
+  var email = document.getElementById('eoEmail').value.trim();
+  var filter = document.getElementById('eoFilter').value.trim();
+  var context = document.getElementById('eoContext').value.trim();
+
+  var btn = document.getElementById('eoResearchBtn');
+  btn.textContent = 'Researching and drafting...';
+  btn.disabled = true;
+  document.getElementById('eoError').style.display = 'none';
+
+  var userMsg = 'Research and draft an outreach email for:\n\nName: ' + name;
+  if (title) userMsg += '\nTitle / Company: ' + title;
+  if (email) userMsg += '\nEmail: ' + email;
+  if (filter) userMsg += '\nKenny\'s connection to them: ' + filter;
+  if (context) userMsg += '\nAdditional context: ' + context;
+
+  callClaude(OUTREACH_SYSTEM_PROMPT, userMsg).then(function(result) {
+    btn.textContent = 'Research & Draft Email';
+    btn.disabled = false;
+    if (!result) {
+      document.getElementById('eoError').textContent = 'Something went wrong. Try again.';
+      document.getElementById('eoError').style.display = 'block';
+      return;
+    }
+
+    // Parse response
+    var research = '';
+    var subject = '';
+    var emailBody = '';
+
+    var researchMatch = result.match(/RESEARCH:\s*\n([\s\S]*?)(?=\nSUBJECT:)/i);
+    var subjectMatch = result.match(/SUBJECT:\s*(.+)/i);
+    var emailMatch = result.match(/EMAIL:\s*\n([\s\S]*)/i);
+
+    if (researchMatch) research = researchMatch[1].trim();
+    if (subjectMatch) subject = subjectMatch[1].trim();
+    if (emailMatch) emailBody = emailMatch[1].trim();
+
+    // Strip em dashes as belt-and-braces
+    emailBody = emailBody.replace(/[\u2014\u2013]/g, ',').replace(/\s{2,}/g, ' ');
+
+    document.getElementById('eoResearch').textContent = research || 'No research returned.';
+    document.getElementById('eoSubject').textContent = subject || 'No subject line.';
+    document.getElementById('eoEmailDraft').textContent = emailBody || result;
+
+    showEoStep(2);
+  });
+}
+
+function copyOutreachEmail() {
+  var subject = document.getElementById('eoSubject').textContent;
+  var body = document.getElementById('eoEmailDraft').textContent;
+  var full = 'Subject: ' + subject + '\n\n' + body;
+  navigator.clipboard.writeText(full).then(function() {
+    var btns = document.querySelectorAll('#eo-step2 .btn-primary');
+    var btn = btns[0];
+    btn.textContent = 'Copied!';
+    setTimeout(function() { btn.textContent = 'Copy email'; }, 2000);
+  });
+}
+
+// ===== PROJECTS TRACKER =====
+var PROJ_CATS = ["Sales","Content","Client Tools","Internal Ops","Client Projects"];
+var PROJ_STATUS_CFG = {
+  live:     { label:"Live",     bg:"#e8f8f0",               color:"#27ae60" },
+  building: { label:"Building", bg:"rgba(148,57,191,0.09)", color:"#9439bf" },
+  idea:     { label:"Idea",     bg:"#eaf2fb",               color:"#3498db" },
+  parked:   { label:"Parked",   bg:"#f0efed",               color:"#66615c" }
+};
+var PROJ_INITIAL = [
+  { id:"p1",  name:"11 HQ",                        subtitle:"Master Dashboard",   category:"Internal Ops",    status:"building", priority:1, progress:20, goal:"Central command hub for all Go To 11 tools. Internal ops view and client-facing portal.",                                                                                              url:null, tags:["infrastructure","flagship"], cv:false, cd:null },
+  { id:"p2",  name:"Outreach Message Builder",      subtitle:null,                 category:"Sales",           status:"live",     priority:1, progress:85, goal:"AI-powered personalised outbound messages. LinkedIn DMs and email. Relevance-led, proof-backed, prospect-specific.",                                                                  url:null, tags:["sales","AI"],              cv:true,  cd:"AI-powered outreach that opens doors. Personalised messages built around your prospect's world." },
+  { id:"p3",  name:"LinkedIn Post Creator",         subtitle:null,                 category:"Content",         status:"live",     priority:1, progress:90, goal:"Draft LinkedIn posts from seed idea to publish-ready, in your voice.",                                                                                                               url:null, tags:["content","LinkedIn"],     cv:true,  cd:"LinkedIn content that sounds like you. From idea to publish-ready in minutes." },
+  { id:"p4",  name:"LinkedIn Skill Builder",        subtitle:"Client Methodology", category:"Client Tools",    status:"live",     priority:2, progress:80, goal:"Build a custom LinkedIn content system for clients using the 4-step Harvest to Extract to Build to Produce methodology.",                                                            url:null, tags:["client","LinkedIn"],     cv:true,  cd:"A done-for-you LinkedIn content system built around your unique voice and audience." },
+  { id:"p5",  name:"Proposal Builder",              subtitle:null,                 category:"Sales",           status:"live",     priority:1, progress:80, goal:"Turn client meeting transcripts into polished Go To 11 proposals automatically.",                                                                                                     url:null, tags:["sales","client"],        cv:false, cd:null },
+  { id:"p6",  name:"Networking Coach",              subtitle:null,                 category:"Client Tools",    status:"live",     priority:2, progress:75, goal:"Help anyone network more effectively. Before, during, and after professional interactions.",                                                                                          url:null, tags:["coaching","client"],     cv:true,  cd:"Professional networking guidance from first contact to lasting relationships." },
+  { id:"p7",  name:"Skill Creator",                 subtitle:"Internal Tool",      category:"Internal Ops",    status:"live",     priority:2, progress:90, goal:"Build, modify, test, and package AI skill files for Claude. The engine behind every skill tool.",                                                                                     url:null, tags:["internal","AI"],         cv:false, cd:null },
+  { id:"p8",  name:"Sales Process Framework",       subtitle:"Pipeline Navigator", category:"Sales",           status:"building", priority:1, progress:40, goal:"Sequential pipeline tool from prospecting to account management. Tells you which tool to use at every stage.",                                                                       url:null, tags:["sales","pipeline"],     cv:true,  cd:"Your guided path from first contact to closed deal. The right tool at every step." },
+  { id:"p9",  name:"Prospector Tool",               subtitle:null,                 category:"Sales",           status:"building", priority:2, progress:15, goal:"Surface ideal-fit leads from LinkedIn and beyond before first touch.",                                                                                                               url:null, tags:["sales","leads"],        cv:false, cd:null },
+  { id:"p10", name:"Contact Audit & ICP Shortlist", subtitle:null,                 category:"Internal Ops",    status:"building", priority:2, progress:10, goal:"Audit contacts across Google, Notion, and Mailchimp. Score against ICP definition and surface top prospects.",                                                                       url:null, tags:["CRM","contacts"],        cv:false, cd:null },
+  { id:"p11", name:"Aiden's Record Database",       subtitle:null,                 category:"Client Projects", status:"idea",     priority:3, progress:0,  goal:"Personal vinyl/music record collection database. Browse, track, and organise a full library.",                                                                                       url:null, tags:["database","personal"],  cv:false, cd:null },
+  { id:"p12", name:"Aiden's Financial Hub",         subtitle:"Budget + Advisor",   category:"Client Projects", status:"idea",     priority:3, progress:0,  goal:"Personal budget tracker and financial advisor. Income, expenses, taxes, filing, and long-term financial strategy in one place.",                                                      url:null, tags:["finance","personal"],   cv:false, cd:null }
+];
+var projProjects = [];
+var projFilter = 'All';
+var projClientView = false;
+var projEditing = null;
+
+function projInit() {
+  try { var s = localStorage.getItem('gt11_projects_v1'); projProjects = s ? JSON.parse(s) : PROJ_INITIAL.map(function(p){return Object.assign({},p);}); }
+  catch(e) { projProjects = PROJ_INITIAL.map(function(p){return Object.assign({},p);}); }
+  projRender();
+}
+function projPersist() { try { localStorage.setItem('gt11_projects_v1', JSON.stringify(projProjects)); } catch(e) {} }
+function projCounts() {
+  return { total:projProjects.length, live:projProjects.filter(function(p){return p.status==='live';}).length, building:projProjects.filter(function(p){return p.status==='building';}).length, idea:projProjects.filter(function(p){return p.status==='idea';}).length, parked:projProjects.filter(function(p){return p.status==='parked';}).length };
+}
+function projVisible() {
+  return projProjects.filter(function(p) {
+    if (projClientView && !p.cv) return false;
+    if (projFilter==='All') return true;
+    if (['live','building','idea','parked'].indexOf(projFilter)!==-1) return p.status===projFilter;
+    return p.category===projFilter;
+  }).sort(function(a,b) {
+    var so={live:0,building:1,idea:2,parked:3};
+    if (a.priority!==b.priority) return a.priority-b.priority;
+    return (so[a.status]||9)-(so[b.status]||9);
+  });
+}
+function projRender() {
+  var c = projCounts();
+  var statsEl = document.getElementById('projStats');
+  if (statsEl) statsEl.innerHTML = [{label:'Total',value:c.total,color:'#1a1a1a'},{label:'Live',value:c.live,color:'#27ae60'},{label:'Building',value:c.building,color:'#9439bf'},{label:'Ideas',value:c.idea,color:'#3498db'}].map(function(s){return '<div class="stat-card"><div class="label">'+s.label+'</div><div class="value" style="color:'+s.color+'">'+s.value+'</div></div>';}).join('');
+  var fb = document.getElementById('projFilterBar');
+  if (fb) {
+    var tabs=[{key:'All',label:'All ('+c.total+')'},{key:'Sales',label:'Sales'},{key:'Content',label:'Content'},{key:'Client Tools',label:'Client Tools'},{key:'Internal Ops',label:'Internal Ops'},{key:'Client Projects',label:'Client Projects'},{key:'live',label:'Live ('+c.live+')'},{key:'building',label:'Building ('+c.building+')'},{key:'idea',label:'Ideas ('+c.idea+')'},{key:'parked',label:'Parked ('+c.parked+')'}];
+    fb.innerHTML = tabs.map(function(t){return '<button class="proj-filter-btn'+(projFilter===t.key?' active':'')+'" onclick="setProjFilter(\''+t.key.replace(/'/g,"\\'")+'\')">' +t.label+'</button>';}).join('');
+  }
+  var qc=document.getElementById('projQuickCapture'); if(qc) qc.style.display=projClientView?'none':'block';
+  var ab=document.getElementById('projAddBtn'); if(ab) ab.style.display=projClientView?'none':'inline-block';
+  var mb=document.getElementById('projMyViewBtn'); var cb=document.getElementById('projClientViewBtn');
+  if(mb){mb.style.background=projClientView?'transparent':'var(--purple)';mb.style.color=projClientView?'var(--grey)':'#fff';}
+  if(cb){cb.style.background=projClientView?'var(--purple)':'transparent';cb.style.color=projClientView?'#fff':'var(--grey)';}
+  var banner=document.getElementById('projClientBanner');
+  if(banner){var vis=projVisible();if(projClientView){banner.style.display='flex';document.getElementById('projClientBannerText').textContent='Client view active - '+vis.length+' client-facing project'+(vis.length!==1?'s':'');}else{banner.style.display='none';}}
+  var sub=document.getElementById('projViewSub'); if(sub) sub.textContent=projClientView?'Client-facing tools and deliverables':'Everything in motion';
+  var grid=document.getElementById('projGrid'); if(!grid) return;
+  var visible=projVisible();
+  if(visible.length===0){grid.innerHTML='<div style="text-align:center;padding:64px"><div style="font-size:15px;font-weight:500;color:var(--grey);margin-bottom:8px">Nothing here</div><div style="font-size:13px;color:#aaa">Try a different filter or add a new project.</div></div>';return;}
+  grid.innerHTML='<div class="proj-tracker-grid">'+visible.map(projCardHTML).join('')+'</div>';
+}
+function projCardHTML(p) {
+  var tags=Array.isArray(p.tags)?p.tags:(p.tags||'').split(',').map(function(t){return t.trim();}).filter(Boolean);
+  var goal=projClientView&&p.cd?p.cd:(p.goal||'');
+  var sc=PROJ_STATUS_CFG[p.status]||PROJ_STATUS_CFG.idea;
+  var bc=p.priority===1?'#9439bf':p.priority===2?'#bfb1c4':'#e8e5e1';
+  var fc=p.status==='live'?'#27ae60':p.status==='building'?'#9439bf':'#ccc';
+  var ca=projClientView?'':' onclick="projOpenForm(\''+p.id+'\')"';
+  var cc=projClientView?' client-card-view':'';
+  var tagsH=(!projClientView&&tags.length>0)?'<div style="display:flex;flex-wrap:wrap;gap:4px">'+tags.map(function(t){return '<span style="padding:2px 7px;border-radius:4px;background:#f0efed;color:var(--grey);font-size:10px;font-weight:500">'+escHtml(t)+'</span>';}).join('')+'</div>':'';
+  var progH=!projClientView?'<div><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:11px;color:var(--grey);font-weight:500">Progress</span><span style="font-size:11px;font-weight:500;color:#555">'+p.progress+'%</span></div><div class="proj-progress-bar"><div class="proj-progress-fill" style="width:'+p.progress+'%;background:'+fc+'"></div></div></div>':'';
+  var prioH=!projClientView?'<span style="font-size:10px;font-weight:500;color:'+(p.priority===1?'#9439bf':'var(--grey)')+'">P'+p.priority+'</span>':'';
+  var parkBtn=(p.status!=='parked')?'<button onclick="event.stopPropagation();projPark(\''+p.id+'\')" style="padding:4px 10px;font-size:11px;font-weight:500;border-radius:6px;border:0.5px solid var(--border);background:transparent;color:var(--grey);cursor:pointer;font-family:var(--font)">Park</button>':'<button onclick="event.stopPropagation();projOpenForm(\''+p.id+'\')" style="padding:4px 10px;font-size:11px;font-weight:500;border-radius:6px;border:0.5px solid #9439bf;background:transparent;color:#9439bf;cursor:pointer;font-family:var(--font)">Activate</button>';
+  var actH=!projClientView?parkBtn:'';
+  var urlH=p.url?'<a href="'+escHtml(p.url)+'" target="_blank" onclick="event.stopPropagation()" style="padding:4px 10px;font-size:11px;font-weight:500;border-radius:6px;background:#9439bf;color:#fff;text-decoration:none">Open</a>':'';
+  return '<div class="proj-tracker-card'+cc+'"'+ca+' style="border-left:3px solid '+bc+'">'+
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">'+
+      '<div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:500;color:#1a1a1a;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(p.name)+'</div>'+(p.subtitle?'<div style="font-size:10px;color:var(--grey);font-weight:500;text-transform:uppercase;letter-spacing:0.5px">'+escHtml(p.subtitle)+'</div>':'')+'</div>'+
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0"><span class="proj-status-badge" style="background:'+sc.bg+';color:'+sc.color+'"><span style="width:5px;height:5px;border-radius:50%;background:'+sc.color+';display:inline-block;flex-shrink:0"></span>'+sc.label+'</span>'+prioH+'</div>'+
+    '</div>'+
+    '<p style="font-size:13px;color:var(--grey);line-height:1.6;margin:0">'+escHtml(goal)+'</p>'+
+    progH+tagsH+
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:0.5px solid var(--border)" onclick="event.stopPropagation()">'+
+      '<span style="font-size:11px;color:var(--grey);font-weight:500">'+escHtml(p.category)+'</span>'+
+      '<div style="display:flex;gap:6px">'+actH+urlH+'</div>'+
+    '</div>'+
+  '</div>';
+}
+function setProjFilter(k){projFilter=k;projRender();}
+function setProjView(v){projClientView=v;if(projEditing){projEditing=null;document.getElementById('projForm').style.display='none';}projRender();}
+function projQuickAdd(e){if(e.key!=='Enter')return;var v=document.getElementById('projQuickInput').value.trim();if(!v)return;projProjects.unshift({id:'p'+Date.now(),name:v,subtitle:'',category:'Sales',status:'parked',priority:3,progress:0,goal:'',url:null,tags:[],cv:false,cd:null});projPersist();document.getElementById('projQuickInput').value='';projRender();}
+function projOpenForm(x){projEditing=x==='new'?'new':(projProjects.find(function(p){return p.id===x;})||null);if(!projEditing&&x!=='new')return;projRenderForm();document.getElementById('projForm').style.display='block';document.querySelector('.main').scrollTo({top:0,behavior:'smooth'});}
+function projCloseForm(){projEditing=null;document.getElementById('projForm').style.display='none';}
+function projToggleCd(){document.getElementById('pf-cd-wrap').style.display=document.getElementById('pf-cv').checked?'block':'none';}
+function projRenderForm(){
+  var isN=projEditing==='new';
+  var f=isN?{id:'',name:'',subtitle:'',category:'Sales',status:'idea',priority:2,progress:0,goal:'',url:'',tags:'',cv:false,cd:''}:Object.assign({},projEditing,{tags:Array.isArray(projEditing.tags)?projEditing.tags.join(', '):(projEditing.tags||'')});
+  var inp='width:100%;padding:8px 10px;background:#fafafa;border:0.5px solid var(--border);border-radius:8px;font-size:13px;color:#1a1a1a;font-family:var(--font);box-sizing:border-box;outline:none';
+  var lbl='font-size:11px;font-weight:500;color:var(--grey);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;display:block';
+  var cOpts=PROJ_CATS.map(function(c){return '<option value="'+c+'"'+(f.category===c?' selected':'')+'>'+c+'</option>';}).join('');
+  var sOpts=Object.keys(PROJ_STATUS_CFG).map(function(k){return '<option value="'+k+'"'+(f.status===k?' selected':'')+'>'+PROJ_STATUS_CFG[k].label+'</option>';}).join('');
+  var pOpts=[[1,'P1 - Critical'],[2,'P2 - Important'],[3,'P3 - Nice to have']].map(function(a){return '<option value="'+a[0]+'"'+(f.priority===a[0]?' selected':'')+'>'+a[1]+'</option>';}).join('');
+  document.getElementById('projForm').innerHTML=
+    '<div style="background:#fff;border:1px solid #9439bf;border-radius:var(--radius);padding:24px;margin-bottom:20px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:15px;font-weight:500">'+(isN?'Add project':'Edit - '+escHtml(f.name))+'</span><button onclick="projCloseForm()" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--grey)">x</button></div>'+
+    '<div class="proj-form-grid">'+
+    '<div style="grid-column:1/-1"><label style="'+lbl+'">Name *</label><input id="pf-name" style="'+inp+'" value="'+escHtml(f.name)+'" placeholder="What are you building?"></div>'+
+    '<div style="grid-column:1/-1"><label style="'+lbl+'">Subtitle</label><input id="pf-subtitle" style="'+inp+'" value="'+escHtml(f.subtitle||'')+'" placeholder="Optional tagline"></div>'+
+    '<div><label style="'+lbl+'">Category</label><select id="pf-cat" style="'+inp+'">'+cOpts+'</select></div>'+
+    '<div><label style="'+lbl+'">Status</label><select id="pf-status" style="'+inp+'">'+sOpts+'</select></div>'+
+    '<div><label style="'+lbl+'">Priority</label><select id="pf-priority" style="'+inp+'">'+pOpts+'</select></div>'+
+    '<div><label id="pf-prog-lbl" style="'+lbl+'">Progress - '+f.progress+'%</label><input type="range" id="pf-progress" min="0" max="100" step="5" value="'+f.progress+'" oninput="document.getElementById(\'pf-prog-lbl\').textContent=\'Progress - \'+this.value+\'%\'" style="width:100%;margin-top:8px;accent-color:#9439bf"></div>'+
+    '<div style="grid-column:1/-1"><label style="'+lbl+'">Objective</label><textarea id="pf-goal" style="'+inp+';min-height:72px;resize:vertical" placeholder="What is this trying to accomplish?">'+escHtml(f.goal||'')+'</textarea></div>'+
+    '<div><label style="'+lbl+'">URL (if live)</label><input id="pf-url" style="'+inp+'" value="'+escHtml(f.url||'')+'" placeholder="https://..."></div>'+
+    '<div><label style="'+lbl+'">Tags (comma-separated)</label><input id="pf-tags" style="'+inp+'" value="'+escHtml(f.tags||'')+'" placeholder="sales, AI, internal"></div>'+
+    '<div style="grid-column:1/-1"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="pf-cv"'+(f.cv?' checked':'')+' onchange="projToggleCd()" style="accent-color:#9439bf;width:15px;height:15px"><span style="'+lbl+';margin:0">Visible in client view</span></label></div>'+
+    '<div id="pf-cd-wrap" style="grid-column:1/-1;'+(f.cv?'':'display:none')+'"><label style="'+lbl+'">Client-facing description</label><textarea id="pf-cd" style="'+inp+';min-height:60px;resize:vertical" placeholder="How would you describe this to a client?">'+escHtml(f.cd||'')+'</textarea></div>'+
+    '</div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;border-top:0.5px solid var(--border);padding-top:16px;margin-top:16px">'+
+    '<div>'+(!isN?'<button onclick="projConfirmDelete(\''+f.id+'\')" style="padding:8px 14px;border-radius:8px;border:0.5px solid #e74c3c;background:transparent;color:#e74c3c;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font)">Remove project</button>':'')+'</div>'+
+    '<div style="display:flex;gap:8px"><button onclick="projCloseForm()" style="padding:8px 16px;border-radius:8px;border:0.5px solid var(--border);background:transparent;color:var(--grey);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font)">Cancel</button>'+
+    '<button onclick="projSaveForm(\''+escHtml(isN?'new':f.id)+'\')" style="padding:8px 20px;border-radius:8px;border:none;background:#9439bf;color:#fff;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font)">'+(isN?'Add project':'Save changes')+'</button></div>'+
+    '</div></div>';
+}
+function projSaveForm(x){
+  var name=document.getElementById('pf-name').value.trim();if(!name){alert('Project name is required.');return;}
+  var tags=document.getElementById('pf-tags').value.split(',').map(function(t){return t.trim();}).filter(Boolean);
+  var cv=document.getElementById('pf-cv').checked;
+  var p={id:x==='new'?'p'+Date.now():x,name:name,subtitle:document.getElementById('pf-subtitle').value.trim(),category:document.getElementById('pf-cat').value,status:document.getElementById('pf-status').value,priority:Number(document.getElementById('pf-priority').value),progress:Number(document.getElementById('pf-progress').value),goal:document.getElementById('pf-goal').value.trim(),url:document.getElementById('pf-url').value.trim()||null,tags:tags,cv:cv,cd:cv?document.getElementById('pf-cd').value.trim():null};
+  if(x==='new'){projProjects.unshift(p);}else{projProjects=projProjects.map(function(q){return q.id===p.id?p:q;});}
+  projPersist();projCloseForm();projRender();
+}
+function projConfirmDelete(id){var p=projProjects.find(function(x){return x.id===id;});if(p&&window.confirm('Remove "'+p.name+'"?')){projProjects=projProjects.filter(function(x){return x.id!==id;});projPersist();projCloseForm();projRender();}}
+function projPark(id){projProjects=projProjects.map(function(p){return p.id===id?Object.assign({},p,{status:'parked'}):p;});projPersist();projRender();}
+projInit();
+
+
+// ===== PROPOSAL BUILDER =====
+var PB_SYSTEM_PROMPT = 'You are the Go To 11 Proposal Builder — an expert system that transforms client meeting transcripts into structured, CFO-defensible proposals for Kenny Solway\'s executive communication coaching services.\n\nKENNY\'S POSITIONING:\n- Company: Go To 11\n- Name: Kenny Solway, Communication Strategist & Executive Coach\n- One-liner: Communication training that turns presentations into conversions\n- Methodology: Three Pillars — People (audience psychology), Process (repeatable frameworks), Delivery (presence through voice, pacing, posture, composure)\n- Core Framework — The Trust Multiplier: Preparation → Clarity → Confidence → Trust → Faster Approval. This is the throughline for every proposal.\n- AI component: AI-powered rehearsal platform with unlimited practice, timestamped feedback, progress tracking (SOC 2 Type II certified)\n- Contact: kennysolway@goto11.ca | (416) 433-9521 | goto11.ca\n\nVOICE AND TONE:\n- Warm and direct. Not corporate or salesy.\n- Confident without arrogance.\n- Client-centric — their challenge is the main character, not Kenny.\n- Mirror the client\'s own language from the transcript.\n- Outcome-focused — always tie back to business results.\n- Never use em dashes. Use commas, periods, or restructure.\n- No emojis. No exclamation marks.';
+
+function savePbApiKey() {
+  var val = document.getElementById('pbApiKey').value.trim();
+  if (val && val.indexOf('sk-') === 0) {
+    localStorage.setItem('anthropic_api_key', val);
+    document.getElementById('pbApiKeyPrompt').style.display = 'none';
+  }
+}
+
+(function() {
+  if (!localStorage.getItem('anthropic_api_key')) {
+    var prompt = document.getElementById('pbApiKeyPrompt');
+    if (prompt) prompt.style.display = 'block';
+  }
+})();
+
+function pbGoStep(n) {
+  document.querySelectorAll('.pb-step').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('pb-step' + n).classList.add('active');
+  document.querySelector('.main').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function pbExtract() {
+  var transcript = document.getElementById('pbTranscript').value.trim();
+  if (!transcript) { alert('Paste a transcript or meeting notes first.'); return; }
+
+  var key = localStorage.getItem('anthropic_api_key');
+  if (!key) { document.getElementById('pbApiKeyPrompt').style.display = 'block'; return; }
+
+  var btn = document.getElementById('pbExtractBtn');
+  btn.textContent = 'Analysing...';
+  btn.disabled = true;
+  document.getElementById('pbError1').style.display = 'none';
+
+  var company = document.getElementById('pbCompany').value.trim();
+  var contact = document.getElementById('pbContact').value.trim();
+
+  var userMsg = 'Analyse this meeting transcript and extract all relevant details for a Go To 11 proposal.\n\n';
+  if (company) userMsg += 'Client company: ' + company + '\n';
+  if (contact) userMsg += 'Primary contact: ' + contact + '\n';
+  userMsg += '\nTRANSCRIPT:\n' + transcript;
+  userMsg += '\n\nRespond in TWO clearly labelled sections:\n\nEXTRACTION:\nA structured summary of everything you found: client info, problem/context, scope signals, budget/logistics, success criteria. Note whether each item was explicitly stated, inferred, or missing.\n\nGAPS:\nA numbered list of the critical missing pieces that must be answered before building the proposal. If you have everything needed, write "No critical gaps — ready to build."';
+
+  callClaude(PB_SYSTEM_PROMPT, userMsg).then(function(result) {
+    btn.textContent = 'Extract & Analyse';
+    btn.disabled = false;
+    if (!result) {
+      document.getElementById('pbError1').textContent = 'Something went wrong. Try again.';
+      document.getElementById('pbError1').style.display = 'block';
+      return;
+    }
+    var extractionMatch = result.match(/EXTRACTION:\s*\n([\s\S]*?)(?=\nGAPS:)/i);
+    var gapsMatch = result.match(/GAPS:\s*\n([\s\S]*)/i);
+    var extraction = extractionMatch ? extractionMatch[1].trim() : result;
+    var gaps = gapsMatch ? gapsMatch[1].trim() : '';
+
+    document.getElementById('pbExtraction').textContent = extraction;
+    var gapsWrap = document.getElementById('pbGapsWrap');
+    if (gaps && gaps.toLowerCase().indexOf('no critical gaps') === -1) {
+      document.getElementById('pbGaps').textContent = gaps;
+      gapsWrap.style.display = 'block';
+    } else {
+      gapsWrap.style.display = 'none';
+    }
+    pbGoStep(2);
+  });
+}
+
+function pbBuild() {
+  var btn = document.getElementById('pbBuildBtn');
+  btn.textContent = 'Building proposal...';
+  btn.disabled = true;
+  document.getElementById('pbError2').style.display = 'none';
+
+  var extraction = document.getElementById('pbExtraction').textContent;
+  var gapAnswers = document.getElementById('pbGapAnswers').value.trim();
+  var company = document.getElementById('pbCompany').value.trim() || 'the client';
+  var contact = document.getElementById('pbContact').value.trim() || 'the contact';
+  var transcript = document.getElementById('pbTranscript').value.trim();
+
+  var userMsg = 'Build a full Go To 11 proposal using the following information.\n\nCLIENT: ' + company + '\nCONTACT: ' + contact + '\n\nEXTRACTED DETAILS:\n' + extraction;
+  if (gapAnswers) userMsg += '\n\nADDITIONAL DETAILS PROVIDED:\n' + gapAnswers;
+  userMsg += '\n\nORIGINAL TRANSCRIPT (for language mirroring):\n' + transcript.substring(0, 2000);
+
+  userMsg += '\n\nBuild a complete Gamma-ready proposal prompt with these 12 sections:\n1. Cover — client name, engagement title, date, Kenny\'s contact\n2. Executive Summary — 3-4 sentences capturing the core problem and Go To 11\'s solution\n3. Understanding of the Situation — mirror their language, name the business impact, include cost-of-inaction framing\n4. Objectives — 4-6 measurable outcomes tied to The Trust Multiplier chain\n5. Program Design — sessions, format, timeline, what each session covers\n6. The Trust Multiplier — explain the 5-stage chain and how this engagement moves them through it\n7. AI Rehearsal Platform — describe the platform and its role in the engagement\n8. What Success Looks Like — measurement approach, leading and lagging indicators\n9. About Go To 11 — Kenny\'s background, methodology, relevant client experience\n10. Testimonials — select 2-3 relevant testimonials from the library\n11. Investment — present pricing clearly with payment terms and what is included\n12. Next Steps — 2-3 clear, specific actions to move forward\n\nWrite in full prose. Warm, direct, client-centric. Mirror their language. No em dashes. No exclamation marks. Output the complete proposal text ready to paste into Gamma.';
+
+  callClaude(PB_SYSTEM_PROMPT, userMsg).then(function(result) {
+    btn.textContent = 'Build Proposal';
+    btn.disabled = false;
+    if (!result) {
+      document.getElementById('pbError2').textContent = 'Something went wrong. Try again.';
+      document.getElementById('pbError2').style.display = 'block';
+      return;
+    }
+    document.getElementById('pbProposalOut').textContent = result;
+    pbGoStep(3);
+  });
+}
+
+function pbCopy() {
+  var text = document.getElementById('pbProposalOut').textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    var btns = document.querySelectorAll('#pb-step3 .btn-primary');
+    var btn = btns[0];
+    btn.textContent = 'Copied!';
+    setTimeout(function() { btn.textContent = 'Copy proposal'; }, 2000);
+  });
+}
+
+</script>
+</body>
+</html>
