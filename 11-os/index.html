@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>11 OS — Go To 11</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAsUlEQVR4Ae3WMQqAMAxG4bz/oXoAN+9m7h7BjXsKguDiJdQEOrjoUJBIQskDQvs3DCk88k1qrc1MREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREZHdBUiDA7f+VuQAAAAASUVORK5CYII=">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -171,6 +172,28 @@ textarea{resize:vertical}
 .placeholder-page h2{font-size:18px;margin-bottom:4px;color:#1a1a1a}
 .placeholder-page p{font-size:13px}
 
+/* Comment Helper */
+.ch-form{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;display:flex;flex-direction:column;gap:20px}
+.ch-label{font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:block}
+.ch-input{width:100%;padding:12px 14px;background:#fff;border:1px solid var(--border);border-radius:10px;font-size:14px;color:#1a1a1a;font-family:var(--font);box-sizing:border-box;outline:none;transition:border-color .15s}
+.ch-input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(148,57,191,.1)}
+.ch-two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.ch-two-col{grid-template-columns:1fr}}
+.ch-output{margin-top:24px;background:var(--card);border:1.5px solid rgba(148,57,191,.13);border-radius:var(--radius);padding:28px}
+.ch-output-text{font-size:15px;line-height:1.7;color:#1a1a1a;margin:0;padding:16px 18px;background:#fafafa;border-radius:10px;border-left:3px solid var(--purple)}
+
+/* Email Outreach */
+.eo-lead-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.eo-lead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s}
+.eo-lead:hover{border-color:var(--purple)}
+.eo-lead.selected{border-color:var(--purple);background:#f9f4fc;box-shadow:0 0 0 2px rgba(148,57,191,.15)}
+.eo-lead-name{font-weight:600;font-size:14px}
+.eo-lead-meta{font-size:12px;color:var(--grey);margin-top:2px}
+.eo-step{display:none}.eo-step.active{display:block}
+.eo-research-box{padding:16px;background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;line-height:1.6;color:#1a1a1a;white-space:pre-wrap;max-height:300px;overflow-y:auto;margin-bottom:16px}
+.eo-email-box{font-size:14px;line-height:1.7;color:#1a1a1a;padding:20px;background:#fafafa;border-radius:10px;border-left:3px solid var(--purple);white-space:pre-wrap;margin-bottom:16px}
+.eo-subject{font-size:14px;font-weight:600;color:var(--purple);margin-bottom:12px}
+
 /* Scrollbar */
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -193,6 +216,8 @@ textarea{resize:vertical}
     <ul class="sb-nav">
       <li><a href="#" data-page="mission-control" class="active">Mission Control <span class="sb-badge">3</span></a></li>
       <li><a href="#" data-page="to-get-to-11">To Get To 11</a></li>
+      <li><a href="#" data-page="comment-helper">Comment Helper</a></li>
+      <li><a href="#" data-page="email-outreach">Email Outreach</a></li>
       <li><a href="#" data-page="projects">Projects &amp; Builds</a></li>
       <li><a href="#" data-page="pipeline">Pipeline <span class="sb-badge">5</span></a></li>
       <li><a href="#" data-page="clients">Clients</a></li>
@@ -293,7 +318,7 @@ textarea{resize:vertical}
     <a href="https://www.linkedin.com/search/results/content/?origin=FACETED_SEARCH&amp;sortBy=%5B%22date_posted%22%5D&amp;datePosted=%5B%22past-week%22%5D&amp;postedBy=%5B%22first%22%5D" target="_blank">&#128337; Catch-up 7d</a>
     <a href="https://www.notion.so/goto11ca/165674c26436818383ace0fee24735d4?v=165674c264368185831a000ce8f05a40&amp;source=copy_link" target="_blank">&#128203; Active Leads</a>
     <a href="https://www.notion.so/goto11ca/165674c264368185874cfd0198b1d832?v=16c674c264368077af4f000c9971364c&amp;source=copy_link" target="_blank">&#9745; My Tasks</a>
-    <a href="https://app.goto11.ca/comment-helper" target="_blank">&#128172; Comment Helper</a>
+    <a href="#" onclick="event.preventDefault();document.querySelectorAll('.sb-nav a').forEach(function(a){a.classList.remove('active')});document.querySelector('[data-page=&quot;comment-helper&quot;]').classList.add('active');document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});document.getElementById('page-comment-helper').classList.add('active');document.querySelector('.main').scrollTop=0;">&#128172; Comment Helper</a>
     <a href="https://www.linkedin.com/mynetwork/invitation-manager/sent/" target="_blank">&#128233; Pending Invites</a>
   </div>
 
@@ -547,6 +572,132 @@ textarea{resize:vertical}
 <!-- Placeholder pages -->
 <div class="page" id="page-content-lab"><div class="placeholder-page"><div class="ph-icon">&#128218;</div><h2>Content Lab</h2><p>Coming soon</p></div></div>
 <div class="page" id="page-offers"><div class="placeholder-page"><div class="ph-icon">&#127873;</div><h2>Offers &amp; Products</h2><p>Coming soon</p></div></div>
+<!-- Comment Helper -->
+<div class="page" id="page-comment-helper">
+  <div style="max-width:640px">
+    <div style="font-size:10px;font-weight:600;color:var(--purple);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px">Go To 11 — Comment Helper</div>
+    <h1 class="page-title">Drop a post. Get a comment.</h1>
+    <p class="page-sub">Paste a LinkedIn post and get a sharp, on-brand comment in your voice. No fluff, no "Great post!" — just something worth saying.</p>
+
+    <div id="chApiKeyPrompt" style="display:none;margin-bottom:20px;padding:16px 20px;background:#fef5e7;border:1px solid #fde68a;border-radius:10px">
+      <label class="ch-label" style="color:#92400e">API Key Required</label>
+      <p style="font-size:13px;color:#92400e;margin-bottom:10px">Enter your Anthropic API key to use the Comment Helper. It's stored locally in your browser — never sent anywhere except Anthropic's API.</p>
+      <input type="password" id="chApiKey" class="ch-input" placeholder="sk-ant-..." style="margin-bottom:8px">
+      <button class="btn btn-primary btn-sm" onclick="saveChApiKey()">Save key</button>
+    </div>
+
+    <div class="ch-form">
+      <div>
+        <label class="ch-label">Post text *</label>
+        <textarea id="chPostText" class="ch-input" rows="7" placeholder="Paste the full text of the LinkedIn post you want to comment on." style="resize:vertical;min-height:140px;line-height:1.6"></textarea>
+      </div>
+      <div class="ch-two-col">
+        <div>
+          <label class="ch-label">Poster name <span style="opacity:.5;font-weight:400">(optional)</span></label>
+          <input id="chPosterName" class="ch-input" placeholder="e.g. Sarah Chen">
+        </div>
+        <div>
+          <label class="ch-label">Your angle <span style="opacity:.5;font-weight:400">(optional)</span></label>
+          <input id="chAngle" class="ch-input" placeholder="A point you want to make">
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;padding-top:4px">
+        <button id="chGenerate" class="btn btn-primary" style="flex:1;padding:13px 20px;font-size:14px;border-radius:10px" onclick="generateComment()">Draft comment</button>
+        <button class="btn btn-outline" style="padding:13px 20px;font-size:14px;border-radius:10px" onclick="clearComment()">Clear</button>
+      </div>
+    </div>
+
+    <div id="chError" style="display:none;margin-top:16px;padding:12px 16px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;font-size:13px;color:#dc2626"></div>
+
+    <div id="chOutput" class="ch-output" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <span style="font-size:11px;font-weight:600;color:var(--purple);text-transform:uppercase;letter-spacing:.6px">Your comment</span>
+        <span id="chCharCount" style="font-size:11px;color:var(--grey)"></span>
+      </div>
+      <p id="chCommentText" class="ch-output-text"></p>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button id="chCopy" class="btn btn-primary" style="flex:1;padding:11px 16px;font-size:13px;border-radius:10px" onclick="copyComment()">Copy comment</button>
+        <button class="btn btn-outline" style="padding:11px 16px;font-size:13px;border-radius:10px;border-color:var(--purple);color:var(--purple)" onclick="generateComment()">Try again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Email Outreach -->
+<div class="page" id="page-email-outreach">
+  <div style="max-width:700px">
+    <div style="font-size:10px;font-weight:600;color:var(--purple);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px">Go To 11 — Email Outreach</div>
+    <h1 class="page-title">Research. Draft. Send.</h1>
+    <p class="page-sub">Pull a lead from Notion, research them, and draft a personalised email in your voice.</p>
+
+    <!-- Step 1: Pick a lead -->
+    <div class="eo-step active" id="eo-step1">
+      <div class="ch-form">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <label class="ch-label" style="margin-bottom:0">Your leads</label>
+          <button class="btn btn-secondary btn-sm" onclick="loadLeads()">Refresh from Notion</button>
+        </div>
+        <div id="eoLeadList" class="eo-lead-list">
+          <p style="font-size:13px;color:var(--grey)">Click "Refresh from Notion" to pull your leads.</p>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:4px">
+          <label class="ch-label">Or enter manually</label>
+          <div class="ch-two-col">
+            <div>
+              <label class="ch-label">Name *</label>
+              <input id="eoName" class="ch-input" placeholder="e.g. Sasha Zito">
+            </div>
+            <div>
+              <label class="ch-label">Title &amp; Company</label>
+              <input id="eoTitle" class="ch-input" placeholder="e.g. VP HR, TransUnion">
+            </div>
+          </div>
+          <div class="ch-two-col" style="margin-top:12px">
+            <div>
+              <label class="ch-label">Email</label>
+              <input id="eoEmail" class="ch-input" placeholder="name@company.com">
+            </div>
+            <div>
+              <label class="ch-label">Your connection <span style="opacity:.5;font-weight:400">(filter)</span></label>
+              <input id="eoFilter" class="ch-input" placeholder="e.g. Previous client, met at event">
+            </div>
+          </div>
+        </div>
+        <div>
+          <label class="ch-label">Additional context <span style="opacity:.5;font-weight:400">(optional)</span></label>
+          <textarea id="eoContext" class="ch-input" rows="3" placeholder="Anything else you know. A recent post, a trigger event, what you want to say." style="resize:vertical;line-height:1.6"></textarea>
+        </div>
+        <button id="eoResearchBtn" class="btn btn-primary" style="width:100%;padding:13px 20px;font-size:14px;border-radius:10px" onclick="researchAndDraft()">Research &amp; Draft Email</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Research + Draft output -->
+    <div class="eo-step" id="eo-step2">
+      <div class="ch-form">
+        <div>
+          <label class="ch-label">Research summary</label>
+          <div id="eoResearch" class="eo-research-box"></div>
+        </div>
+        <div>
+          <label class="ch-label">Subject line</label>
+          <div id="eoSubject" class="eo-subject"></div>
+        </div>
+        <div>
+          <label class="ch-label">Email draft</label>
+          <div id="eoEmailDraft" class="eo-email-box"></div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-primary" style="flex:1;padding:11px 16px;font-size:13px;border-radius:10px" onclick="copyOutreachEmail()">Copy email</button>
+          <button class="btn btn-outline" style="padding:11px 16px;font-size:13px;border-radius:10px;border-color:var(--purple);color:var(--purple)" onclick="researchAndDraft()">Regenerate</button>
+          <button class="btn btn-outline" style="padding:11px 16px;font-size:13px;border-radius:10px" onclick="showEoStep(1)">Back</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="eoError" style="display:none;margin-top:16px;padding:12px 16px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;font-size:13px;color:#dc2626"></div>
+  </div>
+</div>
+
 <div class="page" id="page-network"><div class="placeholder-page"><div class="ph-icon">&#127760;</div><h2>Network</h2><p>Coming soon</p></div></div>
 <div class="page" id="page-playbooks"><div class="placeholder-page"><div class="ph-icon">&#128214;</div><h2>Playbooks</h2><p>Coming soon</p></div></div>
 <div class="page" id="page-finance"><div class="placeholder-page"><div class="ph-icon">&#128176;</div><h2>Finance</h2><p>Coming soon</p></div></div>
@@ -691,7 +842,7 @@ function callClaude(systemPrompt, userPrompt) {
   }).catch(function(e) { alert('Request failed: ' + e.message); return null; });
 }
 
-var SYSTEM_PROMPT = 'You are Kenny Solway\'s LinkedIn ghostwriter. Kenny is a Decision Acceleration Partner who helps VPs and directors frame and present their ideas so senior leadership says yes the first time. He\'s based in Toronto, runs Go To 11. His voice is direct, concrete, slightly irreverent, never corporate-speak. No jargon like "leverage", "synergy", or "unlock". Write like a smart friend who happens to be an expert.';
+var SYSTEM_PROMPT = 'You are Kenny Solway\'s LinkedIn ghostwriter. Kenny is a Decision Acceleration Partner who helps VPs and directors frame and present their ideas so senior leadership says yes the first time. He\'s based in Toronto, runs Go To 11. His voice is direct, concrete, slightly irreverent, never corporate-speak. No jargon like "leverage", "synergy", or "unlock". Write like a smart friend who happens to be an expert.\n\nNever use em-dashes. Use commas, periods, or restructure the sentence instead.';
 
 function generateHooks() {
   var idea = document.getElementById('seedIdea').value.trim();
@@ -769,6 +920,218 @@ document.getElementById('apiKey').addEventListener('change', function() {
     document.getElementById('apiKeyPrompt').style.display = 'none';
   }
 });
+
+// Comment Helper
+var COMMENT_SYSTEM_PROMPT = 'You are Kenny Solway\'s LinkedIn comment ghostwriter. Kenny is the founder of Go To 11, a Decision Acceleration Partner who helps leaders with executive presence, promotion readiness, revenue conversion, and high-stakes communication.\n\nYour job: write a short, sharp public LinkedIn comment (2-4 sentences max) that:\n- Directly references a specific idea, phrase, or claim from the original post. Pull a concrete detail and build on it, challenge it, or reframe it. The reader should immediately see the connection between the post and the comment.\n- Adds genuine value or a fresh angle. Bring a real-world example, a contrarian take, or a "yes, and" that extends their point somewhere unexpected.\n- Sounds like a real human, not a bot. Conversational, confident, occasionally witty.\n- Never kisses up, never uses hollow praise ("Great post!", "Love this!", "So true!")\n- Never asks a question at the end just to seem engaged\n- Positions Kenny as a peer who thinks critically, not a fan\n- Uses first person naturally\n- Matches the tone of the original post. Match casual with casual, serious with serious.\n- Never uses emojis or hashtags\n- Never uses em-dashes. Use commas, periods, or restructure the sentence instead.\n\nIf a poster name is provided, you may reference them naturally (first name only) but don\'t force it.\nIf an angle is provided, lean into that perspective.\n\nRespond with ONLY the comment text. No preamble, no quotes, no explanation.';
+
+function saveChApiKey() {
+  var val = document.getElementById('chApiKey').value.trim();
+  if (val && val.indexOf('sk-') === 0) {
+    localStorage.setItem('anthropic_api_key', val);
+    document.getElementById('chApiKeyPrompt').style.display = 'none';
+  }
+}
+
+// Show API key prompt on Comment Helper if no key stored
+(function() {
+  if (!localStorage.getItem('anthropic_api_key')) {
+    document.getElementById('chApiKeyPrompt').style.display = 'block';
+  }
+})();
+
+function generateComment() {
+  var postText = document.getElementById('chPostText').value.trim();
+  if (!postText) return;
+
+  var key = localStorage.getItem('anthropic_api_key');
+  if (!key) {
+    document.getElementById('chApiKeyPrompt').style.display = 'block';
+    document.getElementById('chApiKey').focus();
+    return;
+  }
+
+  var btn = document.getElementById('chGenerate');
+  btn.textContent = 'Writing...';
+  btn.disabled = true;
+  document.getElementById('chError').style.display = 'none';
+  document.getElementById('chOutput').style.display = 'none';
+
+  var userMsg = 'Here is the LinkedIn post to comment on:\n\n---\n' + postText + '\n---';
+  var posterName = document.getElementById('chPosterName').value.trim();
+  var angle = document.getElementById('chAngle').value.trim();
+  if (posterName) userMsg += '\n\nPoster\'s name: ' + posterName;
+  if (angle) userMsg += '\n\nAngle I want to take: ' + angle;
+
+  callClaude(COMMENT_SYSTEM_PROMPT, userMsg).then(function(result) {
+    btn.textContent = 'Draft comment';
+    btn.disabled = false;
+    if (!result) {
+      document.getElementById('chError').textContent = 'Something went wrong generating the comment. Try again.';
+      document.getElementById('chError').style.display = 'block';
+      return;
+    }
+    document.getElementById('chCommentText').textContent = result;
+    document.getElementById('chCharCount').textContent = result.length + ' chars';
+    document.getElementById('chOutput').style.display = 'block';
+    document.getElementById('chCopy').textContent = 'Copy comment';
+    document.getElementById('chCopy').style.background = 'var(--purple)';
+    document.getElementById('chCopy').style.color = '#fff';
+    document.getElementById('chCopy').style.border = 'none';
+  });
+}
+
+function copyComment() {
+  var text = document.getElementById('chCommentText').textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    var btn = document.getElementById('chCopy');
+    btn.textContent = 'Copied — go paste it';
+    btn.style.background = '#f0fdf4';
+    btn.style.color = '#16a34a';
+    btn.style.border = '1px solid #bbf7d0';
+    setTimeout(function() {
+      btn.textContent = 'Copy comment';
+      btn.style.background = 'var(--purple)';
+      btn.style.color = '#fff';
+      btn.style.border = 'none';
+    }, 2500);
+  });
+}
+
+function clearComment() {
+  document.getElementById('chPostText').value = '';
+  document.getElementById('chPosterName').value = '';
+  document.getElementById('chAngle').value = '';
+  document.getElementById('chOutput').style.display = 'none';
+  document.getElementById('chError').style.display = 'none';
+}
+
+// ===== EMAIL OUTREACH =====
+var OUTREACH_SYSTEM_PROMPT = 'You are drafting a personalised sales outreach email on behalf of Kenny Solway.\n\nWHO KENNY IS\nKenny is the founder of Go To 11 Communication Training (goto11.ca), based in Toronto. He helps VPs and directors frame and present their ideas so senior leadership says yes the first time. Two decades and 1,000+ pitches behind him. Past clients include Microsoft, CIBC, Bell, Pfizer, Canada Post, Kia, Labatt, Publicis, Toronto Raptors.\n\nHe is NOT a presentation coach, public speaking trainer, or motivational speaker. Never use that language.\n\nKENNY\'S CORE BELIEF\nThe problem usually isn\'t the idea. It\'s the moment you have to explain it. Communication is the performance layer that determines whether ideas move, wait, or die.\n\nVOICE\nReflective and observational. Warm but direct. Confident without arrogance. Concise. Short declarative sentences for emphasis, then a longer sentence to elaborate, then short again. Anti-hype. Understated. Let the insight carry the weight, not adjectives. Canadian English (behaviour, organisation, colour, favour).\n\nABSOLUTE RULES\n- Never use em dashes anywhere. Use periods, commas, colons, or restructure.\n- No emojis. No exclamation marks. No hashtags.\n- No "I hope this email finds you well." No "I came across your profile." No "Just wanted to reach out." No LinkedIn cliches.\n- Never pitch Go To 11 directly. Never include a CTA for a meeting. The goal is to start a conversation, not close a deal.\n- The recipient should feel observed accurately, not flattered generically.\n- If context is thin, write shorter rather than padding with fluff.\n\nYour task has TWO parts. You MUST complete both.\n\nPART 1: RESEARCH\nUsing everything you know about the person, their company, their industry, and any context provided, write a brief research summary (3 to 5 bullet points). Include: who they are, what their company is doing lately, and what would make this outreach timely or relevant.\n\nPART 2: DRAFT EMAIL\nUsing the research, draft a personalised email. Structure:\n1. Open with the specific connection or reason for writing. If there is a previous relationship, acknowledge it warmly without guilt about time passing.\n2. One to two sentences showing you actually know what is happening in their world. Reference something specific from research.\n3. One sentence connecting their situation to Kenny\'s lens (how things land in the room, decision velocity, clarity under pressure) but only if it fits naturally. Do not shoehorn it.\n4. Close with a genuine question about their world. No pitch, no meeting ask.\n5. Sign off with "Kenny" on its own line.\n\nLength: 80 to 150 words. Short paragraphs. No markdown formatting. Plain text only.\n\nOUTPUT FORMAT (follow exactly):\nRESEARCH:\n[bullet points]\n\nSUBJECT: [subject line, under 50 chars]\n\nEMAIL:\n[email body]\n\nNo other commentary. No preamble. No explanation.';
+
+var eoSelectedLead = null;
+
+
+function showEoStep(n) {
+  document.querySelectorAll('.eo-step').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('eo-step' + n).classList.add('active');
+}
+
+function loadLeads() {
+  var list = document.getElementById('eoLeadList');
+  list.innerHTML = '<p style="font-size:13px;color:var(--grey)">Loading leads from Notion...</p>';
+
+  fetch('/.netlify/functions/leads').then(function(res) {
+    if (!res.ok) throw new Error('Server error: ' + res.status);
+    return res.json();
+  }).then(function(leads) {
+    if (!leads || leads.length === 0) {
+      list.innerHTML = '<p style="font-size:13px;color:var(--grey)">No leads found in Notion. Use the manual form below.</p>';
+      return;
+    }
+    list.innerHTML = '';
+    leads.forEach(function(lead) {
+      var div = document.createElement('div');
+      div.className = 'eo-lead';
+      div.innerHTML = '<div><div class="eo-lead-name">' + escHtml(lead.name || 'Unknown') + '</div><div class="eo-lead-meta">' + escHtml(lead.title || '') + (lead.filter ? ' \u00B7 ' + escHtml(lead.filter) : '') + '</div></div><div style="text-align:right"><div style="font-size:12px;color:var(--grey)">' + escHtml(lead.email || 'No email') + '</div></div>';
+      div.addEventListener('click', function() {
+        document.querySelectorAll('.eo-lead').forEach(function(l) { l.classList.remove('selected'); });
+        div.classList.add('selected');
+        eoSelectedLead = lead;
+        document.getElementById('eoName').value = lead.name || '';
+        document.getElementById('eoTitle').value = lead.title || '';
+        document.getElementById('eoEmail').value = lead.email || '';
+        document.getElementById('eoFilter').value = lead.filter || '';
+      });
+      list.appendChild(div);
+    });
+  }).catch(function(e) {
+    list.innerHTML = '<p style="font-size:13px;color:#dc2626">Could not load leads: ' + escHtml(e.message) + '. Use the manual form below.</p>';
+  });
+}
+
+function plainText(prop) {
+  if (!prop) return '';
+  var arr = prop.title || prop.rich_text || [];
+  return arr.map(function(t) { return t.plain_text || ''; }).join('').trim();
+}
+
+function escHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function researchAndDraft() {
+  var name = document.getElementById('eoName').value.trim();
+  if (!name) { alert('Enter a contact name.'); return; }
+
+  var key = localStorage.getItem('anthropic_api_key');
+  if (!key) {
+    document.getElementById('chApiKeyPrompt').style.display = 'block';
+    document.getElementById('chApiKey').focus();
+    return;
+  }
+
+  var title = document.getElementById('eoTitle').value.trim();
+  var email = document.getElementById('eoEmail').value.trim();
+  var filter = document.getElementById('eoFilter').value.trim();
+  var context = document.getElementById('eoContext').value.trim();
+
+  var btn = document.getElementById('eoResearchBtn');
+  btn.textContent = 'Researching and drafting...';
+  btn.disabled = true;
+  document.getElementById('eoError').style.display = 'none';
+
+  var userMsg = 'Research and draft an outreach email for:\n\nName: ' + name;
+  if (title) userMsg += '\nTitle / Company: ' + title;
+  if (email) userMsg += '\nEmail: ' + email;
+  if (filter) userMsg += '\nKenny\'s connection to them: ' + filter;
+  if (context) userMsg += '\nAdditional context: ' + context;
+
+  callClaude(OUTREACH_SYSTEM_PROMPT, userMsg).then(function(result) {
+    btn.textContent = 'Research & Draft Email';
+    btn.disabled = false;
+    if (!result) {
+      document.getElementById('eoError').textContent = 'Something went wrong. Try again.';
+      document.getElementById('eoError').style.display = 'block';
+      return;
+    }
+
+    // Parse response
+    var research = '';
+    var subject = '';
+    var emailBody = '';
+
+    var researchMatch = result.match(/RESEARCH:\s*\n([\s\S]*?)(?=\nSUBJECT:)/i);
+    var subjectMatch = result.match(/SUBJECT:\s*(.+)/i);
+    var emailMatch = result.match(/EMAIL:\s*\n([\s\S]*)/i);
+
+    if (researchMatch) research = researchMatch[1].trim();
+    if (subjectMatch) subject = subjectMatch[1].trim();
+    if (emailMatch) emailBody = emailMatch[1].trim();
+
+    // Strip em dashes as belt-and-braces
+    emailBody = emailBody.replace(/[\u2014\u2013]/g, ',').replace(/\s{2,}/g, ' ');
+
+    document.getElementById('eoResearch').textContent = research || 'No research returned.';
+    document.getElementById('eoSubject').textContent = subject || 'No subject line.';
+    document.getElementById('eoEmailDraft').textContent = emailBody || result;
+
+    showEoStep(2);
+  });
+}
+
+function copyOutreachEmail() {
+  var subject = document.getElementById('eoSubject').textContent;
+  var body = document.getElementById('eoEmailDraft').textContent;
+  var full = 'Subject: ' + subject + '\n\n' + body;
+  navigator.clipboard.writeText(full).then(function() {
+    var btns = document.querySelectorAll('#eo-step2 .btn-primary');
+    var btn = btns[0];
+    btn.textContent = 'Copied!';
+    setTimeout(function() { btn.textContent = 'Copy email'; }, 2000);
+  });
+}
 </script>
 </body>
 </html>
